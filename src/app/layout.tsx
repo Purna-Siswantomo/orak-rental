@@ -16,6 +16,10 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "Otak Rental — Jasa Konsultasi & Development Teknis",
   description: "Sewa otak buat ngerjain tugas & project teknis kamu — pricing transparan, formula terbuka, kerja profesional.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
