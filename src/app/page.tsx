@@ -562,8 +562,12 @@ export default function LandingPage() {
             {/* Col 1: Brand & Bio */}
             <div className="md:col-span-5">
               <Link href="/" className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#05100E] text-[#D4E751]">
-                  <ZentraEmblem className="h-4.5 w-4.5" color="#D4E751" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl overflow-hidden">
+                  <img 
+                    src="/logo-dark.png" 
+                    alt="Otak Rental Logo" 
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <span className="font-bold text-zinc-900 tracking-tight text-lg font-sans">
                   Otak Rental
