@@ -1,0 +1,88 @@
+// Prisma schema — Kalkulator Harga Order (admin-only, order dicatat manual)
+// Lihat PRD.md untuk latar belakang; implementasi ini sengaja disederhanakan dari PRD:
+// tanpa form publik, tanpa screening/disclosure otomatis, tanpa audit log —
+// admin yang menentukan kategori & memasukkan order secara manual.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum JobType {
+  TUGAS_MINGGUAN
+  TUBES
+  LAPORAN_MAGANG
+  KONSULTASI_ANALISIS_DATA
+  DEVELOPMENT_PROJECT
+  LAINNYA
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+enum ComplexityTierLabel {
+  LOW
+  MEDIUM
+  HIGH
+  EXPERT
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clientName    String
+  clientContact String?
+  jobType       JobType
+  notes         String?
+  deadline      DateTime
+
+  // Pricing — Harga = (Estimasi Jam x Rate Dasar) x Multiplier Urgensi x Multiplier Kompleksitas + Biaya Tambahan
+  estimatedHours       Float
+  baseRate             Float
+  urgencyMultiplier    Float
+  complexityTierLabel  ComplexityTierLabel
+  complexityMultiplier Float
+  additionalCost       Float @default(0)
+  totalPrice           Float
+  complexityChecklist  String? // JSON: { numFeatures, needsResearch, externalApiDependency, needsArchitectureDesign }
+  feasibilityWarning   String? // diisi kalau jam/hari kerja tidak realistis (>12 jam/hari efektif)
+
+  paymentStatus PaymentStatus @default(UNPAID)
+
+  @@index([clientName])
+}
+
+// Baseline jam per kategori, dapat dikonfigurasi admin
+model JobTypeBaseline {
+  jobType  JobType @id
+  minHours Float
+  maxHours Float
+}
+
+// Multiplier urgensi berdasarkan sisa hari ke deadline
+model UrgencyTier {
+  id         String  @id @default(cuid())
+  label      String
+  minDays    Int?
+  maxDays    Int?
+  multiplier Float
+  notLayak   Boolean @default(false)
+  sortOrder  Int
+}
+
+// Multiplier kompleksitas
+model ComplexityTier {
+  label         ComplexityTierLabel @id
+  minMultiplier Float
+  maxMultiplier Float
+}

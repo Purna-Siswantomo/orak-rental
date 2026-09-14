@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+/* Design tokens — Otak Rental: Tema Zentra Auto
+   Dual-theme: Deep forest dark (#05100E) & Warm sage light (#E8ECE9)
+   Accent: Neon Electric Lime (#D4E751)
+*/
+:root {
+  --background: #05100E;
+  --foreground: #FFFFFF;
+  --zentra-dark: #05100E;
+  --zentra-dark-surface: #0B1916;
+  --zentra-dark-card: rgba(255, 255, 255, 0.035);
+  --zentra-dark-border: rgba(255, 255, 255, 0.09);
+  --zentra-light: #E8ECE9;
+  --zentra-light-surface: #FFFFFF;
+  --zentra-light-border: #DCE3DF;
+  --zentra-accent: #D4E751;
+  --zentra-accent-hover: #C2D640;
+  --zentra-accent-text: #05100E;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth !important;
+  scroll-padding-top: 5.5rem;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+.font-serif-italic {
+  font-family: var(--font-serif), Georgia, Cambria, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Zentra subtle grid background */
+.zentra-grid-bg {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+}
+
+/* Zentra subtle radial hero glow */
+.zentra-hero-glow {
+  background: radial-gradient(ellipse 75% 60% at 50% 0%, rgba(212, 231, 81, 0.12) 0%, rgba(11, 25, 22, 0.45) 50%, transparent 100%);
+}
+
+.zentra-cta-glow {
+  background: radial-gradient(ellipse 70% 65% at 50% 50%, rgba(212, 231, 81, 0.14) 0%, rgba(5, 16, 14, 0.95) 80%);
+}
+
+/* Corner rivet screws effect for dark technical cards */
+.zentra-rivet-card {
+  position: relative;
+}
+.zentra-rivet-card::before,
+.zentra-rivet-card::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+}
+.zentra-rivet-card::before {
+  top: 10px;
+  left: 10px;
+}
+.zentra-rivet-card::after {
+  top: 10px;
+  right: 10px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #05100E;
+}
+::-webkit-scrollbar-thumb {
+  background: #1B352E;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D4E751;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

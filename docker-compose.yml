@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      # Override DATABASE_URL dari .env (yang isinya path host Windows) — di dalam container
+      # datanya ada di volume /app/data. ADMIN_USERNAME/ADMIN_PASSWORD/SESSION_SECRET tetap
+      # ikut dari .env lewat env_file di atas.
+      DATABASE_URL: "file:/app/data/dev.db"
+    volumes:
+      - harga_joki_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  harga_joki_data:
