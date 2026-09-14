@@ -45,3 +45,6 @@ next-env.d.ts
 # database lokal — berisi data klien (deskripsi order, dsb.), jangan pernah commit
 /prisma/*.db
 /prisma/*.db-journal
+
+.vercel
+.env*
