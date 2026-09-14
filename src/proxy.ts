@@ -27,4 +27,11 @@ export const config = {
     "/api/config",
     "/api/config/:path*",
   ],
+  // Exclude static files, images, fonts, etc
+  skipped: [
+    "/((?!api|admin).*)",
+    "/favicon.png",
+    "/manifest.json",
+    "/robots.txt",
+  ],
 };
