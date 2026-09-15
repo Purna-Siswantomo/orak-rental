@@ -17,8 +17,12 @@ export const metadata: Metadata = {
   title: "Otak Rental — Jasa Konsultasi & Development Teknis",
   description: "Sewa otak buat ngerjain tugas & project teknis kamu — pricing transparan, formula terbuka, kerja profesional.",
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
     shortcut: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
 };
 

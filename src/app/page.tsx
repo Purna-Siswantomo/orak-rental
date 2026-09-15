@@ -21,7 +21,6 @@ import {
   Terminal,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
-import { ZentraEmblem } from "@/components/icons/ZentraEmblem";
 import { CategoryBento } from "@/components/CategoryBento";
 import { InteractiveWorkflowShowcase } from "@/components/InteractiveWorkflowShowcase";
 import { InteractivePricingCalculator } from "@/components/InteractivePricingCalculator";
@@ -562,11 +561,11 @@ export default function LandingPage() {
             {/* Col 1: Brand & Bio */}
             <div className="md:col-span-5">
               <Link href="/" className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl overflow-hidden">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl overflow-hidden p-0.5">
                   <img 
-                    src="/logo-dark.png" 
+                    src="/logo-icon-dark.png" 
                     alt="Otak Rental Logo" 
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                   />
                 </div>
                 <span className="font-bold text-zinc-900 tracking-tight text-lg font-sans">

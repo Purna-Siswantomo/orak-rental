@@ -13,7 +13,7 @@ import {
   Zap,
   ArrowRight,
 } from "lucide-react";
-import { ZentraEmblem } from "@/components/icons/ZentraEmblem";
+import Image from "next/image";
 
 type WorkflowStage = "intake" | "formula" | "quality" | "delivery";
 
@@ -302,15 +302,22 @@ export function InteractiveWorkflowShowcase() {
 
               {/* Central spinning emblem badge */}
               <motion.div
-                whileHover={{ scale: 1.08, rotate: 90 }}
+                whileHover={{ scale: 1.08 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="relative flex h-14 sm:h-16 w-14 sm:w-16 items-center justify-center rounded-2xl border border-white/20 bg-[#0B1E1A] shadow-xl text-[#D4E751] zentra-rivet-card cursor-pointer"
+                className="relative flex h-14 sm:h-16 w-14 sm:w-16 items-center justify-center rounded-2xl border border-white/20 bg-[#0B1E1A] shadow-xl zentra-rivet-card cursor-pointer p-2 overflow-hidden"
               >
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                  className="h-full w-full"
                 >
-                  <ZentraEmblem className="h-7 sm:h-8 w-7 sm:w-8" color="#D4E751" />
+                  <Image
+                    src="/logo-icon.png"
+                    alt="Otak Rental"
+                    width={56}
+                    height={56}
+                    className="h-full w-full object-contain"
+                  />
                 </motion.div>
               </motion.div>
             </div>

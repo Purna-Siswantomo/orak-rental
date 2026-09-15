@@ -14,7 +14,7 @@ import {
   ShieldCheck,
   MessageCircle,
 } from "lucide-react";
-import { ZentraEmblem } from "@/components/icons/ZentraEmblem";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const WHATSAPP_LINK = "https://wa.me/6288221401935";
@@ -62,11 +62,18 @@ function PublicHeader() {
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <motion.div
-              whileHover={{ rotate: 90, scale: 1.08 }}
+              whileHover={{ scale: 1.1 }}
               transition={{ type: "spring", stiffness: 300, damping: 18 }}
-              className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-[#D4E751]"
+              className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 border border-white/10 p-1 overflow-hidden"
             >
-              <ZentraEmblem className="h-4.5 w-4.5" color="#D4E751" />
+              <Image
+                src="/logo-icon.png"
+                alt="Otak Rental"
+                width={28}
+                height={28}
+                className="h-full w-full object-contain"
+                priority
+              />
             </motion.div>
             <span className="font-semibold text-white tracking-tight text-base font-sans">
               Otak Rental
@@ -201,8 +208,14 @@ export function Navbar() {
         {/* Brand & Logo */}
         <div className="flex items-center gap-6">
           <Link href="/admin" className="flex items-center gap-3 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-[#D4E751] transition-transform group-hover:rotate-45">
-              <ZentraEmblem className="h-4.5 w-4.5" color="#D4E751" />
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 p-1.5 transition-transform group-hover:scale-105 overflow-hidden">
+              <Image
+                src="/logo-icon.png"
+                alt="Otak Rental"
+                width={32}
+                height={32}
+                className="h-full w-full object-contain"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">

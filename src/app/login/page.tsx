@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Lock, User, LogIn, ArrowLeft } from "lucide-react";
-import { ZentraEmblem } from "@/components/icons/ZentraEmblem";
+import Image from "next/image";
 
 function LoginForm() {
   const router = useRouter();
@@ -46,8 +46,15 @@ function LoginForm() {
 
       <div className="relative w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 border border-white/15 text-[#D4E751] shadow-xl">
-            <ZentraEmblem className="h-7 w-7" color="#D4E751" />
+          <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/15 p-2 shadow-xl overflow-hidden">
+            <Image
+              src="/logo-icon.png"
+              alt="Otak Rental"
+              width={48}
+              height={48}
+              className="h-full w-full object-contain"
+              priority
+            />
           </div>
           <h1 className="mt-5 text-2xl font-bold tracking-tight text-white font-sans">
             Admin Portal
