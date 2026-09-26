@@ -9,7 +9,9 @@ import Image from "next/image";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/admin";
+  // Hanya terima path internal — cegah open redirect lewat ?next=//situs-lain.com
+  const rawNext = searchParams.get("next");
+  const next = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/admin";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
