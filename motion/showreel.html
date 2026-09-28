@@ -448,7 +448,7 @@ function renderAt(t) {
   // ---- backdrop ----
   const gr = eOutExpo(P(t, 0, 1.4)) * 1500;
   grid.style.webkitMaskImage = grid.style.maskImage = `radial-gradient(circle at 50% 52%, #000 ${gr * .55}px, transparent ${gr}px)`;
-  gctx.putImageData(GRAIN[frame % GRAIN.length], 0, 0);
+  gctx.putImageData(GRAIN[Math.floor(t * 12) % GRAIN.length], 0, 0); // 12 fps film boil
 
   // ---- global camera: breathing push + shake (scene 2) ----
   let shx = 0, shy = 0, shr = 0;
@@ -491,7 +491,7 @@ function scene1(t) {
 
   // emblem burst
   const RAD = 158;
-  const rot = 180 * eInOutExpo(P(t, 1.45, 2.05));
+  const rot = 180 * eInOutCubic(P(t, 1.4, 2.1));
   const sc = 1 + .08 * eOutCubic(P(t, 1.45, 2));
   A(emb, { transform: `translate(960 540) rotate(${rot}) scale(${sc})` });
   dots.forEach((d, i) => {
@@ -733,7 +733,7 @@ function transitions(t) {
   } else vis(flash, false);
   // horizontal ink bars: scene 2 → scene 3
   bars.forEach((el, i) => {
-    const a = eInOutExpo(P(t, 5.5 + i * .03, 5.76 + i * .03)), b = eInOutExpo(P(t, 5.92 + i * .03, 6.18 + i * .03));
+    const a = eInOutCubic(P(t, 5.46 + i * .03, 5.76 + i * .03)), b = eInOutCubic(P(t, 5.92 + i * .03, 6.22 + i * .03));
     const x = t < 5.92 ? lerp(-1960, 0, a) : lerp(0, 1960, b);
     T(el, `translateX(${x}px)`); vis(el, t > 5.45 && t < 6.4);
   });

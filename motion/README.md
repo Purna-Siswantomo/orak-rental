@@ -21,7 +21,7 @@ italic, the eight-petal emblem and the brain logo.
 | 11.35–12.85 s | **05 Bukti** | Four rapid beats: 420+, 100%, 0%, 4,9/5. |
 | 12.85–15.0 s | **06 Otak Rental** | The last panel collapses into a lime core and the emblem dots converge and implode. The brain logo pops out with a shockwave, an orbit and sparkles. The wordmark, tagline and WhatsApp CTA follow, and a lime sheen crosses the wordmark at the end. |
 
-Motion blur is real. Each output frame is the average of 3 sub-frame samples taken across a
+Motion blur is real. Each output frame is the average of 6 sub-frame samples taken across a
 180° shutter.
 
 ## Re-rendering
@@ -34,7 +34,7 @@ node render.mjs             # full render → out/otak-rental-reel.mp4
 ```
 
 Rendering needs Playwright's Chromium and `ffmpeg` on `PATH` (or set `FFMPEG=/path/to/ffmpeg`).
-Options: `--fps 60`, `--sub 3` (motion-blur samples), `--shutter 0.5`, `--workers 4`.
+Options: `--fps 60`, `--sub 6` (motion-blur samples), `--shutter 0.5`, `--workers 4`.
 
 The audio is synthesised procedurally from sine, noise and bell tones in `sound.py`, with every
 cue timed to the animation. It uses no samples or licensed music.
