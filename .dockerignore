@@ -13,3 +13,6 @@ prisma/dev.db
 prisma/dev.db-journal
 
 *.md
+
+# motion reel assets & renders — not needed by the app image
+motion
