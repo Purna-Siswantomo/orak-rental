@@ -2,6 +2,8 @@
 //
 //   node render.mjs                         -> out/otak-rental-reel.mp4 (1080p60, with sound.py audio)
 //   node render.mjs --stills 0.5,3.2,7.9    -> out/still-*.png (quick previews)
+//   node render.mjs --page sample.html --width 1080 --height 1350 --name otak-rental-sample-15s \
+//                   --sound sample_sound.py  -> the 4:5 Instagram sample (any page exposing renderAt/DURATION)
 //   options: --fps 60  --sub 6 (motion-blur samples)  --shutter 0.5  --workers 4
 //
 // Needs Playwright (Chromium) and ffmpeg on PATH (or FFMPEG=/path/to/ffmpeg).
@@ -20,6 +22,9 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) =>
 const FPS = +(args.fps || 60), SUB = +(args.sub || 6), SHUTTER = +(args.shutter || 0.5);
 const WORKERS = +(args.workers || Math.max(1, Math.min(4, os.cpus().length)));
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
+const PAGE = args.page || "showreel.html", W = +(args.width || 1920), H = +(args.height || 1080);
+const NAME = args.name || "otak-rental-reel";
+const SOUND = args.sound || "sound.py", WAV = SOUND === "sound.py" ? "reel-audio.wav" : `${NAME}.wav`;
 
 async function loadPlaywright() {
   for (const id of ["playwright", "@playwright/test"]) {
@@ -42,9 +47,9 @@ function serve() {
 }
 
 async function openPage(browser, port) {
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
   page.on("pageerror", e => console.error("page error:", e.message));
-  await page.goto(`http://127.0.0.1:${port}/showreel.html?capture`);
+  await page.goto(`http://127.0.0.1:${port}/${PAGE}?capture`);
   await page.evaluate(() => window.reelReady);
   return page;
 }
@@ -59,7 +64,7 @@ if (args.stills) {
   const page = await openPage(browser, port);
   for (const s of String(args.stills).split(",")) {
     await page.evaluate(t => window.renderAt(t), +s);
-    await page.screenshot({ path: path.join(OUT, `still-${(+s).toFixed(2)}.png`) });
+    await page.screenshot({ path: path.join(OUT, `${PAGE === "showreel.html" ? "still" : NAME}-${(+s).toFixed(2)}.png`) });
   }
   console.log("stills written to", OUT);
 } else {
@@ -80,10 +85,10 @@ if (args.stills) {
   console.log(`\ncaptured ${jobs.length} samples; encoding…`);
   // average each group of SUB samples into one frame (= motion blur), then encode H.264
   const blur = SUB > 1 ? `tmix=frames=${SUB},select='eq(mod(n\\,${SUB})\\,${SUB - 1})',setpts=N/${FPS}/TB,` : "";
-  const mp4 = path.join(OUT, "otak-rental-reel.mp4");
-  // sound design (python3 sound.py) is muxed in when present
-  const wav = path.join(OUT, "reel-audio.wav");
-  if (!fs.existsSync(wav)) spawnSync("python3", [path.join(DIR, "sound.py")], { stdio: "inherit" });
+  const mp4 = path.join(OUT, `${NAME}.mp4`);
+  // sound design (python3 <sound script> <wav>) is muxed in when present
+  const wav = path.join(OUT, WAV);
+  if (!fs.existsSync(wav)) spawnSync("python3", [path.join(DIR, SOUND), wav], { stdio: "inherit" });
   const audio = fs.existsSync(wav) ? ["-i", wav, "-c:a", "aac", "-b:a", "256k", "-shortest"] : [];
   const r = spawnSync(FFMPEG, ["-y", "-loglevel", "error", "-framerate", String(FPS * SUB), "-i", path.join(tmp, "f%06d.jpg"), ...audio.slice(0, 2),
     "-vf", `${blur}format=yuv420p`, "-r", String(FPS), "-c:v", "libx264", "-preset", "slow", "-crf", "18",

@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Otak Rental — Contoh Motion 15s</title>
+<!--
+  15-second 4:5 (1080×1350) sample for the Instagram carousel's slide 4: a promo for a FICTIONAL
+  coffee brand ("Kopi Nalar"), framed by Otak Rental's HUD, that zooms out at the end into a
+  portfolio card ("Ini contoh paket 15 detik"). Deterministic: renderAt(t) draws any frame.
+  Render: node render.mjs --page sample.html --width 1080 --height 1350 --name otak-rental-sample-15s --sound sample_sound.py
+-->
+<style>
+@font-face{font-family:"Geist";src:url(fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-normal.woff2) format("woff2");font-style:normal;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+:root{
+  /* Otak Rental frame */
+  --cream:#FAF7F0; --ink:#05100E; --lime:#D4E751; --emerald:#17463A; --line:#E6DFD0;
+  /* Kopi Nalar (fictional client) */
+  --latte:#FAF1E4; --espresso:#23150E; --roast:#3A2213; --caramel:#C8792E; --aren:#7A3E17;
+  --milk:#EFDCC2; --orange:#E8622C; --foam:#F6E9D7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#15130F}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+body.capture{display:block;background:var(--cream)}
+#viewport{position:relative;width:1080px;height:1350px;transform-origin:0 0;flex:none}
+#stage{position:absolute;inset:0;overflow:hidden;background:var(--cream);color:var(--ink);font-family:"Geist",sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.layer{position:absolute;inset:0}
+.abs{position:absolute;left:0;top:0}
+.mono{font-family:"Geist Mono",monospace}
+.serif{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400}
+.mask{display:inline-block;overflow:hidden;vertical-align:top;padding:.06em .12em .16em;margin:-.06em -.12em -.16em}
+.ch,.wd{display:inline-block;will-change:transform}
+svg{overflow:visible}
+.ctr{position:absolute;left:0;top:0;white-space:nowrap}
+#grid{background-size:60px 60px;background-image:linear-gradient(to right, rgba(5,16,14,.05) 1px, transparent 1px),linear-gradient(to bottom, rgba(5,16,14,.05) 1px, transparent 1px)}
+#grain{width:1080px;height:1350px;mix-blend-mode:multiply;opacity:.3;pointer-events:none}
+#vig{background:radial-gradient(ellipse 85% 75% at 50% 46%, rgba(0,0,0,0) 55%, rgba(60,40,20,.12) 100%);pointer-events:none}
+/* HUD */
+#hud{font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.16em;text-transform:uppercase}
+.cm{position:absolute;width:30px;height:30px;border:0 solid currentColor}
+.hud-t{position:absolute;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.hud-t img{width:32px;height:27px}
+.rec{display:inline-block;width:9px;height:9px;border-radius:50%;background:#EE5A32}
+/* client-brand bits */
+.pill{display:inline-flex;align-items:center;gap:12px;border-radius:999px;white-space:nowrap}
+.callout .k{font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.18em;color:var(--caramel)}
+.callout .v{font-size:30px;font-weight:720;letter-spacing:-.03em;color:var(--espresso);margin-top:4px}
+.panel{position:absolute;left:0;top:0;width:1080px;height:1350px;overflow:hidden}
+.mk{position:relative;display:inline-block;z-index:0}
+.mk::before{content:"";position:absolute;left:-.05em;right:-.07em;top:.5em;height:.4em;background:var(--lime);border-radius:.08em;z-index:-1}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage"></div></div>
+<script>
+"use strict";
+const W = 1080, H = 1350, CX = 540, DUR = 15, FPS = 60;
+const stage = document.getElementById("stage");
+const CAPTURE = /capture/.test(location.search);
+if (CAPTURE) document.body.classList.add("capture");
+
+// ---------- math / easing ----------
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => cl((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eOutExpo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
+const eInExpo = x => x <= 0 ? 0 : Math.pow(2, 10 * x - 10);
+const eInOutExpo = x => x <= 0 ? 0 : x >= 1 ? 1 : x < .5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2;
+const eOutCubic = x => 1 - Math.pow(1 - x, 3);
+const eInQuad = x => x * x;
+const eOutQuad = x => 1 - (1 - x) * (1 - x);
+const eInOutCubic = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eOutBack = (x, s = 1.70158) => 1 + (s + 1) * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2);
+const eInBack = (x, s = 1.70158) => (s + 1) * x * x * x - s * x * x;
+const spring = (x, f = 2.2, d = 7) => x <= 0 ? 0 : 1 - Math.exp(-d * x) * Math.cos(f * 2 * Math.PI * x);
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise1 = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u) * 2 - 1; };
+const fmtID = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+const pad = (n, l = 2) => String(Math.floor(n)).padStart(l, "0");
+
+// ---------- dom helpers ----------
+function $(tag, o = {}, parent = stage) {
+  const el = document.createElement(tag);
+  if (o.cls) el.className = o.cls;
+  if (o.id) el.id = o.id;
+  if (o.html != null) el.innerHTML = o.html;
+  if (o.text != null) el.textContent = o.text;
+  if (o.style) Object.assign(el.style, o.style);
+  parent.appendChild(el);
+  return el;
+}
+const NS = "http://www.w3.org/2000/svg";
+function S(tag, attrs = {}, parent) {
+  const el = document.createElementNS(NS, tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+const A = (el, attrs) => { for (const k in attrs) el.setAttribute(k, attrs[k]); };
+const T = (el, tf, op) => { el.style.transform = tf; if (op != null) el.style.opacity = op; };
+const vis = (el, on) => { el.style.display = on ? "" : "none"; };
+function letters(parent, text, cls = "") {
+  const m = $("span", { cls: "mask " + cls }, parent);
+  return [...text].map(c => $("span", { cls: "ch", text: c === " " ? " " : c }, m));
+}
+function words(parent, text, cls = "") {
+  return text.split(" ").map((w, i, arr) => {
+    const m = $("span", { cls: "mask " + cls }, parent);
+    const s = $("span", { cls: "wd", text: w }, m);
+    if (i < arr.length - 1) parent.appendChild(document.createTextNode(" "));
+    return s;
+  });
+}
+// center a nowrap block on (x, y) plus extra transform
+const at = (el, x, y, extra = "", op) => T(el, `translate(${x}px,${y}px) translate(-50%,-50%) ${extra}`, op);
+
+const C = { ink: "#05100E", lime: "#D4E751", esp: "#23150E", roast: "#3A2213", car: "#C8792E", aren: "#7A3E17", milk: "#EFDCC2", orange: "#E8622C", foam: "#F6E9D7", latte: "#FAF1E4" };
+
+/* ==========================================================================
+   BUILD
+   ========================================================================== */
+const grid = $("div", { cls: "layer", id: "grid" });
+
+// ---------------- A · Otak Rental intro sting ----------------
+const sA = $("div", { cls: "layer" });
+const svA = S("svg", { width: W, height: H, class: "abs" }, sA);
+const shA = S("ellipse", { cx: CX, cy: 704, rx: 40, ry: 8, fill: "rgba(5,16,14,.16)" }, svA);
+const ballA = S("ellipse", { cx: CX, cy: 675, rx: 28, ry: 28, fill: C.lime }, svA);
+const tagA = $("div", { cls: "ctr mono", text: "CONTOH HASIL — PAKET 15 DETIK", style: { fontSize: "18px", letterSpacing: ".2em" } }, sA);
+
+// ---------------- content (the "client video") ----------------
+const shadow = $("div", { cls: "layer", style: { borderRadius: "0", background: C.esp } });
+const content = $("div", { cls: "layer", style: { overflow: "hidden", transformOrigin: "540px 675px" } });
+
+// B · hook on espresso
+const sB = $("div", { cls: "panel", style: { background: C.esp } }, content);
+const bPagi = $("div", { cls: "ctr", style: { fontSize: "300px", fontWeight: 900, letterSpacing: "-.06em", color: C.foam, lineHeight: "1" } }, sB);
+const bPagiL = letters(bPagi, "Pagi");
+const bBerat = $("div", { cls: "ctr serif", style: { fontSize: "300px", color: "#E8913F", lineHeight: "1" } }, sB);
+const bBeratL = letters(bBerat, "berat?");
+const bType = $("div", { cls: "ctr mono", style: { fontSize: "24px", letterSpacing: ".12em", color: "rgba(246,233,215,.8)" } }, sB);
+const B_TXT = "07.00 — nyawa baru kumpul 20%";
+const svB = S("svg", { width: W, height: H, class: "abs" }, sB);
+const batt = S("g", {}, svB);
+S("rect", { x: -48, y: -20, width: 96, height: 40, rx: 9, fill: "none", stroke: C.foam, "stroke-width": 4 }, batt);
+S("rect", { x: 50, y: -8, width: 7, height: 16, rx: 2, fill: C.foam }, batt);
+const battFill = S("rect", { x: -41, y: -13, width: 16, height: 26, rx: 4, fill: "#EE5A32" }, batt);
+const drop = S("path", { d: "M0 -60 C 22 -22, 34 0, 34 18 A 34 34 0 1 1 -34 18 C -34 0, -22 -22, 0 -60Z", fill: C.milk }, svB);
+const splash = [...Array(14)].map((_, i) => S("circle", { r: 6 + hash(i + 5) * 10, fill: i % 3 ? C.milk : "#E8913F" }, svB));
+const splashRing = S("ellipse", { cx: CX, cy: 820, rx: 0, ry: 0, fill: "none", stroke: C.milk, "stroke-width": 6 }, svB);
+
+// C · product build on latte
+const sC = $("div", { cls: "panel", style: { background: C.latte, transformOrigin: "540px 780px" } }, content);
+const cTitle = $("div", { cls: "ctr", style: { textAlign: "center" } }, sC);
+const cT1 = $("div", { style: { fontSize: "104px", fontWeight: 820, letterSpacing: "-.05em", lineHeight: "1", color: C.esp } }, cTitle);
+const cT1w = words(cT1, "Es Kopi Susu");
+const cT2 = $("div", { cls: "serif", style: { fontSize: "124px", lineHeight: "1", color: C.car, marginTop: "2px" } }, cTitle);
+const cT2w = words(cT2, "Gula Aren.");
+const svC = S("svg", { width: W, height: H, class: "abs" }, sC);
+const defs = S("defs", {}, svC);
+defs.innerHTML = `
+  <clipPath id="cupClip"><path d="M332 560 L384 1082 Q540 1104 696 1082 L748 560 Z"/></clipPath>
+  <clipPath id="cupClipTall"><path d="M332 300 L332 560 L384 1082 Q540 1104 696 1082 L748 560 L748 300 Z"/></clipPath>
+  <filter id="marble" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="10"/></filter>
+  <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".18" stop-color="#fff" stop-opacity=".08"/><stop offset=".8" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient>`;
+const cupShadow = S("ellipse", { cx: CX, cy: 1098, rx: 200, ry: 20, fill: "rgba(35,21,14,.16)" }, svC);
+const straw = S("rect", { x: -13, y: -280, width: 26, height: 560, rx: 13, fill: C.orange }, S("g", { "clip-path": "url(#cupClipTall)" }, svC));
+const strawG = straw.parentNode;
+const liquid = S("g", { "clip-path": "url(#cupClip)" }, svC);
+const arenR = S("rect", { x: 300, y: 1100, width: 480, height: 200, fill: C.aren }, liquid);
+const milkP = S("path", { fill: C.milk }, liquid);
+const espP = S("path", { fill: "#7A4A28", filter: "url(#marble)", opacity: .9 }, liquid);
+const stream = S("rect", { x: CX - 9, y: 440, width: 18, height: 0, rx: 9, fill: C.roast }, svC);
+const iceG = S("g", { "clip-path": "url(#cupClipTall)" }, svC);
+const ICE = [{ x: 450, y: 690, r: -12 }, { x: 612, y: 716, r: 17 }, { x: 532, y: 636, r: 5 }];
+const ices = ICE.map(() => { const g = S("g", {}, iceG);
+  S("rect", { x: -54, y: -54, width: 108, height: 108, rx: 20, fill: "rgba(255,255,255,.5)", stroke: "rgba(255,255,255,.95)", "stroke-width": 4 }, g);
+  S("path", { d: "M-34 -30 L -10 -40", stroke: "#fff", "stroke-width": 7, "stroke-linecap": "round" }, g); return g; });
+const cupGlass = S("path", { d: "M332 560 L384 1082 Q540 1104 696 1082 L748 560 Z", fill: "url(#glass)", stroke: C.esp, "stroke-width": 5, "stroke-linejoin": "round", pathLength: 1, "stroke-dasharray": "1 1" }, svC);
+const rim = S("ellipse", { cx: CX, cy: 560, rx: 208, ry: 24, fill: "none", stroke: C.esp, "stroke-width": 5, pathLength: 1, "stroke-dasharray": "1 1" }, svC);
+const drops = [...Array(16)].map((_, i) => S("ellipse", { cx: 370 + hash(i) * 330, cy: 640 + hash(i + 20) * 400, rx: 4 + hash(i + 3) * 4, ry: 6 + hash(i + 7) * 6, fill: "rgba(255,255,255,.75)" }, svC));
+const CALL = [
+  { k: "ESPRESSO", v: "2 shot, fresh.", px: 452, py: 740, lx: 70, ly: 650, side: "L" },
+  { k: "SUSU SEGAR", v: "Creamy banget.", px: 660, py: 880, lx: 790, ly: 790, side: "R" },
+  { k: "GULA AREN", v: "Asli, bukan sirup.", px: 600, py: 1045, lx: 790, ly: 990, side: "R" },
+];
+const callEls = CALL.map(c => {
+  const line = S("polyline", { points: c.side === "L" ? `${c.px},${c.py} ${c.px - 70},${c.ly + 34} ${c.lx + 250},${c.ly + 34}` : `${c.px},${c.py} ${c.px + 70},${c.ly + 34} ${c.lx - 10},${c.ly + 34}`,
+    fill: "none", stroke: C.esp, "stroke-width": 2.5, pathLength: 1, "stroke-dasharray": "1 1" }, svC);
+  const dot = S("circle", { cx: c.px, cy: c.py, r: 0, fill: C.orange, stroke: "#fff", "stroke-width": 4 }, svC);
+  const box = $("div", { cls: "abs callout", html: `<div class="k">${c.k}</div><div class="v">${c.v}</div>`, style: { left: c.lx + "px", top: c.ly - 20 + "px", width: "250px", textAlign: c.side === "L" ? "left" : "left" } }, sC);
+  return { line, dot, box };
+});
+
+// D · three benefit beats
+const sD = $("div", { cls: "panel", style: { background: "transparent" } }, content);
+function beat(bg) { return $("div", { cls: "panel", style: { background: bg } }, sD); }
+const d1 = beat(C.esp), d2 = beat(C.car), d3 = beat(C.latte);
+// d1 — Dingin.
+const svD1 = S("svg", { width: W, height: H, class: "abs" }, d1);
+const flakes = [...Array(18)].map((_, i) => S("rect", { width: 14 + hash(i) * 16, height: 14 + hash(i) * 16, rx: 5, fill: "rgba(246,233,215,.22)" }, svD1));
+const snow = S("g", {}, svD1);
+for (let k = 0; k < 3; k++) {
+  const g = S("g", { transform: `rotate(${k * 60})` }, snow);
+  S("path", { d: "M0 -80 V80 M-22 -62 L0 -40 L22 -62 M-22 62 L0 40 L22 62", fill: "none", stroke: "#8FD0E8", "stroke-width": 9, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
+}
+const d1W = $("div", { cls: "ctr", style: { fontSize: "236px", fontWeight: 900, letterSpacing: "-.06em", color: C.foam, lineHeight: "1" } }, d1);
+const d1L = letters(d1W, "Dingin.");
+const d1M = $("div", { cls: "ctr mono", text: "01 — DISAJIKAN 4°C", style: { fontSize: "22px", letterSpacing: ".2em", color: "rgba(246,233,215,.6)" } }, d1);
+// d2 — Manis pas.
+const d2A = $("div", { cls: "ctr", style: { fontSize: "220px", fontWeight: 900, letterSpacing: "-.06em", color: C.foam, lineHeight: "1" } }, d2);
+const d2AL = letters(d2A, "Manis");
+const d2B = $("div", { cls: "ctr serif", style: { fontSize: "300px", color: C.esp, lineHeight: "1" } }, d2);
+const d2BL = letters(d2B, "pas.");
+const svD2 = S("svg", { width: W, height: H, class: "abs" }, d2);
+S("rect", { x: 220, y: 1035, width: 640, height: 12, rx: 6, fill: "rgba(246,233,215,.35)" }, svD2);
+const meterFill = S("rect", { x: 220, y: 1035, width: 0, height: 12, rx: 6, fill: C.foam }, svD2);
+const knob = S("circle", { cx: 860, cy: 1041, r: 26, fill: C.esp, stroke: C.foam, "stroke-width": 6 }, svD2);
+[0, 25, 50, 75, 100].forEach((v, i) => { const tx = S("text", { x: 220 + i * 160, y: 1100, "text-anchor": "middle", "font-family": "Geist Mono", "font-size": 17, fill: "rgba(35,21,14,.55)", "letter-spacing": 2 }, svD2); tx.textContent = v + "%"; });
+const d2M = $("div", { cls: "ctr mono", style: { fontSize: "20px", letterSpacing: ".2em", color: C.esp } }, d2);
+// d3 — Nendang.
+const svD3 = S("svg", { width: W, height: H, class: "abs" }, d3);
+const bolt = S("path", { d: "M18 -90 L -50 12 L -4 12 L -22 92 L 52 -14 L 6 -14 L 30 -90 Z", fill: C.orange, stroke: C.esp, "stroke-width": 6, "stroke-linejoin": "round" }, svD3);
+const d3W = $("div", { cls: "ctr", style: { fontSize: "200px", fontWeight: 900, letterSpacing: "-.06em", color: C.esp, lineHeight: "1" } }, d3);
+const d3L = letters(d3W, "Nendang.");
+const stamp = S("g", {}, svD3);
+S("circle", { r: 118, fill: "none", stroke: C.orange, "stroke-width": 7 }, stamp);
+S("circle", { r: 100, fill: "none", stroke: C.orange, "stroke-width": 2.5, "stroke-dasharray": "4 7" }, stamp);
+const st1 = S("text", { y: -8, "text-anchor": "middle", "font-family": "Geist", "font-weight": 900, "font-size": 46, fill: C.orange, "letter-spacing": -1 }, stamp); st1.textContent = "DOUBLE";
+const st2 = S("text", { y: 40, "text-anchor": "middle", "font-family": "Geist Mono", "font-size": 26, fill: C.orange, "letter-spacing": 8 }, stamp); st2.textContent = "SHOT";
+
+// E · promo price (on latte, continues from d3)
+const sE = $("div", { cls: "panel", style: { background: C.latte } }, content);
+const sEin = $("div", { cls: "layer" }, sE);
+const eChip = $("div", { cls: "ctr mono pill", text: "PROMO LAUNCHING", style: { fontSize: "20px", letterSpacing: ".2em", background: C.orange, color: C.foam, padding: "14px 24px" } }, sEin);
+const eOld = $("div", { cls: "ctr", text: "Rp18.000", style: { fontSize: "92px", fontWeight: 700, letterSpacing: "-.04em", color: "#A6917D" } }, sEin);
+const svE = S("svg", { width: W, height: H, class: "abs" }, sEin);
+const eStrike = S("line", { x1: 340, y1: 583, x2: 740, y2: 563, stroke: C.orange, "stroke-width": 10, "stroke-linecap": "round", pathLength: 1, "stroke-dasharray": "1 1" }, svE);
+const eNew = $("div", { cls: "ctr", style: { fontWeight: 900, letterSpacing: "-.06em", color: C.esp, lineHeight: "1" }, html: `<span style="font-size:96px;letter-spacing:-.03em;margin-right:10px;color:${C.car}">Rp</span><span class="n" style="font-size:230px">18.000</span>` }, sEin);
+const eNum = eNew.querySelector(".n");
+const badge = S("g", {}, svE);
+const pts = []; for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2, r = i % 2 ? 112 : 126; pts.push(`${(Math.cos(a) * r).toFixed(1)},${(Math.sin(a) * r).toFixed(1)}`); }
+S("polygon", { points: pts.join(" "), fill: C.orange }, badge);
+const bT = S("text", { y: 22, "text-anchor": "middle", "font-family": "Geist", "font-weight": 900, "font-size": 66, fill: C.foam, "letter-spacing": -3 }, badge); bT.textContent = "-33%";
+const ringT = S("g", {}, badge);
+S("path", { id: "ringPath", d: "M -92 0 A 92 92 0 1 1 92 0 A 92 92 0 1 1 -92 0", fill: "none" }, ringT);
+const tp = S("text", { "font-family": "Geist Mono", "font-size": 14, fill: C.foam, "letter-spacing": 4 }, ringT);
+const tpp = S("textPath", { href: "#ringPath" }, tp); tpp.textContent = "PROMO • PROMO • PROMO • PROMO • ";
+const eWeek = $("div", { cls: "ctr mono", style: { fontSize: "24px", letterSpacing: ".22em", color: C.esp } }, sEin);
+const E_TXT = "CUMA MINGGU INI · SELAMA STOK ADA";
+const ePills = ["Es Kopi Susu", "Gula Aren", "Large 16oz"].map(x => $("div", { cls: "ctr pill", text: x, style: { fontSize: "26px", fontWeight: 650, letterSpacing: "-.01em", color: C.esp, border: "2px solid " + C.esp, padding: "14px 24px" } }, sE));
+
+// F · brand end card
+const sF = $("div", { cls: "panel", style: { background: C.latte } }, content);
+const svF = S("svg", { width: W, height: H, class: "abs" }, sF);
+const fRing = S("circle", { cx: CX, cy: 500, r: 0, fill: "none", stroke: C.orange }, svF);
+const rays = S("g", {}, svF);
+const rayEls = [...Array(18)].map((_, i) => S("line", { stroke: C.car, "stroke-width": 5, "stroke-linecap": "round" }, rays));
+const sun = S("circle", { cx: CX, cy: 500, r: 0, fill: "#E8913F" }, svF);
+const bean = S("g", {}, svF);
+S("ellipse", { rx: 92, ry: 128, fill: C.esp }, bean);
+S("path", { d: "M4 -112 C 44 -58, -38 -8, 2 42 C 32 80, -6 100, 2 114", fill: "none", stroke: C.foam, "stroke-width": 11, "stroke-linecap": "round" }, bean);
+const fWord = $("div", { cls: "ctr serif", style: { fontSize: "176px", color: C.esp, lineHeight: "1" } }, sF);
+const fWordL = letters(fWord, "Kopi Nalar");
+const fMono = $("div", { cls: "ctr mono", text: "ES KOPI SUSU · EST. 2026", style: { fontSize: "20px", letterSpacing: ".3em", color: "rgba(35,21,14,.6)" } }, sF);
+const fTag = $("div", { cls: "ctr", style: { fontSize: "44px", fontWeight: 650, letterSpacing: "-.03em", color: C.car } }, sF);
+const fTagW = words(fTag, "Biar mikir tetap jalan.");
+const fCta = $("div", { cls: "ctr pill", html: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="${C.foam}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-1.5-5h-15Z"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg><span>Tersedia di outlet &amp; ojol</span>`, style: { fontSize: "28px", fontWeight: 650, background: C.esp, color: C.foam, padding: "20px 32px" } }, sF);
+
+// ---------------- G · portfolio zoom-out (Otak Rental) ----------------
+const sG = $("div", { cls: "layer" });
+const gBar = $("div", { cls: "abs", style: { width: "605px", height: "4px", borderRadius: "4px", background: "rgba(5,16,14,.12)" } }, sG);
+const gFill = $("div", { cls: "abs", style: { height: "4px", borderRadius: "4px", background: C.ink } }, gBar);
+const gHead = $("div", { cls: "abs", style: { width: "18px", height: "18px", borderRadius: "50%", background: C.lime, border: "3px solid " + C.ink, top: "-7px" } }, gBar);
+const gTime = $("div", { cls: "ctr mono", text: "00:15 / 00:15", style: { fontSize: "16px", letterSpacing: ".16em" } }, sG);
+const gPlay = $("div", { cls: "ctr mono pill", html: `<svg width="14" height="16" viewBox="0 0 14 16"><path d="M1 1 L13 8 L1 15Z" fill="${C.ink}"/></svg>CONTOH HASIL`, style: { fontSize: "15px", letterSpacing: ".18em", background: C.lime, color: C.ink, padding: "10px 16px" } }, sG);
+const gT = $("div", { cls: "ctr", style: { textAlign: "center" } }, sG);
+const gT1 = $("div", { style: { fontSize: "74px", fontWeight: 820, letterSpacing: "-.05em", lineHeight: "1.05" } }, gT);
+const gT1w = words(gT1, "Ini contoh");
+gT1.appendChild(document.createTextNode(" "));
+const gSer = $("span", { cls: "serif", style: { fontSize: "86px", color: "var(--emerald)", letterSpacing: "0" } }, gT1);
+const gMk = $("span", { cls: "mk" }, gSer);
+const gT1b = words(gMk, "paket 15 detik.");
+const gSub = $("div", { cls: "mono", style: { fontSize: "21px", letterSpacing: ".16em", marginTop: "22px", color: "#40443d" } }, gT);
+gSub.innerHTML = `MULAI <b style="color:${C.ink}">RP50K</b> · ORDER VIA DM <b style="color:${C.ink}">@OTAKRENTAL</b>`;
+
+// ---------------- grain / vignette / HUD ----------------
+const vig = $("div", { cls: "layer", id: "vig" });
+const grainCv = $("canvas", { cls: "abs", id: "grain" });
+grainCv.width = 540; grainCv.height = 675;
+const gctx = grainCv.getContext("2d");
+const GRAIN = [...Array(6)].map((_, k) => {
+  const img = gctx.createImageData(540, 675); let s = 999 + k * 313;
+  for (let i = 0; i < img.data.length; i += 4) {
+    s = (s * 1664525 + 1013904223) >>> 0; const v = 255 - ((s >>> 24) & 63) * (((s >>> 8) & 7) === 0 ? 1.4 : .5);
+    img.data[i] = v; img.data[i + 1] = v - 2; img.data[i + 2] = v - 6; img.data[i + 3] = 255;
+  } return img;
+});
+const hud = $("div", { cls: "layer", id: "hud" });
+const crops = [[40, 40, "Top", "Left"], [1010, 40, "Top", "Right"], [40, 1280, "Bottom", "Left"], [1010, 1280, "Bottom", "Right"]].map(([x, y, a, b]) =>
+  $("div", { cls: "cm", style: { left: x + "px", top: y + "px", ["border" + a + "Width"]: "2px", ["border" + b + "Width"]: "2px" } }, hud));
+const hTL = $("div", { cls: "hud-t", html: `<img src="assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Contoh hasil</span>`, style: { left: "92px", top: "58px" } }, hud);
+const hLogo = hTL.querySelector("img");
+const hTR = $("div", { cls: "hud-t", text: "Paket 15 detik", style: { right: "92px", top: "64px" } }, hud);
+const hBL = $("div", { cls: "hud-t", text: "Brand fiktif · untuk demo", style: { left: "92px", bottom: "64px" } }, hud);
+const hBR = $("div", { cls: "hud-t", html: `<span class="rec"></span><span class="tc">00:00:00:00</span>`, style: { right: "92px", bottom: "64px" } }, hud);
+const hTC = hBR.querySelector(".tc"), hRec = hBR.querySelector(".rec");
+
+/* ==========================================================================
+   RENDER
+   ========================================================================== */
+function renderAt(t) {
+  t = cl(t, 0, DUR);
+  const frame = Math.round(t * FPS);
+  gctx.putImageData(GRAIN[Math.floor(t * 12) % GRAIN.length], 0, 0);
+  intro(t); hook(t); build(t); beats(t); promo(t); brand(t); outro(t); hudUpdate(t, frame);
+}
+
+// A · lime drop → espresso iris
+function intro(t) {
+  const on = t < 1.2; vis(sA, on); if (!on) return;
+  const R = 28, G = 703;
+  let y = -80, sx = 1, sy = 1, col = C.lime;
+  if (t < .05) y = -80;
+  else if (t < .4) { const k = eInQuad(P(t, .05, .4)); y = lerp(-80, 675, k); sy = 1 + .3 * k; sx = 1 - .15 * k; }
+  else if (t < .48) { const k = Math.sin(Math.PI * P(t, .4, .48)); sy = 1 - .42 * k; sx = 1 + .42 * k; y = G - R * sy; }
+  else if (t < .64) { const k = eOutQuad(P(t, .48, .64)); y = lerp(675, 560, k); }
+  else { const k = eInQuad(P(t, .64, .8)); y = lerp(560, 675, k); }
+  const grow = P(t, .6, .8);
+  const r = R * lerp(1, 1.5, grow);
+  A(ballA, { cy: y, rx: r * sx, ry: r * sy, fill: grow > .5 ? C.esp : C.lime });
+  A(shA, { opacity: t < .05 ? 0 : (1 - cl((675 - y) / 700)) * (1 - P(t, .8, .9)), rx: 44 * (1 - cl((675 - y) / 700) * .6) });
+  const tk = eOutExpo(P(t, .1, .5));
+  at(tagA, CX, 820, `translateY(${(1 - tk) * 20}px)`, tk * (1 - P(t, .7, .82)));
+}
+
+// B · "Pagi berat?"
+function hook(t) {
+  // content clip: espresso iris opens from the landing drop
+  const iris = eInExpo(P(t, .8, 1.12));
+  content.style.clipPath = t < 1.12 ? `circle(${lerp(42, 1000, iris)}px at 540px 675px)` : "";
+  const on = t > .78 && t < 3.45; vis(sB, on); if (!on) return;
+  // Pagi slams in
+  const k1 = eOutExpo(P(t, 1.02, 1.42));
+  const hitDt = t - 2.95, hit = hitDt > 0;
+  const scatter = (el, i, n, base) => {
+    if (!hit) return "";
+    const a = -Math.PI / 2 + (i - (n - 1) / 2) * .35 + (hash(i + base) - .5) * .5;
+    const v = 900 + hash(i + base + 3) * 700;
+    const x = Math.cos(a) * v * hitDt * .8, y = Math.sin(a) * v * hitDt + 2600 * hitDt * hitDt;
+    return `translate(${x}px,${y}px) rotate(${(hash(i + base + 9) - .5) * 720 * hitDt}deg)`;
+  };
+  at(bPagi, CX, 520, `scale(${lerp(2.4, 1, k1)})`, cl(P(t, 1.02, 1.1)));
+  // letters are masked while they rise in, but must fly free once the drop hits
+  [bPagi, bBerat].forEach(w => { w.firstChild.style.overflow = hit ? "visible" : "hidden"; });
+  bPagi.style.filter = `blur(${(1 - k1) * 18}px)`;
+  bPagiL.forEach((l, i) => T(l, scatter(l, i, 4, 10)));
+  at(bBerat, CX, 790);
+  bBeratL.forEach((l, i) => { const k = eOutExpo(P(t, 1.32 + i * .04, 1.9 + i * .04)); T(l, `translateY(${(1 - k) * 110}%) rotate(${(1 - k) * 12}deg) ` + scatter(l, i, 6, 40)); });
+  const n = Math.floor(B_TXT.length * P(t, 1.75, 2.35));
+  bType.textContent = B_TXT.slice(0, n) + (n > 0 && n < B_TXT.length ? "▍" : "");
+  at(bType, CX, 1010, "", (t > 1.75 ? 1 : 0) * (1 - P(t, 2.95, 3.1)));
+  A(batt, { transform: `translate(${CX} 1090) scale(${eOutBack(P(t, 1.7, 2.0), 2)})`, opacity: 1 - P(t, 2.95, 3.1) });
+  A(battFill, { opacity: Math.floor(t * 6) % 2 ? .35 : 1 });
+  // the milk drop
+  const dk = eInQuad(P(t, 2.55, 2.95));
+  A(drop, { transform: `translate(${CX} ${lerp(-120, 800, dk)}) scale(${1 - .15 * dk},${1 + .3 * dk})`, opacity: t > 2.55 && t < 2.97 ? 1 : 0 });
+  splash.forEach((c, i) => {
+    const a = -Math.PI * (.1 + .8 * (i / 13)), v = 500 + hash(i) * 600, dt = Math.max(0, t - 2.95);
+    A(c, { cx: CX + Math.cos(a) * v * dt, cy: 820 + Math.sin(a) * v * dt + 1900 * dt * dt, opacity: hit ? 1 - P(t, 3.1, 3.4) : 0 });
+  });
+  const rk = eOutExpo(P(t, 2.95, 3.4));
+  A(splashRing, { rx: lerp(20, 380, rk), ry: lerp(6, 90, rk), opacity: hit ? 1 - rk : 0, "stroke-width": lerp(14, 1, rk) });
+}
+
+// C · the cup assembles itself
+function build(t) {
+  const on = t > 2.98 && t < 7.02; vis(sC, on); if (!on) return;
+  // latte iris from the splash point
+  sC.style.clipPath = t < 3.42 ? `circle(${lerp(0, 1500, eInOutCubic(P(t, 3.0, 3.42)))}px at 540px 820px)` : "";
+  // zoom into the coffee → match cut to the first beat
+  const z = eInExpo(P(t, 6.55, 7.0));
+  sC.style.transform = `scale(${lerp(1, 7.5, z) * (1 + .03 * P(t, 3.4, 6.55))})`;
+  sC.style.filter = z > .05 ? `blur(${z * 6}px)` : "none";
+  cT1w.forEach((w, i) => { const k = eOutExpo(P(t, 3.35 + i * .06, 3.95 + i * .06)); T(w, `translateY(${(1 - k) * 105}%)`); });
+  cT2w.forEach((w, i) => { const k = eOutExpo(P(t, 3.5 + i * .07, 4.1 + i * .07)); T(w, `translateY(${(1 - k) * 105}%)`); });
+  at(cTitle, CX, 272);
+  // cup draw
+  const cd = eInOutCubic(P(t, 3.25, 3.75));
+  A(cupGlass, { "stroke-dashoffset": 1 - cd, "fill-opacity": P(t, 3.5, 3.8) });
+  A(rim, { "stroke-dashoffset": 1 - eInOutCubic(P(t, 3.45, 3.85)) });
+  A(cupShadow, { opacity: cd });
+  // layers: aren → milk (wavy) → espresso marble
+  const arenY = lerp(1100, 985, eOutCubic(P(t, 3.6, 3.95)));
+  A(arenR, { y: arenY });
+  const milkTop = lerp(1100, 668, eInOutCubic(P(t, 3.85, 4.4)));
+  const amp = 14 * (1 - P(t, 4.4, 5.6)) + 2;
+  const milkBot = Math.max(milkTop, arenY + 3); // milk sits on top of the aren layer
+  let d = `M300 ${milkBot} L300 ${milkTop}`;
+  for (let x = 300; x <= 780; x += 20) d += ` L${x} ${milkTop + Math.sin(x / 38 + t * 9) * amp}`;
+  d += ` L780 ${milkBot} Z`;
+  A(milkP, { d });
+  const eDepth = lerp(0, 190, eOutCubic(P(t, 4.15, 4.9)));
+  let e = `M300 ${milkTop - 20}`;
+  for (let x = 300; x <= 780; x += 20) e += ` L${x} ${milkTop + Math.sin(x / 38 + t * 9) * amp}`;
+  for (let x = 780; x >= 300; x -= 20) e += ` L${x} ${milkTop + eDepth * (.62 + .22 * Math.sin(x / 70 + 1.7 + t * 1.1) + .12 * Math.sin(x / 26 + t * 2.3))}`;
+  e += " Z";
+  A(espP, { d: e, opacity: eDepth > 1 ? .9 : 0 });
+  // espresso pour stream
+  const sk = P(t, 4.0, 4.25), sEnd = P(t, 4.55, 4.75);
+  const top = lerp(440, milkTop, sEnd), bot = lerp(440, milkTop, eOutCubic(sk));
+  A(stream, { y: top, height: Math.max(0, bot - top), opacity: t > 4.0 && t < 4.76 ? 1 : 0 });
+  // ice cubes drop with bounce
+  ices.forEach((g, i) => {
+    const c = ICE[i], st = 4.45 + i * .1, k = eOutBack(P(t, st, st + .45), 2.2);
+    const bob = t > st + .45 ? Math.sin((t - st) * 3 + i) * 4 : 0;
+    A(g, { transform: `translate(${c.x} ${lerp(-150, c.y, k) + bob}) rotate(${c.r + (1 - k) * 60})`, opacity: t > st ? 1 : 0 });
+  });
+  // straw slides in
+  const sw = eOutBack(P(t, 4.85, 5.2), 1.6);
+  A(straw, { transform: `translate(620 ${lerp(-500, 750, sw)}) rotate(14)` });
+  // condensation
+  drops.forEach((dr, i) => A(dr, { opacity: cl(P(t, 5.0 + hash(i + 50) * .5, 5.3 + hash(i + 50) * .5)) * .85 }));
+  // callouts
+  callEls.forEach((c, i) => {
+    const st = 5.2 + i * .18, k = eInOutCubic(P(t, st, st + .35));
+    A(c.line, { "stroke-dashoffset": 1 - k });
+    A(c.dot, { r: 9 * eOutBack(P(t, st - .05, st + .15), 3) });
+    const bk = eOutExpo(P(t, st + .2, st + .6));
+    T(c.box, `translateY(${(1 - bk) * 16}px)`, bk);
+  });
+}
+
+// D · benefit beats (push-up transitions)
+function beats(t) {
+  const on = t > 6.95 && t < 9.75; vis(sD, on); if (!on) return;
+  const u2 = eInOutExpo(P(t, 7.8, 8.08)), u3 = eInOutExpo(P(t, 8.65, 8.93));
+  T(d1, `translateY(${-u2 * 30}%)`); vis(d1, t < 8.1);
+  T(d2, `translateY(${(1 - u2) * 100 - u3 * 30}%)`); vis(d2, t > 7.78 && t < 8.95);
+  T(d3, `translateY(${(1 - u3) * 100}%)`); vis(d3, t > 8.63);
+  // d1
+  d1L.forEach((l, i) => { const k = eOutExpo(P(t, 7.0 + i * .04, 7.5 + i * .04)); T(l, `translateY(${(1 - k) * 110}%)`); });
+  at(d1W, CX, 720);
+  A(snow, { transform: `translate(${CX} 430) rotate(${t * 60}) scale(${eOutBack(P(t, 7.0, 7.35), 2.2)})` });
+  at(d1M, CX, 880, "", P(t, 7.25, 7.4));
+  flakes.forEach((f, i) => {
+    const y = ((hash(i) * 1350 + (t - 6.9) * (300 + hash(i + 9) * 400)) % 1450) - 100;
+    A(f, { x: hash(i + 30) * 1040, y, transform: `rotate(${(t * 90 + i * 40) % 360} ${hash(i + 30) * 1040 + 12} ${y + 12})` });
+  });
+  // d2
+  d2AL.forEach((l, i) => { const k = eOutExpo(P(t, 7.9 + i * .035, 8.4 + i * .035)); T(l, `translateY(${(1 - k) * 110}%)`); });
+  d2BL.forEach((l, i) => { const k = eOutExpo(P(t, 8.0 + i * .04, 8.5 + i * .04)); T(l, `translateY(${(1 - k) * 110}%) rotate(${(1 - k) * 10}deg)`); });
+  at(d2A, CX, 470); at(d2B, CX, 700);
+  const lvl = lerp(100, 50, eOutBack(P(t, 8.05, 8.5), 1.8)), kx = 220 + 640 * lvl / 100;
+  A(knob, { cx: kx }); A(meterFill, { width: kx - 220 });
+  d2M.textContent = `LEVEL GULA · ${Math.round(lvl)}%`;
+  at(d2M, CX, 985);
+  // d3
+  d3L.forEach((l, i) => { const k = eOutExpo(P(t, 8.75 + i * .03, 9.25 + i * .03)); T(l, `translateY(${(1 - k) * 110}%)`); });
+  const sh = t > 9.08 && t < 9.35 ? 10 * (1 - P(t, 9.08, 9.35)) : 0;
+  const ex = eInBack(P(t, 9.45, 9.7));
+  at(d3W, CX + sh * noise1(t * 50), 700 + sh * noise1(t * 47 + 3), `translateY(${-ex * 400}px)`, 1 - ex);
+  A(bolt, { transform: `translate(${CX} ${440 - ex * 400}) rotate(${lerp(-40, 0, eOutBack(P(t, 8.8, 9.2), 2))}) scale(${1.1 * spring(t - 8.8, 1.6, 6) * (t > 8.8 ? 1 : 0)})`, opacity: 1 - ex });
+  const sk = P(t, 9.05, 9.2);
+  A(stamp, { transform: `translate(${790 + sh * noise1(t * 40)} ${960 - ex * 400}) rotate(-14) scale(${t < 9.05 ? 0 : lerp(2.4, 1, eInQuad(sk))})`, opacity: (t < 9.05 ? 0 : cl(sk * 2)) * (1 - ex) });
+}
+
+// E · promo price
+function promo(t) {
+  const on = t > 9.5 && t < 11.8; vis(sE, on); if (!on) return;
+  const out = eInBack(P(t, 11.45, 11.75));
+  sEin.style.transform = `scale(${1 - out * .15})`; sEin.style.opacity = 1 - out;
+  at(eChip, CX, 420, `scale(${spring(t - 9.62, 1.8, 7) * (t > 9.62 ? 1 : 0)})`);
+  const ok = eOutExpo(P(t, 9.7, 10.1));
+  at(eOld, CX, 575, `translateY(${(1 - ok) * 30}px)`, ok * (1 - .35 * P(t, 10.2, 10.4)));
+  A(eStrike, { "stroke-dashoffset": 1 - eInOutCubic(P(t, 9.95, 10.18)) });
+  const nk = spring(t - 10.1, 1.6, 6.5) * (t > 10.1 ? 1 : 0);
+  at(eNew, CX, 770, `scale(${nk})`);
+  eNum.textContent = fmtID(Math.round(lerp(18000, 12000, eOutExpo(P(t, 10.15, 10.75))) / 100) * 100);
+  A(badge, { transform: `translate(850 450) rotate(${lerp(-200, -12, eOutBack(P(t, 10.35, 10.8), 1.6)) + (t - 10.35) * 8}) scale(${spring(t - 10.35, 1.8, 6.5) * (t > 10.35 ? 1 : 0)})` });
+  const n = Math.floor(E_TXT.length * P(t, 10.5, 10.95));
+  eWeek.textContent = E_TXT.slice(0, n);
+  at(eWeek, CX, 945);
+  const gap = 18, ws = ePills.map(p => p.offsetWidth), tot = ws.reduce((a, b) => a + b, 0) + gap * 2;
+  let x = CX - tot / 2;
+  ePills.forEach((p, i) => { const k = spring(t - (10.7 + i * .08), 1.8, 7) * (t > 10.7 + i * .08 ? 1 : 0); at(p, x + ws[i] / 2, 1055, `scale(${k})`); x += ws[i] + gap; });
+}
+
+// F · brand lockup
+function brand(t) {
+  const on = t > 11.6; vis(sF, on); if (!on) return;
+  sF.style.opacity = eOutCubic(P(t, 11.6, 11.72));
+  A(sun, { r: 190 * spring(t - 11.7, 1.4, 6) * (t > 11.7 ? 1 : 0) });
+  const rk = eOutExpo(P(t, 11.85, 12.3));
+  rayEls.forEach((l, i) => { const a = i / 18 * Math.PI * 2 + t * .25, r0 = 232, r1 = r0 + 34 * rk;
+    A(l, { x1: CX + Math.cos(a) * r0, y1: 500 + Math.sin(a) * r0, x2: CX + Math.cos(a) * r1, y2: 500 + Math.sin(a) * r1, opacity: rk }); });
+  const bk = P(t, 11.72, 12.08);
+  const by = t < 12.08 ? lerp(-260, 500, eInQuad(bk)) : 500;
+  const sq = t > 12.08 ? Math.exp(-9 * (t - 12.08)) * Math.sin((t - 12.08) * 30) : 0;
+  A(bean, { transform: `translate(${CX} ${by}) rotate(${lerp(-200, -24, eOutCubic(bk))}) scale(${1 + .18 * sq},${1 - .18 * sq})` });
+  const w = P(t, 12.08, 12.7);
+  A(fRing, { r: lerp(120, 460, eOutExpo(w)), "stroke-width": lerp(16, 1, w), opacity: t > 12.08 ? 1 - w : 0 });
+  fWordL.forEach((l, i) => { const k = eOutExpo(P(t, 12.1 + i * .035, 12.7 + i * .035)); T(l, `translateY(${(1 - k) * 110}%) rotate(${(1 - k) * 8}deg)`); });
+  at(fWord, CX, 815);
+  const mk = eOutExpo(P(t, 12.35, 12.8));
+  at(fMono, CX, 940, `translateY(${(1 - mk) * 16}px)`, mk);
+  at(fTag, CX, 1012);
+  fTagW.forEach((x, i) => { const k = eOutCubic(P(t, 12.45 + i * .05, 12.85 + i * .05)); x.style.opacity = k; x.style.filter = `blur(${(1 - k) * 8}px)`; T(x, `translateY(${(1 - k) * 20}px)`); });
+  const ck = spring(t - 12.7, 1.6, 7) * (t > 12.7 ? 1 : 0);
+  at(fCta, CX, 1118, `scale(${ck})`);
+}
+
+// G · zoom out into a portfolio card
+function outro(t) {
+  const k = eInOutExpo(P(t, 13.35, 14.0));
+  const s = lerp(1, .56, k), ty = lerp(0, 560 - 675, k), R = lerp(0, 64, k);
+  const tf = `translateY(${ty}px) scale(${s})`;
+  if (t > 1.12) content.style.clipPath = k > 0 ? `inset(0 round ${R}px)` : "";
+  content.style.transform = tf;
+  shadow.style.transform = tf; shadow.style.transformOrigin = "540px 675px";
+  shadow.style.borderRadius = R + "px";
+  shadow.style.boxShadow = `0 ${60 * k}px ${120 * k}px -30px rgba(5,16,14,${.5 * k})`;
+  vis(shadow, k > 0);
+  const on = t > 13.4; vis(sG, on); if (!on) return;
+  // card rect after scale: 605×756 centred at (540, 560)
+  const cardB = 560 + 378;
+  const bk = eOutExpo(P(t, 13.8, 14.2));
+  Object.assign(gBar.style, { left: 540 - 302 + "px", top: cardB + 30 + "px", opacity: bk });
+  gFill.style.width = 605 * bk + "px"; gHead.style.left = 605 * bk - 9 + "px";
+  at(gTime, 540 + 302 - 70, cardB + 58, "", bk);
+  at(gPlay, 540 - 302 + 100, 560 - 378 + 46, `scale(${spring(t - 13.9, 1.8, 7) * (t > 13.9 ? 1 : 0)})`);
+  [...gT1w, ...gT1b].forEach((w, i) => { const q = eOutExpo(P(t, 13.85 + i * .05, 14.45 + i * .05)); T(w, `translateY(${(1 - q) * 105}%)`); });
+  at(gT, CX, 1115);
+  const sk = eOutExpo(P(t, 14.3, 14.7));
+  gSub.style.opacity = sk; gSub.style.transform = `translateY(${(1 - sk) * 14}px)`;
+  gMk.classList.toggle("mk", t > 14.25);
+}
+
+// HUD adapts to dark scenes
+function hudUpdate(t, frame) {
+  const dark = (t > .98 && t < 3.25) || (t > 6.9 && t < 8.85);
+  const col = dark ? "#F6E9D7" : C.ink;
+  hud.style.color = col;
+  hLogo.style.filter = dark ? "invert(1) brightness(1.6)" : "none";
+  const ck = eOutExpo(P(t, .02, .5));
+  crops.forEach(c => { c.style.opacity = ck; });
+  [hTL, hTR, hBL, hBR].forEach(e => e.style.opacity = P(t, .1, .4));
+  const f = Math.min(frame, DUR * FPS);
+  hTC.textContent = `00:00:${pad(Math.floor(f / FPS))}:${pad(f % FPS)}`;
+  hRec.style.opacity = Math.floor(t * 2) % 2 ? .3 : 1;
+}
+
+/* ==========================================================================
+   BOOT
+   ========================================================================== */
+window.renderAt = renderAt;
+window.DURATION = DUR;
+window.reelReady = (async () => {
+  await document.fonts.ready;
+  await document.fonts.load('900 40px "Geist"'); await document.fonts.load('40px "Geist Mono"'); await document.fonts.load('italic 40px "Instrument Serif"');
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  renderAt(0);
+  return true;
+})();
+function fit() {
+  const vp = document.getElementById("viewport");
+  if (CAPTURE) { vp.style.transform = "none"; return; }
+  const z = Math.min(innerWidth / W, innerHeight / H);
+  vp.style.transform = `scale(${z})`;
+  vp.style.marginRight = (W * z - W) + "px"; vp.style.marginBottom = (H * z - H) + "px";
+}
+addEventListener("resize", fit); fit();
+if (!CAPTURE) {
+  let paused = false, last = performance.now(), cur = 0;
+  addEventListener("keydown", e => {
+    if (e.code === "Space") { paused = !paused; e.preventDefault(); }
+    if (e.code === "ArrowRight") cur = Math.min(DUR, cur + (e.shiftKey ? 1 : 1 / FPS));
+    if (e.code === "ArrowLeft") cur = Math.max(0, cur - (e.shiftKey ? 1 : 1 / FPS));
+  });
+  window.reelReady.then(() => {
+    last = performance.now();
+    const loop = now => { if (!paused) { cur += (now - last) / 1000; if (cur > DUR + 1.2) cur = 0; } last = now; renderAt(Math.min(cur, DUR)); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+}
+</script>
+</body>
+</html>
