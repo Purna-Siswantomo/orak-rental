@@ -25,7 +25,6 @@ function PublicHeader() {
   const navLinks = [
     { label: "Cara Kerja", href: "#cara-kerja" },
     { label: "Kategori", href: "#kategori" },
-    { label: "Kalkulator", href: "#kalkulator" },
     { label: "Transparansi", href: "#transparansi" },
     { label: "FAQ", href: "#faq" },
   ];
