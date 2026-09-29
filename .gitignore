@@ -48,3 +48,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# gambar kerja sementara (bukan aset aplikasi)
+/scratchpad_images/

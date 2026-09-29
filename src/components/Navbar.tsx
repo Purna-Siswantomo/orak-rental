@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ClipboardList,
   PlusCircle,
@@ -29,12 +29,46 @@ function PublicHeader() {
     { label: "FAQ", href: "#faq" },
   ];
 
+  // Section yang sedang aktif — ditandai pill di navbar (konsep sama dengan tab showcase).
+  const [activeHref, setActiveHref] = useState<string | null>(null);
+  // Saat smooth-scroll hasil klik, scroll-spy dikunci sebentar supaya pill tidak
+  // "loncat-loncat" melewati section yang dilalui.
+  const scrollLockUntil = useRef(0);
+
+  useEffect(() => {
+    const hrefs = ["#cara-kerja", "#kategori", "#transparansi", "#faq"];
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      if (performance.now() < scrollLockUntil.current) return;
+      let current: string | null = null;
+      for (const href of hrefs) {
+        const elem = document.getElementById(href.slice(1));
+        if (elem && elem.getBoundingClientRect().top <= 120) current = href;
+      }
+      setActiveHref(current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#")) {
       e.preventDefault();
       const targetId = href.replace("#", "");
       const elem = document.getElementById(targetId);
       if (elem) {
+        setActiveHref(href);
+        scrollLockUntil.current = e.timeStamp + 1000; // e.timeStamp memakai jam yang sama dengan performance.now()
         const navOffset = 90; // Floating navbar clearance
         const elementPosition = elem.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - navOffset;
@@ -80,17 +114,30 @@ function PublicHeader() {
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => handleScrollTo(e, link.href)}
-                className="text-sm font-medium text-zinc-300 hover:text-white transition-colors cursor-pointer"
-              >
-                {link.label}
-              </a>
-            ))}
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = activeHref === link.href;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleScrollTo(e, link.href)}
+                  aria-current={isActive ? "location" : undefined}
+                  className={`relative rounded-xl px-3.5 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
+                    isActive ? "text-[#D4E751]" : "text-zinc-300 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activePublicNavLink"
+                      className="absolute inset-0 rounded-xl bg-white/15 border border-white/10 shadow-inner"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{link.label}</span>
+                </a>
+              );
+            })}
           </nav>
 
           {/* Right Action */}
@@ -137,7 +184,11 @@ function PublicHeader() {
                       setMobileOpen(false);
                       handleScrollTo(e, link.href);
                     }}
-                    className="block px-2 py-1.5 text-sm font-medium text-zinc-300 hover:text-white cursor-pointer"
+                    className={`block rounded-lg px-2 py-1.5 text-sm font-medium cursor-pointer ${
+                      activeHref === link.href
+                        ? "bg-white/10 text-[#D4E751]"
+                        : "text-zinc-300 hover:text-white"
+                    }`}
                   >
                     {link.label}
                   </a>
