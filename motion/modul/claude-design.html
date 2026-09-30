@@ -7,63 +7,6 @@
      The Claude interface is redrawn in HTML/CSS as an illustration (not screenshots). -->
 <link rel="stylesheet" href="modul.css">
 <link rel="stylesheet" href="claude-ui.css">
-<style>
-/* annotation */
-.co{position:absolute;width:19px;height:19px;border-radius:50%;background:var(--lime);border:1.5px solid var(--ink);font-family:"Geist Mono",monospace;font-size:9px;font-weight:700;display:grid;place-items:center;z-index:4;box-shadow:0 4px 8px -4px rgba(5,16,14,.5)}
-.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:14px}
-.legend div{display:flex;gap:9px;align-items:flex-start;font-size:10.8px;line-height:1.45}
-.legend .n{flex:none;width:19px;height:19px;border-radius:50%;background:var(--lime);border:1.5px solid var(--ink);font-family:"Geist Mono",monospace;font-size:9px;font-weight:700;display:grid;place-items:center;margin-top:-1px}
-.legend b{font-weight:720}
-/* menus / dialogs */
-.menu{position:absolute;background:#fff;border:1px solid #D9D5CA;border-radius:10px;box-shadow:0 20px 40px -18px rgba(40,34,20,.45);padding:5px;font-size:8.2px;z-index:3}
-.menu .it{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;white-space:nowrap}
-.menu .it.on{background:#F3F1EA}
-.menu .it i{width:12px;height:12px;border-radius:3px;border:1.3px solid #8b897f;flex:none}
-.menu .it .k{margin-left:auto;font-size:7px;color:var(--cm)}
-.menu .it .ok{margin-left:auto;color:var(--ca);font-weight:700}
-.menu .sep{height:1px;background:var(--cl);margin:4px 2px}
-.menu .hd{font-family:"Geist Mono",monospace;font-size:6.6px;letter-spacing:.12em;text-transform:uppercase;color:var(--cm);padding:5px 8px 3px}
-.dlg{background:#fff;border:1px solid #D9D5CA;border-radius:14px;box-shadow:0 30px 60px -26px rgba(40,34,20,.55);padding:16px}
-.dlg h5{font-size:12px;font-weight:650;letter-spacing:-.01em}
-.tabs{display:flex;gap:2px;background:var(--cp);border:1px solid var(--cl);border-radius:8px;padding:2px;margin:10px 0}
-.tabs span{flex:1;text-align:center;padding:5px 0;border-radius:6px;font-size:8px;color:var(--cm)}
-.tabs span.on{background:#fff;color:var(--ct);box-shadow:0 1px 2px rgba(0,0,0,.1);font-weight:600}
-.fld{font-size:7.6px;color:var(--cm);margin:9px 0 4px}
-.inp{border:1px solid #D3CFC3;border-radius:8px;padding:6px 8px;font-size:8.4px;background:#fff}
-.inp.focus{border-color:var(--ca);box-shadow:0 0 0 2px rgba(217,119,87,.18)}
-.opt{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.opt div{border:1px solid var(--cl);border-radius:10px;padding:8px;font-size:7.6px;color:var(--cm)}
-.opt div b{display:block;color:var(--ct);font-size:8.4px;margin-bottom:2px}
-.opt div.on{border:1.5px solid var(--ca);background:rgba(217,119,87,.06)}
-.thumb{height:40px;border-radius:6px;background:#EEECE4;margin-bottom:6px;position:relative;overflow:hidden}
-.sw{display:inline-block;width:22px;height:22px;border-radius:6px;border:1px solid rgba(0,0,0,.12);vertical-align:middle}
-.slider{display:flex;align-items:center;gap:8px;font-size:7.8px;margin:7px 0}
-.slider .lb{width:78px;color:var(--ct)}
-.slider .rl{flex:1;height:4px;border-radius:3px;background:var(--cl);position:relative}
-.slider .rl b{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ca)}
-.slider .rl i{position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:#fff;border:1.5px solid var(--ca);box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.slider .v{width:34px;text-align:right;font-family:"Geist Mono",monospace;font-size:7px;color:var(--cm)}
-.pin{position:absolute;width:20px;height:20px;border-radius:50% 50% 50% 2px;background:var(--ca);color:#fff;font-size:8px;font-weight:700;display:grid;place-items:center;box-shadow:0 4px 10px -3px rgba(0,0,0,.4);z-index:3}
-.cbox{position:absolute;background:#fff;border:1px solid #D9D5CA;border-radius:10px;box-shadow:0 16px 30px -14px rgba(40,34,20,.5);padding:8px;font-size:7.8px;line-height:1.45;width:170px;z-index:3}
-.sel{position:absolute;border:1.5px solid var(--ca);border-radius:3px;box-shadow:0 0 0 3px rgba(217,119,87,.18);z-index:2}
-.sel::after{content:attr(data-tag);position:absolute;left:-1.5px;top:-13px;background:var(--ca);color:#fff;font-family:"Geist Mono",monospace;font-size:6px;padding:1.5px 4px;border-radius:3px 3px 3px 0;white-space:nowrap}
-/* page helpers */
-.tlist{position:relative;margin-top:14px}
-.tlist::before{content:"";position:absolute;left:14px;top:14px;bottom:14px;width:2px;background:repeating-linear-gradient(to bottom,var(--ink) 0 4px,transparent 4px 8px);opacity:.35}
-.tstep{position:relative;display:flex;gap:14px;align-items:flex-start;margin-bottom:11px}
-.tstep .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--lime);font-family:"Geist Mono",monospace;font-size:11px;font-weight:700;display:grid;place-items:center;z-index:1}
-.tstep .n.o{background:var(--paper);color:var(--ink);border:1.5px dashed var(--ink)}
-.tstep .bx{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:9px 14px;display:flex;gap:12px;align-items:center}
-.tstep .bx h3{margin:0;font-size:13.5px}
-.tstep .bx p{margin:1px 0 0;font-size:10.6px;color:var(--muted);line-height:1.45}
-.tstep .bx .m{margin-left:auto;text-align:right;font-family:"Geist Mono",monospace;font-size:8.5px;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
-.tstep .bx .m b{display:block;color:var(--ink);font-size:10px}
-.num{list-style:none;counter-reset:n;margin:8px 0}
-.num li{counter-increment:n;position:relative;padding-left:30px;font-size:12px;line-height:1.55;margin:7px 0}
-.num li::before{content:counter(n);position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--lime);font-family:"Geist Mono",monospace;font-size:9.5px;font-weight:700;display:grid;place-items:center}
-.kbd{font-family:"Geist Mono",monospace;font-size:.86em;background:var(--paper);border:1px solid #cfc8b8;border-bottom-width:2px;border-radius:4px;padding:0 4px}
-.side{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-</style>
 </head>
 <body>
 

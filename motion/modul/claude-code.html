@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="id" data-pdf="Motion-Pakai-Claude-Code.pdf">
+<head>
+<meta charset="utf-8">
+<title>Motion Pakai Claude Code — Otak Rental</title>
+<!-- Side module (A4 PDF). Build: node modul/build.mjs claude-code.html → modul/Motion-Pakai-Claude-Code.pdf
+     The Claude Code interface is redrawn in HTML/CSS as an illustration (not screenshots). -->
+<link rel="stylesheet" href="modul.css">
+<link rel="stylesheet" href="claude-ui.css">
+<style>
+.tree{font-family:"Geist Mono",monospace;font-size:9.6px;line-height:1.75;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;white-space:pre}
+.tree b{font-weight:700}.tree .c{color:var(--muted)}.tree .l{background:var(--lime);padding:0 3px;border-radius:3px}
+.flow{display:flex;align-items:stretch;gap:0;margin-top:14px}
+.flow .fx{flex:1;background:var(--paper);border:1.5px solid var(--ink);border-radius:14px;padding:12px 12px 10px;position:relative}
+.flow .fx.dk{background:var(--ink);color:#EDEAE4}
+.flow .fx.lm{background:var(--lime)}
+.flow .fx .k{font-family:"Geist Mono",monospace;font-size:8px;letter-spacing:.14em;text-transform:uppercase;opacity:.6}
+.flow .fx h3{margin:6px 0 3px;font-size:13px}
+.flow .fx p{font-size:9.6px;line-height:1.45;margin:0;color:inherit;opacity:.8}
+.flow .ar{flex:none;width:22px;display:grid;place-items:center;font-size:14px}
+.vs td:first-child{font-weight:650}
+.vs td.y{color:var(--emerald);font-weight:650}
+.path{display:inline-flex;align-items:center;gap:8px;font-family:"Geist Mono",monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;border-radius:8px;padding:6px 10px;border:1.5px solid var(--ink)}
+.path.a{background:var(--lime)}.path.b{background:var(--ink);color:var(--lime)}
+</style>
+</head>
+<body>
+
+<!-- ================================================================ 01 · COVER -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Modul bonus 03</span><span>Edisi Sept 2026 · v1.0</span></div>
+  <div class="pad" style="padding-top:112px">
+    <span class="kicker dark"><i></i>Di balik layar Otak Rental</span>
+    <h1 style="font-size:66px;line-height:.98;margin-top:20px">Motion pakai<span class="ser" style="font-size:78px;margin-top:4px"><span class="mk">Claude Code.</span></span></h1>
+    <p class="lead" style="width:490px;font-size:15px">Cara persis kami membuat semua video motion Otak Rental: brand disimpan di repo, Claude Code menulis animasinya, lalu dirender jadi <b>MP4 60 fps</b>. Bisa di <b>cloud</b> atau di <b>laptop sendiri</b>.</p>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <span class="kicker">16 halaman</span><span class="kicker">Cloud &amp; lokal</span><span class="kicker">Prompt asli kami</span>
+    </div>
+
+    <div class="ui win" style="position:absolute;left:52px;right:52px;top:540px;height:410px">
+      <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>claude.ai</b>/code</span></div>
+      <div class="ccw" style="height:386px">
+        <div class="sb">
+          <div class="nw"><i class="spk"></i>New session</div>
+          <div class="lb">Sessions</div>
+          <div class="ss on">Promo kopi 15s<small>otakrental/brand · +612</small></div>
+          <div class="ss">Reel 30 detik<small>otakrental/brand · +1.204</small></div>
+          <div class="ss">Carousel IG<small>otakrental/brand · +388</small></div>
+          <div class="ss">Everything Moves<small>otakrental/brand · +940</small></div>
+        </div>
+        <div class="mn">
+          <div class="hdr"><b>Promo kopi 15s</b><span class="chip-s">⎇ claude/promo-kopi</span><span class="diffc" style="margin-left:auto"><b>+612</b> <i>−0</i></span><span class="ubtn">Create PR</span></div>
+          <div class="conv">
+            <div class="msg-u">Buat video promo 15 detik 4:5 untuk Kopi Nalar. Pakai brand di repo ini, render jadi MP4 60 fps dengan suara.</div>
+            <div class="msg-c"><i class="spk"></i><p>Aku baca dulu <b>CLAUDE.md</b> dan folder brand, lalu buat animasinya.</p></div>
+            <div class="tool"><span class="dot"></span><b>Read</b> CLAUDE.md, fonts/, assets/logo.png</div>
+            <div class="tool"><span class="dot"></span><b>Write</b> sample.html <span style="color:var(--cm)">(renderAt · 15 dtk · 1080×1350)</span></div>
+            <div class="tool"><span class="dot"></span><b>Bash</b> node render.mjs --page sample.html --fps 60</div>
+            <div style="display:flex;gap:10px;align-items:flex-end">
+              <div class="vid" style="width:118px;height:148px"><img src="img/kopi-price.jpg" alt=""><span class="pl2">▶</span><div class="pb"><b style="width:62%"></b></div></div>
+              <div class="msg-c" style="flex:1"><i class="spk"></i><p>Selesai: <b>otak-rental-sample-15s.mp4</b> (1080×1350, 60 fps, 15 dtk). Sudah aku commit dan push ke branch.</p></div>
+            </div>
+            <div class="composer" style="margin-top:auto"><div class="ph">Reply…</div><div class="row"><span class="chip-s">▣ otakrental/brand</span><span class="chip-s">Auto ▾</span><span class="model">Opus 5.5 ▾</span><span class="send">↑</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute;right:30px;top:452px;width:112px;height:112px;border-radius:50%;background:var(--lime);border:2px solid var(--ink);display:grid;place-items:center;text-align:center;transform:rotate(10deg);z-index:5;box-shadow:0 16px 26px -14px rgba(5,16,14,.6)">
+      <div><div class="mono" style="font-size:8px;letter-spacing:.18em">RENDER</div><div style="font-size:30px;font-weight:840;letter-spacing:-.05em;line-height:1">60<span style="font-size:15px">fps</span></div><div class="mono" style="font-size:8px;letter-spacing:.18em">MP4</div></div>
+    </div>
+  </div>
+  <div class="ft"><span>otakrental · @otakrental</span><span>Motion pakai Claude Code</span></div>
+</section>
+
+<!-- ================================================================ 02 · HALO -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Pembuka</span></div>
+  <div class="pad">
+    <span class="kicker"><i></i>Halo lagi</span>
+    <h1>Ini dapur kami,<span class="ser">kamu boleh masuk.</span></h1>
+    <p class="lead">Showreel, video contoh di feed, reel 30 detik, sampai carousel Instagram Otak Rental semuanya dibuat dengan cara yang ada di modul ini. Tidak ada After Effects, tidak ada template berbayar.</p>
+    <div class="grid4" style="margin-top:14px">
+      <div><div class="shot" style="height:118px"><img src="img/kopi-hook.jpg" alt=""></div><div class="cap">Promo 15 dtk · 4:5</div></div>
+      <div><div class="shot" style="height:118px"><img src="img/r30-hook.jpg" alt=""></div><div class="cap">Reel 30 dtk · 9:16</div></div>
+      <div><div class="shot" style="height:118px"><img src="img/em-tunnel.jpg" alt=""></div><div class="cap">Landscape · 16:9</div></div>
+      <div><div class="shot" style="height:118px"><img src="img/eror.jpg" alt="" style="object-position:top"></div><div class="cap">Konten · 4:5</div></div>
+    </div>
+    <h2>Bedanya dengan Claude Design</h2>
+    <table class="vs"><tr><th style="width:28%"></th><th>Claude Design (modul 02)</th><th>Claude Code (modul ini)</th></tr>
+      <tr><td>Cara kerja</td><td>Ngobrol, lihat kanvas</td><td>Ngobrol, Claude menulis &amp; menjalankan kode</td></tr>
+      <tr><td>Hasil akhir</td><td>File HTML, lalu direkam layar</td><td class="y">MP4 asli, dirender per frame</td></tr>
+      <tr><td>Kualitas</td><td>Tergantung perekam layar</td><td class="y">60 fps stabil, motion blur, tanpa patah</td></tr>
+      <tr><td>Suara</td><td>Ditambah manual di CapCut</td><td class="y">Bisa dibuat &amp; disinkronkan otomatis</td></tr>
+      <tr><td>Brand</td><td>Design system di Claude Design</td><td>Disimpan di repo GitHub / folder</td></tr>
+      <tr><td>Tingkat kesulitan</td><td class="y">Paling mudah</td><td>Sedikit teknis, tapi dipandu</td></tr>
+    </table>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card"><h3 style="margin-top:0">Yang kamu butuhkan</h3><ul class="clean"><li>Paket <b>Claude Pro</b> (atau Max/Team)</li><li>Akun <b>GitHub</b> gratis (untuk jalur cloud)</li><li>Laptop/PC untuk jalur lokal, <b>atau cukup HP</b> untuk jalur cloud</li></ul></div>
+      <div class="card ink"><h3 style="margin-top:0;color:#fff">Tidak perlu bisa coding</h3><p>Kamu tetap cuma menulis permintaan dalam bahasa sehari-hari. Kode ditulis, dijalankan, dan diperbaiki oleh Claude. Tugasmu: memberi arahan dan menilai hasil.</p></div>
+    </div>
+  </div>
+  <div class="ft"><span>02</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 03 · CARA KERJA -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Bab 01 · Cara kerja</span></div>
+  <div class="chapnum">01</div>
+  <div class="pad">
+    <span class="kicker"><i></i>Bab 01</span>
+    <h1>Dari repo<span class="ser">jadi MP4.</span></h1>
+    <p class="lead">Bayangkan Claude Code sebagai <b>editor motion yang tinggal di dalam folder proyekmu</b>. Ia bisa membaca file brand, menulis file animasi, menjalankan program, lalu memeriksa hasilnya sendiri.</p>
+    <div class="flow">
+      <div class="fx"><div class="k">01 · Bahan</div><h3>Repo brand</h3><p>Logo, font, warna, dan CLAUDE.md berisi aturan brand.</p></div><div class="ar">→</div>
+      <div class="fx dk"><div class="k">02 · Tulis</div><h3>Animasi HTML</h3><p>Claude menulis 1 file yang menggambar frame di detik ke-t.</p></div><div class="ar">→</div>
+      <div class="fx"><div class="k">03 · Foto</div><h3>Playwright</h3><p>Browser otomatis memotret 60 frame per detik.</p></div><div class="ar">→</div>
+      <div class="fx lm"><div class="k">04 · Gabung</div><h3>ffmpeg</h3><p>Frame + suara disatukan jadi MP4.</p></div>
+    </div>
+    <h2>Kenapa "render per frame" itu penting?</h2>
+    <p>Rekam layar bergantung pada kecepatan laptop: kalau laptop sibuk, video patah-patah. Di cara ini, animasi dibuat <b>deterministik</b>: gambar di detik 3,25 selalu sama persis, secepat atau selambat apa pun komputernya. Hasilnya mulus seperti render After Effects.</p>
+    <div class="prompt" data-label="Bentuk animasinya · kamu tidak perlu menulis ini">const DURATION = 15;              <span class="c">// panjang video (detik)</span>
+function renderAt(t) {             <span class="c">// gambar frame di detik ke-t</span>
+  const masuk = easeOut(clamp((t - 0.5) / 0.6));   <span class="c">// judul masuk 0,5–1,1 dtk</span>
+  judul.style.transform = `translateY(${(1 - masuk) * 80}px)`;
+  ...
+}
+window.renderAt = renderAt; window.DURATION = DURATION;   <span class="c">// dipakai mesin render</span></div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="card"><h3 style="margin-top:0">Motion blur asli</h3><p class="small">Tiap frame adalah rata-rata 6 potret kecil, jadi gerakan cepat terlihat "ngeblur" natural.</p></div>
+      <div class="card"><h3 style="margin-top:0">Suara tersinkron</h3><p class="small">Efek suara dibuat oleh skrip Python dan ditaruh tepat di detik tiap gerakan.</p></div>
+      <div class="card"><h3 style="margin-top:0">Bisa diulang</h3><p class="small">Ganti teks atau warna, render ulang, hasilnya konsisten. Cocok untuk jasa.</p></div>
+    </div>
+  </div>
+  <div class="ft"><span>03</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 04 · PILIH JALUR -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Bab 02 · Pilih jalur</span></div>
+  <div class="chapnum">02</div>
+  <div class="pad">
+    <span class="kicker"><i></i>Bab 02</span>
+    <h1>Cloud atau lokal?<span class="ser">Dua-duanya bisa.</span></h1>
+    <p class="lead">Claude Code-nya sama. Bedanya hanya <b>di mana komputernya berjalan</b>: di server Anthropic (cloud) atau di laptopmu sendiri (lokal).</p>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card" style="border:1.5px solid var(--ink)"><span class="path a">Jalur A · Cloud</span><h3>claude.ai/code</h3>
+        <ul class="clean"><li>Tanpa instal apa pun, jalan di browser atau HP</li><li>Tetap jalan walau laptop ditutup</li><li>Butuh repo <b>GitHub</b></li><li>File hasil diambil dari GitHub</li></ul>
+        <p class="small" style="margin-top:6px">Cocok untuk: pemula, kerja dari HP, laptop kentang.</p></div>
+      <div class="card ink"><span class="path b" style="border-color:var(--lime)">Jalur B · Lokal</span><h3 style="color:#fff">Desktop app / terminal</h3>
+        <ul class="clean" style="color:#EDEAE4"><li>File langsung ada di laptopmu</li><li>Tidak wajib pakai GitHub</li><li>Perlu instal Node.js, ffmpeg, Chromium</li><li>Render memakai tenaga laptopmu</li></ul>
+        <p style="margin-top:6px;font-size:10.5px;opacity:.7">Cocok untuk: sering render, file besar, klien banyak.</p></div>
+    </div>
+    <h2>Syarat &amp; fakta penting</h2>
+    <table><tr><th style="width:32%">Hal</th><th>Keterangan</th></tr>
+      <tr><td>Paket</td><td>Claude Code butuh paket <b>Pro, Max, Team, atau Enterprise</b>. Paket gratis tidak bisa.</td></tr>
+      <tr><td>Kuota</td><td>Sesi cloud memakai kuota yang sama dengan chat Claude biasa. Tidak ada biaya server terpisah.</td></tr>
+      <tr><td>Model</td><td>Pilih <b>Opus 5.5</b> dari menu model untuk animasi yang rumit.</td></tr>
+      <tr><td>Sistem operasi (lokal)</td><td>macOS 13+, Windows 10 (1809)+, atau Ubuntu 20.04+. RAM minimal 4 GB.</td></tr>
+    </table>
+    <div class="tip"><b class="t">SARAN</b><span>Mulai dari <b>Jalur A</b> untuk video pertamamu. Setelah paham alurnya, pindah ke Jalur B kalau mulai sering render.</span></div>
+  </div>
+  <div class="ft"><span>04</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 05 · REPO BRAND -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Bab 03 · Repo brand</span></div>
+  <div class="chapnum">03</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Bab 03 · sekali saja</span>
+    <h1>Simpan brand<span class="ser">di satu folder.</span></h1>
+    <p class="lead">Rahasia kenapa semua video kami seragam: Claude selalu membaca <b>folder brand yang sama</b> sebelum bekerja. Buat foldernya sekali, pakai selamanya.</p>
+    <div class="side" style="margin-top:12px;grid-template-columns:.85fr 1.15fr">
+      <div class="tree"><b>otakrental-brand/</b>
+├─ <span class="l">CLAUDE.md</span>      <span class="c">← aturan brand</span>
+├─ assets/
+│  ├─ logo.png
+│  └─ logo-putih.png
+├─ fonts/
+│  ├─ Geist.woff2
+│  └─ InstrumentSerif.woff2
+├─ referensi/      <span class="c">← contoh gaya</span>
+│  └─ feed-ig.jpg
+└─ motion/         <span class="c">← diisi Claude</span></div>
+      <div>
+        <ol class="num" style="margin-top:0">
+          <li>Buat repo baru di <b>github.com/new</b> (boleh Private), misal <code>otakrental-brand</code>. Untuk jalur lokal, cukup folder biasa.</li>
+          <li>Upload logo, font (file .woff2/.ttf), dan 2–3 gambar referensi gaya.</li>
+          <li>Buat file <b>CLAUDE.md</b> dengan isi seperti contoh di bawah. Claude Code otomatis membaca file ini di setiap sesi.</li>
+        </ol>
+        <div class="tip"><b class="t">FONT</b><span>Pakai font berlisensi bebas (Google Fonts). Unduh di <b>fonts.google.com</b> → Download family.</span></div>
+      </div>
+    </div>
+    <div class="prompt" data-label="Contoh CLAUDE.md · sesuaikan">
+# Brand: Otak Rental
+Warna: krem <b>#FAF7F0</b> (latar), tinta <b>#05100E</b> (teks), lime <b>#D4E751</b> (aksen), hijau <b>#17463A</b>.
+Font: Geist (judul tebal), Geist Mono (label kecil, huruf kapital, spasi lebar),
+      Instrument Serif italic (kata penekanan).
+Gaya: bersih, grid tipis di latar, crop mark di sudut, stabilo lime di kata kunci.
+Logo: assets/logo.png (latar terang), assets/logo-putih.png (latar gelap).
+
+# Aturan motion
+- Semua animasi: 1 file HTML di folder motion/, fungsi renderAt(t) + DURATION (deterministik).
+- Easing ease-out untuk masuk, selalu ada jeda diam ≥1 dtk di akhir.
+- Teks minimal 80px dari tepi. Cek dengan still frame sebelum render penuh.
+- Output MP4 H.264 60 fps di motion/out/.</div>
+  </div>
+  <div class="ft"><span>05</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 06 · JALUR A SETUP -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Jalur A · Cloud</span></div>
+  <div class="chapnum">04</div>
+  <div class="pad">
+    <span class="path a">Jalur A · Cloud</span>
+    <h1>Hubungkan<span class="ser">GitHub, sekali saja.</span></h1>
+    <ol class="num" style="margin-top:12px">
+      <li>Buka <b>claude.ai/code</b> dan login dengan akun Pro-mu.</li>
+      <li>Klik tombol untuk <b>connect GitHub</b>, lalu setujui (Authorize) di halaman GitHub.</li>
+      <li><b>Install Claude GitHub App</b> di repo brand-mu. <span class="mk">Langkah ini wajib untuk repo Private</span>, termasuk supaya Claude bisa <b>push</b> hasilnya.</li>
+      <li>Untuk paket Pro, environment bernama <b>Default</b> dibuat otomatis. Biarkan apa adanya.</li>
+    </ol>
+    <div class="ui win" style="margin-top:12px;height:300px">
+      <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>github.com</b>/apps/claude</span></div>
+      <div style="padding:18px 22px;background:#fff;height:276px;font-size:8.4px">
+        <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:9px;background:#F5F0E8;display:grid;place-items:center"><i class="spk" style="width:24px;height:24px"></i></div><div><div style="font-size:12px;font-weight:650">Install Claude</div><div style="color:#57606a">Install on your personal account <b>otakrental</b></div></div></div>
+        <div style="border:1px solid #d0d7de;border-radius:8px;margin-top:14px;padding:10px 12px">
+          <div style="display:flex;gap:7px;align-items:center;margin-bottom:7px"><span style="width:10px;height:10px;border-radius:50%;border:1.5px solid #8c959f"></span>All repositories</div>
+          <div style="display:flex;gap:7px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;border:3.5px solid #0969da"></span><b>Only select repositories</b></div>
+          <div style="margin:8px 0 0 17px;display:inline-flex;gap:6px;align-items:center;border:1px solid #d0d7de;border-radius:6px;padding:4px 8px;background:#f6f8fa">▣ otakrental/otakrental-brand <span style="color:#57606a">✕</span></div>
+        </div>
+        <div style="color:#57606a;margin-top:10px;line-height:1.5">with these permissions: read access to metadata · read and write access to code, pull requests</div>
+        <div style="margin-top:14px"><span style="display:inline-block;background:#1f883d;color:#fff;border-radius:6px;padding:6px 14px;font-weight:600">Install</span></div>
+      </div>
+      <span class="co" style="left:30px;top:118px">✓</span><span class="co" style="left:30px;top:236px">→</span>
+    </div>
+    <div class="tip warn"><b class="t">ERROR 403?</b><span>Kalau Claude bilang <i>push gagal, 403</i>, artinya GitHub App belum terpasang di repo itu. Kami sendiri pernah kena: pekerjaan aman tersimpan, tapi tidak bisa dikirim ke GitHub sampai App dipasang. Pasang di <b>github.com/apps/claude</b>, lalu minta Claude push ulang.</span></div>
+  </div>
+  <div class="ft"><span>06</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 07 · JALUR A MULAI SESI -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Jalur A · Cloud</span></div>
+  <div class="pad">
+    <span class="path a">Jalur A · Cloud</span>
+    <h1>Mulai sesi<span class="ser">pertamamu.</span></h1>
+    <div class="ui win" style="margin-top:14px;height:220px">
+      <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>claude.ai</b>/code</span></div>
+      <div style="background:var(--cb);height:196px;padding:30px 60px;position:relative">
+        <div style="font-family:'Instrument Serif',serif;font-size:26px;display:flex;gap:10px;align-items:center;justify-content:center"><i class="spk" style="width:22px;height:22px"></i>What should we work on?</div>
+        <div class="composer" style="margin:18px auto 0;width:470px"><div class="ph typed">Baca CLAUDE.md, lalu siapkan mesin render motion di folder motion/…</div>
+          <div class="row"><span class="chip-s">▣ otakrental/otakrental-brand</span><span class="chip-s">⎇ main</span><span class="chip-s">☁ Default</span><span class="chip-s" style="margin-left:auto">Auto ▾</span><span class="model">Opus 5.5 ▾</span><span class="send">↑</span></div></div>
+      </div>
+      <span class="co" style="left:118px;top:170px">1</span><span class="co" style="left:290px;top:170px">2</span><span class="co" style="left:389px;top:170px">3</span><span class="co" style="left:500px;top:170px">4</span>
+    </div>
+    <div class="legend">
+      <div><span class="n">1</span><span><b>Repository.</b> Pilih repo brand-mu. Tiap repo punya pilihan branch (biarkan <b>main</b>).</span></div>
+      <div><span class="n">2</span><span><b>Environment.</b> Pakai <b>Default</b>. Aksesnya "Trusted": bisa mengunduh paket npm &amp; pip yang dibutuhkan.</span></div>
+      <div><span class="n">3</span><span><b>Mode izin.</b> <b>Auto</b> atau <b>Accept edits</b> supaya Claude bekerja tanpa berhenti. <b>Plan</b> kalau mau lihat rencananya dulu.</span></div>
+      <div><span class="n">4</span><span><b>Model.</b> Pilih <b>Opus 5.5</b>, lalu tulis permintaan dan tekan Enter.</span></div>
+    </div>
+    <h2>Setelah kamu tekan Enter</h2>
+    <p>Claude menyalin repo ke komputer cloud, membaca CLAUDE.md, lalu mulai bekerja. Kamu bisa melihat setiap langkahnya (<i>Read</i>, <i>Write</i>, <i>Bash</i>). Boleh ditinggal, tutup tab, bahkan cek dari aplikasi Claude di HP. Sesi tetap berjalan.</p>
+    <div class="grid2">
+      <div class="tip" style="margin:0"><b class="t">HP</b><span>Sesi yang sama bisa dibuka di tab <b>Code</b> aplikasi Claude di HP. Enak untuk cek progres sambil jalan.</span></div>
+      <div class="tip" style="margin:0"><b class="t">RAPI</b><span>Satu video = satu sesi. Setiap sesi otomatis punya branch sendiri, jadi video tidak saling tercampur.</span></div>
+    </div>
+  </div>
+  <div class="ft"><span>07</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 08 · JALUR A AMBIL HASIL -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Jalur A · Cloud</span></div>
+  <div class="pad">
+    <span class="path a">Jalur A · Cloud</span>
+    <h1>Ambil videonya<span class="ser">dari GitHub.</span></h1>
+    <p class="lead">Komputer cloud dihapus setelah lama tidak dipakai. Jadi semua hasil harus <b>di-commit dan di-push</b> ke GitHub, baru diunduh.</p>
+    <div class="side" style="margin-top:12px;grid-template-columns:1fr 1fr">
+      <div class="ui win" style="height:280px">
+        <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>github.com</b>/otakrental/…/motion/out</span></div>
+        <div style="background:#fff;height:256px;padding:12px 14px;font-size:8.2px">
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px"><span class="chip-s">⎇ claude/promo-kopi</span><span style="color:#57606a">otakrental-brand / motion / out</span></div>
+          <div style="border:1px solid #d0d7de;border-radius:8px;overflow:hidden">
+            <div style="padding:6px 10px;background:#f6f8fa;border-bottom:1px solid #d0d7de;color:#57606a">claude · Render promo kopi 15s</div>
+            <div style="padding:6px 10px;border-bottom:1px solid #eaeef2">🎞 otak-rental-sample-15s.mp4 <span style="float:right;color:#57606a">8.4 MB</span></div>
+            <div style="padding:6px 10px;border-bottom:1px solid #eaeef2">🖼 poster.png <span style="float:right;color:#57606a">412 KB</span></div>
+            <div style="padding:6px 10px">📄 sample.html <span style="float:right;color:#57606a">38 KB</span></div>
+          </div>
+          <div style="margin-top:14px;border:1px solid #d0d7de;border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center"><span>otak-rental-sample-15s.mp4</span><span style="border:1px solid #d0d7de;border-radius:6px;padding:3px 8px;background:#f6f8fa">⤓ Download raw file</span></div>
+        </div>
+        <span class="co" style="left:18px;top:34px">1</span><span class="co" style="left:18px;top:102px">2</span><span class="co" style="right:14px;top:210px">3</span>
+      </div>
+      <div>
+        <ol class="num" style="margin-top:0">
+          <li>Di akhir permintaan, selalu tulis: <i>"commit dan push hasilnya"</i>. Claude akan mendorong <b>branch</b>-nya ke GitHub.</li>
+          <li>Buka repo di github.com, ganti branch ke branch sesi (awalan <code>claude/</code>), masuk ke <code>motion/out</code>.</li>
+          <li>Klik file MP4 → <b>Download raw file</b>. Selesai, tinggal upload.</li>
+        </ol>
+        <div class="tip"><b class="t">UKURAN</b><span>GitHub menolak file di atas 100 MB. Minta Claude: <i>"pastikan MP4 di bawah 30 MB, naikkan CRF kalau perlu."</i></span></div>
+      </div>
+    </div>
+    <h2>Mau dilanjutkan di laptop?</h2>
+    <p>Kalau sudah memasang Claude Code lokal (Jalur B), sesi cloud bisa "ditarik" ke terminal, lengkap dengan branch dan riwayat chat-nya:</p>
+    <div class="prompt" data-label="Terminal · dari folder repo yang sama">claude --teleport          <span class="c"># pilih sesi dari daftar</span></div>
+    <div class="grid2">
+      <div class="card"><h3 style="margin-top:0">Review perubahan</h3><p class="small">Klik angka <b>+612 −0</b> di atas chat untuk melihat semua file yang dibuat Claude, dan beri komentar per baris.</p></div>
+      <div class="card"><h3 style="margin-top:0">Create PR (opsional)</h3><p class="small">Kalau mau menggabungkan hasil ke branch <b>main</b>, klik <b>Create PR</b> lalu merge di GitHub.</p></div>
+    </div>
+  </div>
+  <div class="ft"><span>08</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 09 · JALUR B INSTAL -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Jalur B · Lokal</span></div>
+  <div class="chapnum">05</div>
+  <div class="pad">
+    <span class="path b">Jalur B · Lokal</span>
+    <h1>Pasang<span class="ser">Claude Code di laptop.</span></h1>
+    <p class="lead">Ada dua pintu. Pilih salah satu, keduanya memakai Claude Code yang sama.</p>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card"><span class="kicker dark">Pintu 1 · paling mudah</span><h3>Aplikasi desktop Claude</h3>
+        <ol class="num" style="margin:6px 0 0"><li style="font-size:11px">Unduh di <b>claude.com/download</b> (Mac / Windows), login.</li><li style="font-size:11px">Klik tab <b>Code</b> di bagian atas.</li><li style="font-size:11px">Pilih <b>Local</b> → <b>Select folder</b> → folder brand-mu.</li></ol>
+        <p class="small" style="margin-top:6px">Tidak perlu terminal. Aplikasi sudah berisi Claude Code.</p></div>
+      <div class="card ink"><span class="kicker" style="background:transparent;border-color:rgba(255,255,255,.2);color:var(--lime)">Pintu 2 · terminal</span><h3 style="color:#fff">Claude Code CLI</h3>
+        <p style="font-size:11px">Buka Terminal (Mac) atau PowerShell (Windows), tempel perintah di bawah, lalu buka terminal baru dan ketik <code style="background:rgba(255,255,255,.1);color:var(--lime)">claude</code> di dalam folder brand-mu. Login lewat browser saat diminta.</p></div>
+    </div>
+    <div class="term" style="margin-top:14px">
+      <div class="ttb"><i></i><i></i><i></i><span>Terminal — instal Claude Code</span></div>
+<div class="tbody"><span class="c"># macOS / Linux / WSL</span>
+<span class="p">$</span> curl -fsSL https://claude.ai/install.sh | bash
+
+<span class="c"># Windows PowerShell</span>
+<span class="p">PS&gt;</span> irm https://claude.ai/install.ps1 | iex
+
+<span class="c"># cek instalasi (buka terminal baru dulu)</span>
+<span class="p">$</span> claude --version
+<span class="g">2.1.x (Claude Code)</span>
+
+<span class="c"># masuk ke folder brand, lalu mulai</span>
+<span class="p">$</span> cd otakrental-brand
+<span class="p">$</span> claude
+<div class="welcome"><span style="color:#D97757">✻</span> <span class="w">Welcome to Claude Code!</span>   <span class="c">/help for help · cwd: ~/otakrental-brand</span></div>
+<div class="inbox"><span class="p">&gt;</span> <span class="c">Try "siapkan mesin render motion di folder motion/"</span></div></div>
+    </div>
+    <div class="tip"><b class="t">WINDOWS</b><span>Disarankan juga memasang <b>Git for Windows</b> (git-scm.com) supaya Claude bisa menjalankan perintah dengan lebih lancar. Tanpa itu, Claude memakai PowerShell.</span></div>
+  </div>
+  <div class="ft"><span>09</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 10 · JALUR B TOOLS -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Jalur B · Lokal</span></div>
+  <div class="pad">
+    <span class="path b">Jalur B · Lokal</span>
+    <h1>Siapkan<span class="ser">3 alat render.</span></h1>
+    <p class="lead">Mesin render butuh tiga program gratis. Cara termudah: <b>minta Claude memasangnya</b>. Kamu tinggal klik izinkan setiap kali ia meminta menjalankan perintah.</p>
+    <table style="margin-top:12px"><tr><th style="width:20%">Alat</th><th style="width:28%">Fungsinya</th><th>Pasang manual (kalau perlu)</th></tr>
+      <tr><td><b>Node.js</b></td><td>Menjalankan skrip render</td><td>Mac: <code>brew install node</code> · Windows: <code>winget install OpenJS.NodeJS.LTS</code> · atau nodejs.org</td></tr>
+      <tr><td><b>Chromium</b><br><span class="small">(via Playwright)</span></td><td>Browser otomatis yang memotret frame</td><td><code>npm i -D playwright</code> lalu <code>npx playwright install chromium</code></td></tr>
+      <tr><td><b>ffmpeg</b></td><td>Menyatukan frame + suara jadi MP4</td><td>Mac: <code>brew install ffmpeg</code> · Windows: <code>winget install Gyan.FFmpeg</code></td></tr>
+      <tr><td><b>Python 3</b><br><span class="small">(opsional)</span></td><td>Membuat efek suara</td><td>python.org atau Microsoft Store (Windows)</td></tr>
+    </table>
+    <div class="prompt" data-label="Prompt · biar Claude yang pasang">Cek apakah Node.js, ffmpeg, dan Chromium untuk Playwright sudah terpasang di komputer ini.
+Kalau belum, pasang dengan cara paling aman untuk sistem operasi saya, jelaskan setiap
+perintah sebelum dijalankan, lalu tes: render video hitam 1 detik ke motion/out/tes.mp4.</div>
+    <div class="term" style="margin-top:10px">
+      <div class="ttb"><i></i><i></i><i></i><span>claude — ~/otakrental-brand</span></div>
+<div class="tbody"><span class="p">⏺</span> <span class="w">Bash</span>(node --version &amp;&amp; ffmpeg -version | head -1)
+  <span class="c">⎿</span> <span class="g">v22.11.0</span>
+  <span class="c">⎿</span> <span style="color:#F08A6C">ffmpeg: command not found</span>
+<span class="p">⏺</span> ffmpeg belum ada. Aku akan memasangnya dengan winget.
+<div class="inbox" style="border-color:#D97757">Allow <span class="w">Bash(winget install Gyan.FFmpeg)</span>?   <span class="w">❯ 1. Yes</span>   2. Yes, and don't ask again   3. No</div></div>
+    </div>
+    <div class="tip warn"><b class="t">AMAN</b><span>Baca dulu perintah yang diminta sebelum menekan <b>Yes</b>. Kalau ragu, pilih <b>No</b> dan tanya Claude: <i>"Perintah ini untuk apa?"</i></span></div>
+  </div>
+  <div class="ft"><span>10</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 11 · PROMPT MESIN RENDER -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Bab 06 · Mesin render</span></div>
+  <div class="chapnum">06</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Bab 06 · cloud &amp; lokal sama</span>
+    <h1>Prompt 1:<span class="ser">bangun mesin render.</span></h1>
+    <p class="lead">Cukup <b>sekali per repo</b>. Setelah mesin ini ada, setiap video baru tinggal "isi animasinya".</p>
+<div class="prompt" data-label="Prompt mesin render · copy-paste" style="margin-top:14px">Baca CLAUDE.md. Siapkan mesin render motion di folder <b>motion/</b>:
+
+1. <b>render.mjs</b> (Node): sajikan folder motion/ lewat server lokal, buka halaman animasi
+   di Chromium (Playwright) dengan ukuran <b>--width</b> × <b>--height</b>, lalu untuk setiap frame
+   panggil <b>window.renderAt(t)</b> dan ambil screenshot. Durasi dari <b>window.DURATION</b>.
+2. Opsi: <b>--page</b>, <b>--name</b>, <b>--fps 60</b>, <b>--sub 6</b> (motion blur: rata-rata 6 sub-frame
+   per frame), <b>--stills 1.5,4,9</b> (hanya simpan PNG di detik tertentu untuk preview).
+3. Gabungkan frame dengan <b>ffmpeg</b>: H.264, CRF 18, yuv420p, +faststart, 60 fps.
+   Kalau ada file WAV dengan nama yang sama, masukkan sebagai audio AAC.
+4. Buat <b>contoh.html</b>: 5 detik, 1080×1350, teks brand masuk dengan ease-out.
+5. Tes: buat 3 still, lalu render penuh ke motion/out/contoh.mp4. Tunjukkan hasilnya.
+6. Tulis cara pakainya di motion/README.md. Commit dan push.</div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="card"><h3 style="margin-top:0">--stills</h3><p class="small">Preview super cepat: hanya beberapa gambar diam. Pakai ini sebelum render penuh supaya hemat waktu &amp; kuota.</p></div>
+      <div class="card"><h3 style="margin-top:0">--sub 6</h3><p class="small">Motion blur asli. Makin besar makin halus, tapi render makin lama. 6 sudah cukup.</p></div>
+      <div class="card"><h3 style="margin-top:0">CRF 18</h3><p class="small">Kualitas tinggi. Kalau file terlalu besar untuk diunggah, naikkan ke 22–24.</p></div>
+    </div>
+    <div class="tip"><b class="t">LAMA RENDER</b><span>Video 15 detik 60 fps = 900 frame. Dengan motion blur, butuh beberapa menit. Biarkan Claude bekerja; kamu bisa mengerjakan hal lain.</span></div>
+    <h2>Perintah yang nanti sering kamu lihat</h2>
+    <div class="term">
+      <div class="ttb"><i></i><i></i><i></i><span>Perintah render · dijalankan oleh Claude</span></div>
+<div class="tbody"><span class="c"># preview cepat: 3 gambar diam</span>
+<span class="p">$</span> node motion/render.mjs --page contoh.html --width 1080 --height 1350 --stills 1,2.5,4.5
+
+<span class="c"># render penuh 60 fps + motion blur</span>
+<span class="p">$</span> node motion/render.mjs --page contoh.html --width 1080 --height 1350 --name contoh
+<span class="g">✓ 300 frame · contoh.mp4 (1080×1350, 60 fps, 5.0 dtk)</span></div>
+    </div>
+    <p class="small" style="margin-top:8px">Kamu tidak perlu mengetik perintah ini. Tapi kalau paham artinya, kamu bisa mengecek apa yang sedang dikerjakan Claude.</p>
+  </div>
+  <div class="ft"><span>11</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 12 · PROMPT ANIMASI -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Bab 07 · Animasi</span></div>
+  <div class="chapnum">07</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Bab 07</span>
+    <h1>Prompt 2:<span class="ser">brief videonya.</span></h1>
+    <p class="lead">Ini prompt yang kami pakai untuk video contoh "Kopi Nalar". Formatnya seperti brief ke editor manusia: <b>tujuan, format, alur per detik, dan standar kualitas</b>.</p>
+<div class="prompt" data-label="Prompt brief · versi asli kami (diringkas)" style="margin-top:14px">Buat contoh motion graphic <b>15 detik</b> untuk slide 4 carousel "Price List Motion",
+biar calon klien tahu hasilnya. Buat sekeren dan seprofesional mungkin.
+Format <b>1080×1350 (4:5)</b>, <b>60 fps</b>, brand fiktif <b>"Kopi Nalar"</b> (es kopi susu gula aren).
+
+Alur:
+0–3 dtk     Hook "Pagi berat?" jatuh ke layar gelap, huruf memantul.
+3–7 dtk     Gelas digambar garis demi garis, es jatuh, 3 label rasa muncul bergantian.
+7–9,6 dtk   Kamera masuk ke gelas, 3 panel bergantian (push-up): Dingin, Manis pas, Nendang.
+9,6–11,7    Harga lama Rp18.000 dicoret, Rp12.000 berputar seperti slot, stiker -33%.
+11,7–15     Logo jatuh &amp; memantul, tagline, CTA, lalu diam.
+
+Standar: motion blur, suara tersinkron di setiap hentakan, semua teks aman dari tepi.
+Kerjakan: buat <b>still di 6 titik waktu</b> dulu dan tunjukkan ke saya. Setelah saya
+bilang oke, render penuh + suara. Commit dan push.</div>
+    <h2>Kalimat sakti kami</h2>
+    <div class="grid2">
+      <div class="pl"><span class="no">01</span><div><h4>"Tunjukkan still dulu"</h4><p>Hemat kuota. Kesalahan layout ketahuan sebelum render 900 frame.</p></div></div>
+      <div class="pl"><span class="no">02</span><div><h4>"Satu alur yang rapi"</h4><p>Supaya transisi antar scene menyambung, bukan potongan acak.</p></div></div>
+      <div class="pl"><span class="no">03</span><div><h4>"Bebas berkarya"</h4><p>Beri ruang kreatif. Hasil Opus 5.5 sering lebih berani dari bayangan kita.</p></div></div>
+      <div class="pl"><span class="no">04</span><div><h4>"Tanpa unsur brand X"</h4><p>Untuk karya portofolio murni, sebutkan apa yang tidak boleh muncul.</p></div></div>
+    </div>
+    <h2>Ukuran yang kami pakai</h2>
+    <div class="grid3">
+      <div class="card" style="text-align:center"><div style="margin:2px auto 8px;width:36px;height:64px;border:2px solid var(--ink);border-radius:7px;background:var(--lime)"></div><h3 style="margin:0">1080×1920</h3><p class="small">Reels · TikTok · Shorts</p></div>
+      <div class="card" style="text-align:center"><div style="margin:2px auto 8px;width:51px;height:64px;border:2px solid var(--ink);border-radius:7px;background:var(--paper)"></div><h3 style="margin:0">1080×1350</h3><p class="small">Feed &amp; carousel Instagram</p></div>
+      <div class="card" style="text-align:center"><div style="margin:14px auto 20px;width:80px;height:45px;border:2px solid var(--ink);border-radius:7px;background:var(--ink)"></div><h3 style="margin:0">1920×1080</h3><p class="small">YouTube · showreel</p></div>
+    </div>
+  </div>
+  <div class="ft"><span>12</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 13 · LOOP KERJA -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Bab 08 · Loop kerja</span></div>
+  <div class="chapnum">08</div>
+  <div class="pad">
+    <span class="kicker"><i></i>Bab 08</span>
+    <h1>Still → revisi →<span class="ser">render → kirim.</span></h1>
+    <p class="lead">Beginilah satu putaran kerja kami. Kuncinya: <b>jangan render penuh sebelum still-nya benar</b>.</p>
+    <div class="side" style="margin-top:12px;grid-template-columns:1.1fr .9fr">
+      <div>
+        <div class="card" style="padding:10px"><div class="cap" style="margin:0 0 6px">Lembar still (contact sheet) · 6 titik waktu</div>
+          <div class="grid3" style="gap:5px">
+            <div class="shot" style="height:112px"><img src="img/kopi-hook.jpg" alt=""></div><div class="shot" style="height:112px"><img src="img/kopi-cup.jpg" alt=""></div><div class="shot" style="height:112px"><img src="img/kopi-dingin.jpg" alt=""></div>
+            <div class="shot" style="height:112px"><img src="img/kopi-price.jpg" alt=""></div><div class="shot" style="height:112px"><img src="img/kopi-brand.jpg" alt=""></div><div class="shot" style="height:112px"><img src="img/kopi-end.jpg" alt=""></div>
+          </div></div>
+      </div>
+      <div>
+        <ol class="num" style="margin-top:0">
+          <li><b>Still.</b> Claude membuat gambar diam di beberapa detik penting, digabung jadi satu lembar.</li>
+          <li><b>Nilai.</b> Cek: teks kepotong? terlalu mepet? warna pas? urutan jelas?</li>
+          <li><b>Revisi</b> dengan kalimat spesifik (lihat bab 09).</li>
+          <li><b>Render penuh</b> + suara setelah still oke.</li>
+          <li><b>Tonton MP4-nya</b>, lalu kirim/upload.</li>
+        </ol>
+      </div>
+    </div>
+    <h2>Suara: dibuat, bukan dicari</h2>
+    <p>Semua suara di video kami <b>dibuat oleh skrip Python</b> dari nada dan noise sederhana: whoosh, pop, klik, bass. Karena dibuat sendiri, <b>tidak ada masalah hak cipta</b>, dan setiap efek bisa ditaruh tepat di detik gerakan.</p>
+<div class="prompt" data-label="Prompt suara">Buat sound_kopi.py (hanya library bawaan Python) yang menghasilkan WAV 15 detik:
+whoosh saat scene berganti, "pop" saat huruf mendarat, klik slot saat harga berputar,
+bass hit saat logo jatuh, dan musik latar lembut 100 BPM. Samakan waktunya dengan animasi.</div>
+    <div class="tip"><b class="t">MUSIK</b><span>Lebih suka lagu? Render tanpa suara, lalu tambahkan musik bebas royalti di CapCut atau langsung dari Instagram.</span></div>
+  </div>
+  <div class="ft"><span>13</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 14 · TROUBLESHOOTING -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Bab 09 · Kalau ada yang aneh</span></div>
+  <div class="chapnum">09</div>
+  <div class="pad">
+    <span class="kicker"><i></i>Bab 09 · dari pengalaman nyata</span>
+    <h1>Masalah yang<span class="ser">pernah kami temui.</span></h1>
+    <p class="lead">Semua di bawah ini benar-benar terjadi saat kami membuat video-video Otak Rental, lengkap dengan kalimat perbaikannya.</p>
+    <table style="margin-top:12px"><tr><th style="width:27%">Masalah</th><th style="width:28%">Penyebab</th><th>Kalimat perbaikan</th></tr>
+      <tr><td><b>Teks kepotong di tepi</b></td><td>Kata terlalu panjang untuk ukuran font</td><td>"Kecilkan judul sampai semua teks berjarak ≥80px dari tepi, cek dengan still."</td></tr>
+      <tr><td><b>Ada frame hitam / garis nyasar</b></td><td>Objek 3D terlalu dekat kamera</td><td>"Batasi jarak kamera, lewati titik yang ada di belakang kamera."</td></tr>
+      <tr><td><b>Tulisan muncul terlalu cepat</b></td><td>Elemen bocor sebelum waktunya</td><td>"Pastikan tulisan X benar-benar tidak terlihat sebelum detik 12."</td></tr>
+      <tr><td><b>Garis/efek tidak kelihatan</b></td><td>Format warna salah di kode</td><td>"Efek garis tidak muncul di still, cek dan perbaiki fungsi warnanya."</td></tr>
+      <tr><td><b>MP4 terlalu besar</b></td><td>Kualitas terlalu tinggi</td><td>"Encode ulang dengan CRF 22 supaya di bawah 30 MB."</td></tr>
+      <tr><td><b>Push gagal 403</b></td><td>Claude GitHub App belum dipasang</td><td>Pasang App di github.com/apps/claude, lalu "push ulang".</td></tr>
+      <tr><td><b>Chromium tidak ditemukan</b></td><td>Playwright belum mengunduh browser</td><td>"Jalankan npx playwright install chromium lalu coba lagi."</td></tr>
+      <tr><td><b>ffmpeg not found</b></td><td>ffmpeg belum terpasang</td><td>Lokal: minta Claude memasangnya. Cloud: "pakai ffmpeg dari paket pip imageio-ffmpeg."</td></tr>
+      <tr><td><b>Render sangat lama</b></td><td>Motion blur &amp; 60 fps berat</td><td>"Untuk preview pakai 30 fps tanpa motion blur, render final baru 60 fps."</td></tr>
+    </table>
+    <div class="tip"><b class="t">KUNCI</b><span>Selalu minta Claude <b>memeriksa hasilnya sendiri</b> ("cek still-nya, perbaiki kalau ada yang overlap") sebelum menunjukkan ke kamu. Opus 5.5 bisa melihat gambar dan menemukan masalahnya.</span></div>
+  </div>
+  <div class="ft"><span>14</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 15 · HEMAT KUOTA + 8 IDE -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Bab 10 · Tips Pro</span></div>
+  <div class="chapnum">10</div>
+  <div class="pad">
+    <span class="kicker"><i></i>Bab 10</span>
+    <h1>Hemat kuota,<span class="ser">hasil maksimal.</span></h1>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card"><h3 style="margin-top:0">6 kebiasaan hemat</h3><ul class="clean">
+        <li>Brief lengkap di pesan pertama</li>
+        <li>Still dulu, render penuh belakangan</li>
+        <li>Satu sesi untuk satu video</li>
+        <li>Pakai mode <b>Plan</b> untuk ide besar, sebelum Claude menulis kode</li>
+        <li>Gabungkan beberapa revisi dalam satu pesan</li>
+        <li>Ketik <code>/compact</code> kalau percakapan sudah sangat panjang</li></ul></div>
+      <div class="card ink"><h3 style="margin-top:0;color:#fff">Pakai ulang, jangan mulai dari nol</h3><p>Video berikutnya cukup: <i>"Duplikat sample.html jadi promo-teh.html. Ganti produknya jadi es teh leci, warna hijau muda, alur sama. Still dulu."</i></p><p style="margin-top:8px">Mesin render, suara, dan aturan brand sudah ada. Waktu kerja turun drastis.</p></div>
+    </div>
+    <h2>8 ide video untuk dicoba</h2>
+    <div class="grid2" style="gap:9px">
+      <div class="pl"><span class="no">01</span><div><h4>Showreel brand 15 dtk</h4><p>6 scene: logo, masalah, formula harga, layanan, angka bukti, penutup.</p></div></div>
+      <div class="pl"><span class="no">02</span><div><h4>Price list bergerak</h4><p>Kartu harga masuk bergantian, angka dihitung naik, CTA DM.</p></div></div>
+      <div class="pl"><span class="no">03</span><div><h4>Reel skill 30 dtk 9:16</h4><p>Teks kinetik, shape morph, partikel, UI, tanpa brand. Untuk portofolio.</p></div></div>
+      <div class="pl"><span class="no">04</span><div><h4>Landscape gelap 16:9</h4><p>Terrain 3D wireframe, terowongan, bunga geometri, judul besar.</p></div></div>
+      <div class="pl"><span class="no">05</span><div><h4>Demo website</h4><p>Mockup browser, halaman di-scroll pelan, kursor mengklik tombol.</p></div></div>
+      <div class="pl"><span class="no">06</span><div><h4>Slide carousel bergerak</h4><p>Ubah slide IG jadi video 5 dtk dengan animasi ringan.</p></div></div>
+      <div class="pl"><span class="no">07</span><div><h4>Carousel PNG</h4><p>Bukan video pun bisa: 1080×1350 PNG langsung dari HTML.</p></div></div>
+      <div class="pl"><span class="no">08</span><div><h4>Modul PDF</h4><p>Modul yang sedang kamu baca juga dibuat dengan cara ini.</p></div></div>
+    </div>
+  </div>
+  <div class="ft"><span>15</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 16 · PENUTUP -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Code</span><span>Penutup</span></div>
+  <div class="pad">
+    <span class="kicker"><i></i>Ringkasan</span>
+    <h1>Satu halaman,<span class="ser">semua langkah.</span></h1>
+    <table style="margin-top:14px"><tr><th style="width:7%">#</th><th style="width:30%">Langkah</th><th>Ingat ini</th></tr>
+      <tr><td>1</td><td>Repo / folder brand</td><td>Logo, font, referensi, CLAUDE.md (sekali saja)</td></tr>
+      <tr><td>2A</td><td>Cloud: claude.ai/code</td><td>Connect GitHub + <b>install Claude GitHub App</b> di repo</td></tr>
+      <tr><td>2B</td><td>Lokal: desktop app / CLI</td><td>Tab Code → Local, atau <code>claude</code> di terminal + Node, ffmpeg, Chromium</td></tr>
+      <tr><td>3</td><td>Prompt mesin render</td><td>renderAt(t) + Playwright + ffmpeg (sekali per repo)</td></tr>
+      <tr><td>4</td><td>Prompt brief video</td><td>Format, alur per detik, standar, "still dulu"</td></tr>
+      <tr><td>5</td><td>Still → revisi → render</td><td>Jangan render penuh sebelum still benar</td></tr>
+      <tr><td>6</td><td>Ambil hasil</td><td>Cloud: commit, push, unduh dari GitHub · Lokal: folder motion/out</td></tr>
+    </table>
+    <div class="card ink" style="margin-top:16px;display:flex;align-items:center;gap:18px;padding:18px 20px">
+      <div style="flex:1"><div class="mono" style="font-size:8.5px;letter-spacing:.18em;color:var(--lime)">SERI MODUL OTAK RENTAL</div>
+        <div style="font-size:19px;font-weight:800;letter-spacing:-.035em;margin-top:4px;color:#fff">01 · <span class="ser" style="color:var(--lime);font-size:22px">Motion tanpa After Effects</span></div>
+        <div style="font-size:19px;font-weight:800;letter-spacing:-.035em;color:#fff">02 · <span class="ser" style="color:var(--lime);font-size:22px">Motion pakai Claude Design</span></div>
+        <p style="margin-top:4px">Belum sempat bikin sendiri? Jasa motion Otak Rental mulai Rp50K untuk 15 detik.</p></div>
+      <span style="flex:none;background:var(--lime);color:var(--ink);border-radius:999px;padding:12px 18px;font-weight:800;font-size:13.5px;letter-spacing:-.02em">DM @otakrental</span>
+    </div>
+    <h2>Lisensi &amp; catatan</h2>
+    <p class="small">Modul ini untuk penggunaan pribadi pembeli. Dilarang menjual ulang atau membagikan file ini, baik sebagian maupun seluruhnya. Prompt dan hasil animasi buatanmu sendiri boleh dipakai untuk proyek pribadi maupun komersial.</p>
+    <p class="small">Claude, Claude Code, dan Opus adalah merek milik Anthropic. GitHub adalah merek milik GitHub, Inc. Modul ini dibuat secara independen oleh Otak Rental dan tidak berafiliasi dengan maupun disponsori oleh Anthropic atau GitHub. Ilustrasi antarmuka digambar ulang untuk keperluan edukasi, bukan tangkapan layar resmi. Informasi fitur, paket, perintah instalasi, dan model berlaku per September 2026 dan dapat berubah.</p>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:16px"><img src="../assets/logo-icon-dark.png" alt="" style="width:42px"><div><div style="font-weight:750;font-size:14px">Otak Rental</div><div class="mono" style="font-size:8.5px;letter-spacing:.14em;color:var(--muted)">SEWA OTAK TEKNIS, SEBELUM DEADLINE MENCEKIK · BONUS 03 · V1.0</div></div></div>
+  </div>
+  <div class="ft"><span>16</span><span>@otakrental</span></div>
+</section>
+
+<script src="claude-ui.js"></script>
+</body>
+</html>
