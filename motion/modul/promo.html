@@ -7,7 +7,8 @@
   Promo assets for the "Motion Tanpa After Effects" module.
   Each .art is rendered to its own PNG by promo.mjs (data-out = file name):
     promo-slide1..5.png  Instagram carousel 1080×1350
-    lynk-thumbnail.png   Lynk.id product image 1080×1080
+    lynk-thumbnail.png   Lynk.id product image 1080×1080 (main module)
+    lynk-thumbnail-claude-design.png   Lynk.id product image 1080×1080 (Claude Design side module)
 -->
 <style>
 @font-face{font-family:"Geist";src:url(../fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
@@ -90,6 +91,7 @@ ul.ck li b{font-weight:740}
 .x{position:relative;display:inline-block;color:#8a8c83}
 .x::after{content:"";position:absolute;left:-4px;right:-4px;top:54%;height:4px;background:var(--coral);border-radius:3px;transform:rotate(-2deg)}
 </style>
+<link rel="stylesheet" href="claude-ui.css">
 </head>
 <body>
 
@@ -235,5 +237,38 @@ ul.ck li b{font-weight:740}
   <div class="sticker" style="left:860px;top:180px;width:170px;height:170px;transform:rotate(12deg)"><div><div class="t" style="font-size:13px">Pakai</div><b style="font-size:52px">AI</b><div class="t" style="font-size:13px">Claude</div></div></div>
 </section>
 
+<!-- ============================================================ LYNK.ID THUMBNAIL 1:1 · MODUL CLAUDE DESIGN -->
+<section class="art sq" data-out="lynk-thumbnail-claude-design">
+  <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b><span style="opacity:.5">/ Modul bonus 02</span></div>
+
+  <div class="abs" style="left:92px;top:146px"><span class="chip dark"><i></i>Khusus pelanggan Claude Pro</span></div>
+  <div class="abs h sans" style="left:86px;top:216px;font-size:122px">Motion pakai</div>
+  <div class="abs h ser" style="left:84px;top:334px;font-size:128px"><span class="mk">Claude Design.</span></div>
+  <div class="abs lead" style="left:92px;top:484px;width:620px;font-size:27px">Tutorial klik demi klik, dari setup akun sampai video jadi <b>MP4</b>.</div>
+  <div class="abs" style="left:92px;top:586px;display:flex;gap:10px">
+    <span class="chip"><i></i>15 halaman</span><span class="chip"><i></i>8 langkah</span><span class="chip"><i></i>10 prompt</span>
+  </div>
+
+  <div class="ui win" style="position:absolute;left:154px;top:426px;width:560px;height:330px;zoom:1.62;transform:rotate(-2deg);transform-origin:0 0">
+    <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>claude.ai</b>/design</span></div>
+    <div class="atop"><span class="brand"><i class="spk"></i>Claude Design <span class="pj">/ Promo 10s</span></span>
+      <div class="tools"><span>Tweaks</span><span class="on">Comment</span><span>Edit</span></div><span class="ubtn dk">Export</span></div>
+    <div class="abody" style="height:272px">
+      <div class="chat">
+        <div class="msg-u">Buat animasi promo 10 detik, 1080×1350, untuk kopi susu gula aren.</div>
+        <div class="msg-c"><i class="spk"></i><div><span class="think">✓ Thought for 12s</span><p>Siap! 5 scene dengan timeline. Tekan ▶ untuk memutar.</p></div></div>
+        <div class="composer"><div class="ph">Reply to Claude…</div><div class="row"><span class="plus">+</span><span class="model">Opus 5.5 ▾</span><span class="send">↑</span></div></div>
+      </div>
+      <div class="cv">
+        <div class="stage" style="width:150px;height:188px;margin-bottom:34px"><img src="img/kopi-cup.jpg" alt=""></div>
+        <div class="tline"><span class="pl">▶</span><span class="t"><b>00:03.4</b></span><div class="tr"><b style="--w:2"></b><b class="on" style="--w:2.5"></b><b style="--w:2"></b><b style="--w:2"></b><span class="ph" style="left:34%"></span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="sticker" style="left:820px;top:560px;width:190px;height:190px;transform:rotate(10deg)"><div><div class="t">Model</div><b style="font-size:48px;line-height:.9">Opus<br>5.5</b></div></div>
+</section>
+
+<script src="claude-ui.js"></script>
 </body>
 </html>

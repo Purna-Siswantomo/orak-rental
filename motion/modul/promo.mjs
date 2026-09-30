@@ -19,7 +19,7 @@ async function loadPlaywright() {
   return createRequire(import.meta.url)(path.join(globalRoot, "playwright")).chromium;
 }
 
-const MIME = { ".html": "text/html", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg" };
+const MIME = { ".html": "text/html", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg", ".css": "text/css" };
 const srv = http.createServer((req, res) => {
   const p = path.join(ROOT, decodeURIComponent(new URL(req.url, "http://x").pathname));
   if (!p.startsWith(ROOT) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); return res.end(); }
