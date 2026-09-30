@@ -1,6 +1,7 @@
-// Builds modul.html into an A4 PDF: Motion-Tanpa-After-Effects.pdf
-//   node build.mjs              -> PDF only
-//   node build.mjs --previews   -> PDF + preview/page-XX.png (one PNG per page, for checking layout)
+// Builds an A4 module page into a PDF named by <html data-pdf="…">
+//   node build.mjs                                  -> modul.html → Motion-Tanpa-After-Effects.pdf
+//   node build.mjs claude-design.html               -> Motion-Pakai-Claude-Design.pdf
+//   node build.mjs <file> --previews                -> also preview/<file>/page-XX.png (for checking layout)
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -11,6 +12,7 @@ import { createRequire } from "node:module";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.dirname(HERE); // motion/ (fonts + assets live there)
 const PREVIEWS = process.argv.includes("--previews");
+const SRC = process.argv.slice(2).find(a => a.endsWith(".html")) || "modul.html";
 
 async function loadPlaywright() {
   for (const id of ["playwright", "@playwright/test"]) { try { return (await import(id)).chromium; } catch {} }
@@ -18,7 +20,7 @@ async function loadPlaywright() {
   return createRequire(import.meta.url)(path.join(globalRoot, "playwright")).chromium;
 }
 
-const MIME = { ".html": "text/html", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg" };
+const MIME = { ".html": "text/html", ".woff2": "font/woff2", ".png": "image/png", ".jpg": "image/jpeg", ".css": "text/css" };
 const srv = http.createServer((req, res) => {
   const p = path.join(ROOT, decodeURIComponent(new URL(req.url, "http://x").pathname));
   if (!p.startsWith(ROOT) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); return res.end(); }
@@ -30,16 +32,16 @@ await new Promise(r => srv.listen(0, "127.0.0.1", r));
 const chromium = await loadPlaywright();
 const browser = await chromium.launch({ args: ["--force-color-profile=srgb"] });
 const page = await browser.newPage({ viewport: { width: 794, height: 1123 }, deviceScaleFactor: 2 });
-await page.goto(`http://127.0.0.1:${srv.address().port}/modul/modul.html`, { waitUntil: "networkidle" });
+await page.goto(`http://127.0.0.1:${srv.address().port}/modul/${SRC}`, { waitUntil: "networkidle" });
 await page.evaluate(async () => {
   await document.fonts.ready;
   await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
 });
 
 if (PREVIEWS) {
-  const dir = path.join(HERE, "preview");
+  const dir = path.join(HERE, "preview", path.basename(SRC, ".html"));
   fs.rmSync(dir, { recursive: true, force: true });
-  fs.mkdirSync(dir);
+  fs.mkdirSync(dir, { recursive: true });
   const pages = await page.$$(".page");
   for (const [i, el] of pages.entries())
     await el.screenshot({ path: path.join(dir, `page-${String(i + 1).padStart(2, "0")}.png`) });
@@ -52,7 +54,8 @@ if (PREVIEWS) {
   console.log(over.length ? "overflow:\n" + over.join("\n") : "no overflow");
 }
 
-await page.pdf({ path: path.join(HERE, "Motion-Tanpa-After-Effects.pdf"), printBackground: true, preferCSSPageSize: true });
+const pdf = await page.getAttribute("html", "data-pdf");
+await page.pdf({ path: path.join(HERE, pdf), printBackground: true, preferCSSPageSize: true });
 await browser.close();
 srv.close();
-console.log("done");
+console.log(pdf);
