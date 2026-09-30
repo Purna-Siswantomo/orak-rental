@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion Reel 30s — 9:16</title>
+<!--
+  30-second vertical (1080×1920) personal-branding reel for a motion designer. Free style, dark and loud:
+  a hook, seven chapters of different motion disciplines cut on a 120 BPM grid, and a branded outro.
+  Everything is drawn on one <canvas> by renderAt(t), so any frame is reproducible.
+  Render: node render.mjs --page reel30.html --width 1080 --height 1920 --name motion-reel-30s --sound reel30_sound.py --sub 4
+-->
+<style>
+@font-face{font-family:"Anton";src:url(fonts/Anton-normal.woff2) format("woff2");font-display:block}
+@font-face{font-family:"Syne";src:url(fonts/Syne-normal.woff2) format("woff2");font-weight:400 800;font-display:block}
+@font-face{font-family:"Geist";src:url(fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+html,body{margin:0;height:100%;background:#000}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+body.capture{display:block}
+canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<script>
+"use strict";
+const W = 1080, H = 1920, DUR = 30, FPS = 60, BEAT = 0.5;
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+const CAPTURE = /capture/.test(location.search);
+if (CAPTURE) document.body.classList.add("capture");
+else { const fit = () => { const z = Math.min(innerWidth / W, innerHeight / H); cv.style.width = W * z + "px"; cv.style.height = H * z + "px"; }; addEventListener("resize", fit); fit(); }
+
+// palette
+const BG = "#0B0B0F", PAPER = "#F2EFE9", OR = "#FF5A1F", VI = "#6B4DFF", AC = "#C8FF3D", PK = "#FF3D8B";
+
+// ---------- math ----------
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => cl((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eOutExpo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
+const eInExpo = x => x <= 0 ? 0 : Math.pow(2, 10 * x - 10);
+const eInOutExpo = x => x <= 0 ? 0 : x >= 1 ? 1 : x < .5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2;
+const eOutCubic = x => 1 - Math.pow(1 - x, 3);
+const eInOutCubic = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eOutBack = (x, s = 1.70158) => 1 + (s + 1) * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2);
+const spring = (x, f = 2, d = 7) => x <= 0 ? 0 : 1 - Math.exp(-d * x) * Math.cos(f * 2 * Math.PI * x);
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise1 = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u) * 2 - 1; };
+const TAU = Math.PI * 2;
+// time since the most recent beat, and a decaying "kick" pulse
+const sinceBeat = t => ((t % BEAT) + BEAT) % BEAT;
+const pulse = (t, d = 9) => Math.exp(-sinceBeat(t) * d);
+const bump = (t, a, len) => Math.sin(Math.PI * P(t, a, a + len));
+const hex = (h, a = 1) => { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+const mix = (h1, h2, k) => { const a = parseInt(h1.slice(1), 16), b = parseInt(h2.slice(1), 16);
+  const c = s => Math.round(lerp((a >> s) & 255, (b >> s) & 255, k)); return `rgb(${c(16)},${c(8)},${c(0)})`; };
+
+// ---------- drawing helpers ----------
+function txt(s, x, y, o = {}) {
+  ctx.save();
+  ctx.font = `${o.st || "normal"} ${o.w || 400} ${o.size || 100}px "${o.f || "Anton"}"`;
+  ctx.textAlign = o.align || "center"; ctx.textBaseline = o.base || "alphabetic";
+  ctx.letterSpacing = (o.ls || 0) + "px";
+  if (o.alpha != null) ctx.globalAlpha *= o.alpha;
+  if (o.stroke) { ctx.lineWidth = o.stroke; ctx.strokeStyle = o.color || PAPER; ctx.lineJoin = "round"; ctx.strokeText(s, x, y); }
+  else { ctx.fillStyle = o.color || PAPER; ctx.fillText(s, x, y); }
+  ctx.restore();
+}
+function measure(s, o) { ctx.save(); ctx.font = `${o.st || "normal"} ${o.w || 400} ${o.size}px "${o.f}"`; ctx.letterSpacing = (o.ls || 0) + "px"; const m = ctx.measureText(s).width; ctx.restore(); return m; }
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function withT(x, y, rot, sx, sy, fn) { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(sx, sy); fn(); ctx.restore(); }
+function fill(c) { ctx.fillStyle = c; ctx.fillRect(0, 0, W, H); }
+function dotGrid(color, a) {
+  ctx.fillStyle = hex(color, a);
+  for (let y = 40; y < H; y += 60) for (let x = 30; x < W; x += 60) ctx.fillRect(x, y, 3, 3);
+}
+
+/* ==========================================================================
+   SCENES — each paints a full frame for absolute time t
+   ========================================================================== */
+
+// 0 · HOOK (0–2): one slam per beat
+const HOOK = [
+  { bg: BG, n: "30", l: "DETIK", c: OR, lc: PAPER, s: 900 },
+  { bg: OR, n: "7", l: "GAYA MOTION", c: BG, lc: BG, s: 1000 },
+  { bg: VI, n: "1", l: "EDITOR", c: AC, lc: PAPER, s: 1000 },
+  { bg: PAPER, n: "GO.", l: "TONTON SAMPAI HABIS", c: BG, lc: BG, s: 560 },
+];
+function sHook(t) {
+  const k = cl(Math.floor(t / BEAT), 0, 3), lt = t - k * BEAT, h = HOOK[k];
+  fill(h.bg);
+  dotGrid(h.lc, .12);
+  const s = lerp(1.9, 1, eOutExpo(P(lt, 0, .2)));
+  const sh = 18 * Math.exp(-lt * 12);
+  withT(W / 2 + sh * noise1(t * 60), 930 + sh * noise1(t * 57 + 4), (1 - eOutExpo(P(lt, 0, .2))) * -.12, s, s, () =>
+    txt(h.n, 0, 0, { size: h.s, color: h.c, base: "middle" }));
+  const lk = eOutExpo(P(lt, .06, .3));
+  txt(h.l, W / 2, 1520 + (1 - lk) * 40, { f: "Geist Mono", size: 46, w: 500, ls: 14, color: h.lc, alpha: lk });
+  // beat counter
+  for (let i = 0; i < 4; i++) { ctx.fillStyle = i <= k ? h.lc : hex(h.lc === BG ? "#000000" : "#FFFFFF", .2); rr(W / 2 - 90 + i * 48, 1640, 36, 8, 4); ctx.fill(); }
+}
+
+// 1 · KINETIC TYPE (2–6)
+const MOTION = ["M", "O", "T", "I", "O", "N"];
+function sType(t) {
+  fill(PAPER);
+  dotGrid(BG, .08);
+  // beat-pulsing disc on the right
+  const pr = 170 + 40 * pulse(t, 7) * (t > 2.4 ? 1 : 0);
+  const dk = eOutBack(P(t, 2.25, 2.7), 1.8);
+  ctx.fillStyle = OR; ctx.beginPath(); ctx.arc(800, 720, pr * dk, 0, TAU); ctx.fill();
+  ctx.strokeStyle = BG; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(800, 720, (pr + 46) * dk, -Math.PI / 2, -Math.PI / 2 + TAU * P(t, 2.3, 5.8)); ctx.stroke();
+  txt("01", 800, 745, { f: "Syne", w: 800, size: 90, color: BG, alpha: dk });
+  // vertical caption
+  withT(1010, 960, Math.PI / 2, 1, 1, () => txt("KINETIC TYPOGRAPHY — KINETIC TYPOGRAPHY", 0, 0, { f: "Geist Mono", size: 26, ls: 8, color: BG, alpha: P(t, 2.4, 2.8) }));
+  const size = 300, x0 = 80, y0 = 420, lh = 262;
+  MOTION.forEach((ch, i) => {
+    const w = measure(ch, { f: "Anton", size });
+    const k = eOutExpo(P(t, 2.0 + i * .06, 2.55 + i * .06));
+    let x = lerp(i % 2 ? W + 200 : -700, x0, k), y = y0 + i * lh, rot = 0, sx = 1, sy = 1;
+    const d = eInExpo(P(t, 5.62 + i * .03, 6.05));
+    y += 1300 * d; rot += d * .8 * (i % 2 ? 1 : -1);
+    sx += .7 * bump(t, 3.0 + i * .02, .42);
+    rot += TAU * eInOutCubic(P(t, 4.0 + i * .05, 4.42 + i * .05)) * (i % 2 ? -1 : 1);
+    const outline = t > 2.5 && t < 4.0 && i % 2 === 0;
+    const orange = t > 4.5 && i % 2 === 1;
+    // highlight block behind the "I"
+    if (i === 3) { const hk = eOutExpo(P(t, 3.5, 3.8)) * (1 - P(t, 5.5, 5.7)); ctx.fillStyle = AC; ctx.fillRect(x - 20, y - 250, (w + 40 + 400) * hk, 270);
+      if (hk > .6) txt("SQUASH · STRETCH · SPIN", x + w + 40, y - 105, { f: "Geist Mono", w: 700, size: 24, ls: 3, color: BG, align: "left", alpha: P(hk, .6, 1) }); }
+    withT(x + w / 2, y - size * .36, rot, sx, sy, () =>
+      txt(ch, 0, size * .36, { size, color: orange ? OR : BG, stroke: outline ? 5 : 0 }));
+  });
+  // "bahasa saya." slashes across
+  if (t > 4.95) {
+    const rk = eOutExpo(P(t, 5.0, 5.35)), out = P(t, 5.7, 6.0);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W * rk, H); ctx.clip();
+    withT(560, 1420 + out * 900, -.14, 1, 1, () => {
+      ctx.fillStyle = BG; rr(-470, -160, 940, 210, 24); ctx.fill();
+      txt("bahasa saya.", 0, 0, { f: "Instrument Serif", st: "italic", size: 190, color: AC });
+    });
+    ctx.restore();
+  }
+}
+
+// 2 · SHAPE MORPH (6–10)
+const SEQ = [0, 1, 2, 3, 4, 0, 1, 3];
+function shapeR(id, th) {
+  const R = 1;
+  if (id === 0) return R;
+  if (id === 1) return .82 / Math.max(Math.abs(Math.cos(th)), Math.abs(Math.sin(th)));
+  if (id === 2) { const a = ((th + Math.PI / 2) % (TAU / 3) + TAU / 3) % (TAU / 3) - Math.PI / 3; return .52 / Math.cos(a); }
+  if (id === 3) return .45 + .62 * Math.pow((1 + Math.cos(5 * (th + Math.PI / 2))) / 2, 2.4);
+  return 1 + .16 * Math.sin(3 * th + 1) + .1 * Math.sin(5 * th);
+}
+function shapePath(t, cx, cy, R) {
+  const bi = cl(Math.floor((t - 6) / BEAT), 0, 7), lt = t - 6 - bi * BEAT;
+  const a = SEQ[Math.max(0, bi - 1)], b = SEQ[bi], m = bi === 0 ? 1 : eInOutExpo(P(lt, 0, .3));
+  const rot = (bi * 45 + 45 * m) * Math.PI / 180;
+  ctx.beginPath();
+  for (let j = 0; j <= 200; j++) {
+    const th = j / 200 * TAU, r = lerp(shapeR(a, th), shapeR(b, th), m) * R;
+    const x = cx + r * Math.cos(th + rot), y = cy + r * Math.sin(th + rot);
+    j ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  }
+  ctx.closePath();
+}
+function sShape(t) {
+  fill(VI);
+  dotGrid(PAPER, .1);
+  const cx = 540, cy = 860;
+  const R = 340 * eOutBack(P(t, 6.0, 6.45), 1.6) * (1 + .06 * pulse(t, 9));
+  // orbiting dots
+  for (let i = 0; i < 12; i++) {
+    const a = i / 12 * TAU + t * .7, rr2 = 500 + 20 * Math.sin(t * 3 + i);
+    ctx.fillStyle = [OR, PK, AC][i % 3]; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * rr2, cy + Math.sin(a) * rr2 * .9, 12 + 6 * pulse(t + i * .04), 0, TAU); ctx.fill();
+  }
+  // echo trails
+  for (let e = 5; e >= 1; e--) {
+    ctx.strokeStyle = hex(PAPER, .28 * (1 - e / 6)); ctx.lineWidth = 3;
+    shapePath(t - e * .03, cx, cy, R * (1 + e * .05)); ctx.stroke();
+  }
+  shapePath(t, cx, cy, R);
+  ctx.fillStyle = AC; ctx.fill();
+  ctx.strokeStyle = BG; ctx.lineWidth = 8; ctx.stroke();
+  const names = ["CIRCLE", "SQUARE", "TRIANGLE", "STAR", "BLOB"];
+  const bi = cl(Math.floor((t - 6) / BEAT), 0, 7);
+  txt(names[SEQ[bi]], cx, cy + 16, { f: "Geist Mono", size: 34, w: 600, ls: 10, color: BG, alpha: P(t, 6.3, 6.5) });
+  const k1 = eOutExpo(P(t, 6.15, 6.7)), k2 = eOutExpo(P(t, 6.3, 6.85));
+  txt("SHAPE", lerp(-600, 540, k1), 1500, { size: 250, color: PAPER, stroke: 5 });
+  txt("MORPH", lerp(W + 600, 540, k2), 1740, { size: 250, color: PAPER });
+}
+
+// 3 · 3D PARTICLES (10–14)
+const NP = 720;
+const PTS = (() => {
+  const sph = [], cube = [], tor = [], gal = [];
+  for (let i = 0; i < NP; i++) {
+    const y = 1 - (i + .5) / NP * 2, r = Math.sqrt(1 - y * y), th = i * 2.399963;
+    sph.push([Math.cos(th) * r, y, Math.sin(th) * r]);
+    const f = Math.floor(hash(i * 3.1) * 6), u = hash(i * 7.7) * 2 - 1, v = hash(i * 9.3) * 2 - 1, s = .78;
+    const c = [[1, u, v], [-1, u, v], [u, 1, v], [u, -1, v], [u, v, 1], [u, v, -1]][f];
+    cube.push(c.map(q => q * s));
+    const a = hash(i * 1.3) * TAU, b = hash(i * 2.9) * TAU;
+    tor.push([(1 + .38 * Math.cos(b)) * Math.cos(a) * .85, .38 * Math.sin(b) * .85, (1 + .38 * Math.cos(b)) * Math.sin(a) * .85]);
+    const arm = i % 3, rr3 = Math.pow(hash(i * 5.1), .7) * 1.15, ang = arm / 3 * TAU + rr3 * 3.2;
+    gal.push([Math.cos(ang) * rr3, (hash(i * 8.8) - .5) * .12 * (1.2 - rr3), Math.sin(ang) * rr3]);
+  }
+  return [sph, cube, tor, gal];
+})();
+function sParticles(t) {
+  fill(BG);
+  const g = ctx.createRadialGradient(540, 880, 50, 540, 880, 900);
+  g.addColorStop(0, hex(VI, .35)); g.addColorStop(1, hex(VI, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const seg = cl(Math.floor(t - 10), 0, 3), lt = t - 10 - seg;
+  const m = seg === 0 ? 1 : eInOutExpo(P(lt, 0, .45));
+  const A = PTS[Math.max(0, seg - 1)], B = PTS[seg];
+  const intro = eOutExpo(P(t, 10.0, 10.6)), boom = eInExpo(P(t, 13.55, 14.0));
+  const ry = t * .9, rx = .45 + .2 * Math.sin(t * .8);
+  const S = 390 * (1 + .07 * pulse(t, 8)), f = 1000;
+  const cy = Math.cos(ry), sy = Math.sin(ry), cx2 = Math.cos(rx), sx2 = Math.sin(rx);
+  const proj = [];
+  for (let i = 0; i < NP; i++) {
+    let x = lerp(A[i][0], B[i][0], m), y = lerp(A[i][1], B[i][1], m), z = lerp(A[i][2], B[i][2], m);
+    const sc = lerp(3.5 + hash(i) * 2, 1, intro) * (1 + boom * (2 + hash(i + 3) * 3));
+    x *= sc; y *= sc; z *= sc;
+    const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
+    const y2 = y * cx2 - z1 * sx2, z2 = y * sx2 + z1 * cx2;
+    const pz = f / (f + z2 * S);
+    if (!(pz > .05)) continue; // behind the camera during the explosion
+    proj.push([540 + x1 * S * pz, 880 + y2 * S * pz, z2, pz]);
+  }
+  proj.sort((a, b) => b[2] - a[2]);
+  for (const [x, y, z, pz] of proj) {
+    const k = cl((z + 1.2) / 2.4);
+    ctx.fillStyle = mix(OR, VI, k);
+    ctx.globalAlpha = lerp(1, .35, k) * (1 - boom * .6);
+    ctx.beginPath(); ctx.arc(x, y, 5.2 * pz, 0, TAU); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  const names = ["SPHERE", "CUBE", "TORUS", "GALAXY"];
+  const k1 = eOutExpo(P(t, 10.2, 10.7));
+  txt("DEPTH", 540, 1560 + (1 - k1) * 80, { f: "Syne", w: 800, size: 150, ls: 4, color: PAPER, alpha: k1 });
+  txt(`720 PARTIKEL · ${names[seg]}`, 540, 1650, { f: "Geist Mono", size: 30, ls: 8, color: AC, alpha: k1 });
+}
+
+// 4 · LIQUID (14–18): gooey metaballs via blur + contrast threshold
+const offA = document.createElement("canvas"), offB = document.createElement("canvas");
+offA.width = offB.width = 540; offA.height = offB.height = 960;
+const cA = offA.getContext("2d"), cB = offB.getContext("2d");
+function blobs(t) {
+  const out = [], cx = 540, cy = 880;
+  out.push([cx, cy, 200 * (1 + .12 * pulse(t, 7)) * eOutBack(P(t, 14.0, 14.5), 1.6)]);
+  for (let i = 0; i < 7; i++) {
+    const a = i / 7 * TAU + t * (.5 + i * .07) * (i % 2 ? 1 : -1);
+    const shoot = 260 * bump(t, 14.5 + i * .5, .45);
+    const d = (270 + 120 * Math.sin(t * 1.3 + i * 2) + shoot) * eOutExpo(P(t, 14.1 + i * .04, 14.8));
+    out.push([cx + Math.cos(a) * d, cy + Math.sin(a) * d * 1.1, 62 + 26 * Math.sin(i * 1.7 + t)]);
+  }
+  // drips
+  for (let j = 0; j < 3; j++) { const ph = ((t - 14 + j * .55) % 1.6) / 1.6; out.push([cx + (j - 1) * 90, cy + 200 + ph * 700, 46 * (1 - ph)]); }
+  return out;
+}
+function sLiquid(t) {
+  fill(PK);
+  dotGrid(BG, .1);
+  cA.fillStyle = "#000"; cA.fillRect(0, 0, 540, 960);
+  cA.fillStyle = "#fff";
+  for (const [x, y, r] of blobs(t)) { if (r <= 0) continue; cA.beginPath(); cA.arc(x / 2, y / 2, r / 2, 0, TAU); cA.fill(); }
+  cB.filter = "none"; cB.fillStyle = "#000"; cB.fillRect(0, 0, 540, 960);
+  cB.filter = "blur(14px) contrast(40)"; cB.drawImage(offA, 0, 0); cB.filter = "none";
+  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.imageSmoothingQuality = "high"; ctx.drawImage(offB, 0, 0, W, H); ctx.restore();
+  // big type punched through with difference blending
+  const k = eOutExpo(P(t, 14.2, 14.8));
+  ctx.save(); ctx.globalCompositeOperation = "difference";
+  txt("FLOW", 540, 1040 + (1 - k) * 200, { size: 450, color: "#FFFFFF", alpha: k });
+  ctx.restore();
+  txt("LIQUID MOTION", 540, 1640, { f: "Geist Mono", size: 34, w: 600, ls: 14, color: BG, alpha: P(t, 14.4, 14.8) });
+}
+
+// 5 · UI MOTION (18–22)
+function sUI(t) {
+  fill(PAPER);
+  dotGrid(BG, .08);
+  // vertical outline title on the left
+  withT(150, 960, -Math.PI / 2, 1, 1, () => txt("UI MOTION", 0, 0, { size: 230, color: BG, stroke: 4, alpha: P(t, 18.1, 18.5) }));
+  const ek = eOutExpo(P(t, 18.0, 18.65));
+  const rot = lerp(-.2, -.06, ek) + .01 * Math.sin(t * 1.5);
+  const px = 560, py = 960 + (1 - ek) * 1100 + 10 * Math.sin(t * 2);
+  // shadow
+  ctx.fillStyle = hex(BG, .18); ctx.beginPath(); ctx.ellipse(px + 30, 1560, 250 * ek, 34 * ek, 0, 0, TAU); ctx.fill();
+  withT(px, py, rot, 1, 1, () => {
+    ctx.translate(-260, -550);
+    rr(0, 0, 520, 1100, 72); ctx.fillStyle = BG; ctx.fill();
+    rr(16, 16, 488, 1068, 58); ctx.fillStyle = "#F7F5F0"; ctx.fill();
+    ctx.save(); rr(16, 16, 488, 1068, 58); ctx.clip();
+    rr(200, 30, 120, 32, 16); ctx.fillStyle = BG; ctx.fill();
+    txt("9:41", 60, 60, { f: "Geist", w: 700, size: 22, color: BG, align: "left" });
+    txt("Halo, Rara", 48, 150, { f: "Geist", w: 800, size: 44, color: BG, align: "left", alpha: P(t, 18.4, 18.6) });
+    ctx.fillStyle = OR; ctx.beginPath(); ctx.arc(446, 136, 28, 0, TAU); ctx.fill();
+    // balance card
+    const ck = eOutBack(P(t, 18.45, 18.9), 1.5);
+    withT(260, 290, 0, ck, ck, () => {
+      const g = ctx.createLinearGradient(-220, -100, 220, 100); g.addColorStop(0, VI); g.addColorStop(1, PK);
+      rr(-220, -100, 440, 200, 34); ctx.fillStyle = g; ctx.fill();
+      txt("SALDO", -186, -48, { f: "Geist Mono", size: 18, ls: 4, color: "#fff", align: "left" });
+      const v = Math.round(2450000 * eOutExpo(P(t, 18.7, 19.5)) / 1000) * 1000;
+      txt("Rp" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."), -186, 30, { size: 64, color: "#fff", align: "left" });
+      rr(96, 44, 100, 36, 18); ctx.fillStyle = AC; ctx.fill();
+      txt("+12%", 146, 70, { f: "Geist Mono", w: 700, size: 18, color: BG });
+    });
+    // transaction rows
+    const ROWS = [["Kopi Nalar", "-Rp18.000", OR], ["Transfer masuk", "+Rp500.000", AC], ["Top up e-wallet", "-Rp100.000", VI]];
+    ROWS.forEach((r, i) => {
+      const k = eOutExpo(P(t, 19.0 + i * .12, 19.55 + i * .12));
+      const x = 40 + (1 - k) * 500, y = 420 + i * 108;
+      rr(x, y, 440, 90, 24); ctx.fillStyle = "#fff"; ctx.fill(); ctx.strokeStyle = hex(BG, .08); ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = r[2]; ctx.beginPath(); ctx.arc(x + 45, y + 45, 22, 0, TAU); ctx.fill();
+      txt(r[0], x + 84, y + 54, { f: "Geist", w: 650, size: 24, color: BG, align: "left" });
+      txt(r[1], x + 420, y + 54, { f: "Geist Mono", w: 600, size: 20, color: BG, align: "right" });
+    });
+    // like burst on row 1
+    if (t > 21.1) { const bk = P(t, 21.1, 21.6);
+      for (let i = 0; i < 10; i++) { const a = i / 10 * TAU; ctx.fillStyle = [PK, OR, AC][i % 3]; ctx.globalAlpha = 1 - bk;
+        ctx.beginPath(); ctx.arc(420 + Math.cos(a) * 70 * eOutCubic(bk), 465 + Math.sin(a) * 70 * eOutCubic(bk), 7, 0, TAU); ctx.fill(); }
+      ctx.globalAlpha = 1; }
+    // toggle
+    const tk = eInOutCubic(P(t, 20.0, 20.2));
+    txt("Notifikasi", 48, 800, { f: "Geist", w: 650, size: 26, color: BG, align: "left", alpha: P(t, 19.4, 19.6) });
+    rr(372, 770, 100, 50, 25); ctx.fillStyle = mix("#D8D4CC", AC, tk); ctx.fill();
+    ctx.fillStyle = BG; ctx.beginPath(); ctx.arc(397 + 50 * tk, 795, 19, 0, TAU); ctx.fill();
+    // chart line
+    ctx.strokeStyle = VI; ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.beginPath();
+    const lp = eInOutCubic(P(t, 19.6, 20.6));
+    for (let i = 0; i <= 40 * lp; i++) { const x = 48 + i * 10.6, y = 930 - 40 * Math.sin(i * .35) - i * 1.6; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.stroke();
+    // bottom nav with sliding indicator
+    rr(40, 990, 440, 70, 35); ctx.fillStyle = BG; ctx.fill();
+    const stops = [0, 1, 2, 3], pos = lerp(0, 1, eInOutExpo(P(t, 19.5, 19.8))) + eInOutExpo(P(t, 20.5, 20.8)) + eInOutExpo(P(t, 21.5, 21.8));
+    rr(56 + pos * 104, 1002, 96, 46, 23); ctx.fillStyle = AC; ctx.fill();
+    stops.forEach(i => { ctx.fillStyle = Math.round(pos) === i ? BG : hex(PAPER, .6); ctx.beginPath(); ctx.arc(104 + i * 104, 1025, 9, 0, TAU); ctx.fill(); });
+    // toast
+    const to = eOutBack(P(t, 20.45, 20.8), 1.4) * (1 - eInOutCubic(P(t, 21.55, 21.85)));
+    withT(260, lerp(-80, 120, to), 0, 1, 1, () => {
+      rr(-230, -44, 460, 88, 26); ctx.fillStyle = BG; ctx.fill();
+      ctx.fillStyle = AC; ctx.beginPath(); ctx.arc(-182, 0, 22, 0, TAU); ctx.fill();
+      ctx.strokeStyle = BG; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(-193, 0); ctx.lineTo(-185, 8); ctx.lineTo(-171, -8); ctx.stroke();
+      txt("Pembayaran berhasil", -142, 9, { f: "Geist", w: 650, size: 26, color: "#fff", align: "left" });
+    });
+    ctx.restore();
+  });
+  // floating chips
+  [["micro-interaction", 850, 470, .1, 18.8], ["app promo", 930, 1330, -.08, 19.3], ["onboarding", 830, 1480, .06, 19.8]].forEach(([s, x, y, r, st]) => {
+    const k = spring(t - st, 1.8, 7) * (t > st ? 1 : 0);
+    withT(x, y + 6 * Math.sin(t * 2 + x), r, k, k, () => {
+      const w = measure(s, { f: "Geist Mono", size: 26 }) + 44;
+      rr(-w / 2, -30, w, 60, 30); ctx.fillStyle = BG; ctx.fill();
+      txt(s, 0, 9, { f: "Geist Mono", size: 26, color: AC });
+    });
+  });
+}
+
+// 6 · DATA (22–24)
+const BARS = [[.35, .5, .42, .62, .55, .78, .92], [.6, .42, .74, .5, .86, .66, .98], [.4, .7, .55, .88, .62, .95, .8], [.72, .5, .9, .66, 1, .78, .94]];
+function sData(t) {
+  fill(BG);
+  ctx.strokeStyle = hex(PAPER, .08); ctx.lineWidth = 2;
+  for (let y = 700; y <= 1420; y += 120) { ctx.beginPath(); ctx.moveTo(90, y); ctx.lineTo(990, y); ctx.stroke(); }
+  const bi = cl(Math.floor((t - 22) / BEAT), 0, 3), lt = t - 22 - bi * BEAT;
+  const k0 = eOutExpo(P(t, 22.0, 22.4));
+  const tops = [];
+  for (let i = 0; i < 7; i++) {
+    const prev = bi === 0 ? 0 : BARS[bi - 1][i], cur = BARS[bi][i];
+    const v = lerp(prev, cur, spring(lt - i * .02, 1.6, 7)) * (bi === 0 ? k0 : 1);
+    const h = 700 * v, x = 120 + i * 128;
+    const g = ctx.createLinearGradient(0, 1420 - h, 0, 1420); g.addColorStop(0, mix(OR, PK, i / 6)); g.addColorStop(1, mix(VI, OR, i / 6));
+    rr(x, 1420 - h, 96, h, 18); ctx.fillStyle = g; ctx.fill();
+    tops.push([x + 48, 1420 - h]);
+  }
+  ctx.strokeStyle = AC; ctx.lineWidth = 7; ctx.lineJoin = "round"; ctx.beginPath();
+  tops.forEach(([x, y], i) => i ? ctx.lineTo(x, y - 40) : ctx.moveTo(x, y - 40)); ctx.stroke();
+  tops.forEach(([x, y]) => { ctx.fillStyle = BG; ctx.beginPath(); ctx.arc(x, y - 40, 11, 0, TAU); ctx.fill(); ctx.strokeStyle = AC; ctx.lineWidth = 5; ctx.stroke(); });
+  const n = Math.round(248 * eOutExpo(P(t, 22.0, 22.9)));
+  txt(`+${n}%`, 540, 520, { size: 280, color: AC });
+  txt("DATA VISUALIZATION", 540, 600, { f: "Geist Mono", size: 30, ls: 12, color: PAPER, alpha: P(t, 22.1, 22.4) });
+  txt("Q1   Q2   Q3   Q4   Q5   Q6   Q7", 540, 1480, { f: "Geist Mono", size: 26, ls: 6, color: hex(PAPER, .5) });
+}
+
+// 7 · GLITCH (24–26) ending in a TV switch-off
+function sGlitch(t) {
+  const flashes = [OR, VI, PK, AC];
+  const bi = cl(Math.floor((t - 24) / BEAT), 0, 3), lt = t - 24 - bi * BEAT;
+  fill(lt < .07 ? flashes[bi] : BG);
+  if (t > 25.7) {
+    fill(BG);
+    const k = P(t, 25.7, 25.86), k2 = P(t, 25.86, 26.0);
+    const hgt = lerp(H, 6, eOutCubic(k)), wid = lerp(W, 0, eInOutCubic(k2));
+    ctx.fillStyle = PAPER; ctx.shadowColor = PAPER; ctx.shadowBlur = 40;
+    ctx.fillRect(540 - wid / 2, 960 - hgt / 2, wid, hgt); ctx.shadowBlur = 0;
+    return;
+  }
+  const fr = Math.floor(t * 30);
+  const amp = 6 + 40 * Math.exp(-lt * 10);
+  ctx.save(); ctx.globalCompositeOperation = "screen";
+  txt("NO", 540 - amp * hash(fr), 820, { size: 420, color: OR });
+  txt("NO", 540 + amp * hash(fr + 1), 820, { size: 420, color: VI });
+  txt("LIMIT.", 540 - amp * hash(fr + 2), 1180, { size: 360, color: OR });
+  txt("LIMIT.", 540 + amp * hash(fr + 3), 1180, { size: 360, color: VI });
+  ctx.restore();
+  txt("NO", 540, 820, { size: 420, color: PAPER });
+  txt("LIMIT.", 540, 1180, { size: 360, color: PAPER });
+  // displaced strips (self-copy)
+  const strips = 3 + Math.floor(5 * Math.exp(-lt * 6));
+  for (let i = 0; i < strips; i++) {
+    const y = hash(fr * 7 + i) * H, h = 10 + hash(fr * 3 + i) * 90, dx = (hash(fr + i * 5) - .5) * 160 * (amp / 46);
+    ctx.drawImage(cv, 0, y, W, h, dx, y, W, h);
+  }
+  // blocks + scanlines
+  for (let i = 0; i < 6; i++) if (hash(fr * 11 + i) > .55) { ctx.fillStyle = [AC, PK, OR][i % 3]; ctx.fillRect(hash(fr + i * 13) * W, hash(fr + i * 17) * H, 40 + hash(i + fr) * 220, 12 + hash(i * 3 + fr) * 40); }
+  ctx.fillStyle = "rgba(0,0,0,.18)"; for (let y = 0; y < H; y += 6) ctx.fillRect(0, y, W, 2);
+  txt("GLITCH  /  TRANSITION", 540, 1400, { f: "Geist Mono", size: 32, ls: 10, color: AC });
+}
+
+// OUTRO (26–30)
+const logo = new Image(); logo.src = "assets/logo-icon.png";
+function sOutro(t) {
+  fill(BG);
+  const g = ctx.createRadialGradient(540, 760, 40, 540, 760, 900);
+  g.addColorStop(0, hex(VI, .45)); g.addColorStop(1, hex(VI, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  dotGrid(PAPER, .06);
+  // beat ripples
+  for (let b = 0; b < 8; b++) {
+    const bt = 26 + b * BEAT, k = P(t, bt, bt + 1.2);
+    if (t < bt || k >= 1) continue;
+    ctx.strokeStyle = hex([AC, OR, PK, VI][b % 4], (1 - k) * .7); ctx.lineWidth = 6 * (1 - k) + 1;
+    ctx.beginPath(); ctx.arc(540, 760, 240 + k * 600, 0, TAU); ctx.stroke();
+  }
+  // spinning arcs
+  const ak = eOutExpo(P(t, 26.25, 26.9));
+  [[AC, 1.2, 0], [OR, -.9, 1.6], [PK, .7, 3.1], [VI, -1.4, 4.4]].forEach(([c, sp, o], i) => {
+    ctx.strokeStyle = c; ctx.lineWidth = 12; ctx.lineCap = "round";
+    const a = o + t * sp, r = 270 + i * 22;
+    ctx.beginPath(); ctx.arc(540, 760, r * ak, a, a + 1.1 * ak); ctx.stroke();
+  });
+  // dot → logo
+  const pop = spring(t - 26.15, 1.5, 6) * (t > 26.15 ? 1 : 0);
+  if (t < 26.3) { ctx.fillStyle = PAPER; ctx.beginPath(); ctx.arc(540, 760, 10 + 30 * P(t, 26, 26.15), 0, TAU); ctx.fill(); }
+  if (logo.complete && pop > 0) {
+    const w = 360 * pop, h = w * 292 / 344;
+    ctx.drawImage(logo, 540 - w / 2, 760 - h / 2 - 6 * Math.sin(t * 2), w, h);
+  }
+  // wordmark: letters rise through a clip
+  const WM = "OTAK RENTAL", o = { f: "Syne", w: 800, size: 76, ls: 2 };
+  const tw = measure(WM, o); let x = 540 - tw / 2;
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 1040, W, 170); ctx.clip();
+  [...WM].forEach((ch, i) => {
+    const cw = measure(ch, o), k = eOutExpo(P(t, 26.5 + i * .035, 27.1 + i * .035));
+    txt(ch, x + cw / 2, 1170 + (1 - k) * 160, { ...o, ls: 0, color: PAPER });
+    x += cw + 2;
+  });
+  ctx.restore();
+  const s1 = eOutExpo(P(t, 26.9, 27.4));
+  txt("MOTION  STUDIO", 540, 1255, { f: "Geist Mono", size: 36, w: 600, ls: 16, color: AC, alpha: s1 });
+  txt("Reels · Iklan · Logo reveal · Explainer", 540, 1370, { f: "Geist", w: 500, size: 34, color: hex(PAPER, .75), alpha: eOutExpo(P(t, 27.1, 27.6)) });
+  // price chip + CTA
+  const c1 = spring(t - 27.4, 1.6, 7) * (t > 27.4 ? 1 : 0), c2 = spring(t - 27.65, 1.6, 7) * (t > 27.65 ? 1 : 0);
+  withT(540, 1480, 0, c1, c1, () => { rr(-250, -38, 500, 76, 38); ctx.fillStyle = AC; ctx.fill(); txt("MULAI RP50K / 15 DETIK", 0, 11, { f: "Geist Mono", w: 700, size: 30, ls: 3, color: BG }); });
+  withT(540, 1620, 0, c2 * (1 + .03 * pulse(t, 6) * (t > 28 ? 1 : 0)), c2 * (1 + .03 * pulse(t, 6) * (t > 28 ? 1 : 0)), () => {
+    rr(-300, -58, 600, 116, 58); ctx.fillStyle = OR; ctx.fill();
+    txt("DM @otakrental", 0, 18, { f: "Geist", w: 800, size: 52, color: BG });
+  });
+  txt("Buka slot project bulan ini", 540, 1745, { f: "Instrument Serif", st: "italic", size: 46, color: PAPER, alpha: P(t, 28.0, 28.4) });
+}
+
+/* ==========================================================================
+   TIMELINE + TRANSITIONS
+   ========================================================================== */
+const SCENES = [
+  [0, 2, sHook], [2, 6, sType], [6, 10, sShape], [10, 14, sParticles], [14, 18, sLiquid],
+  [18, 22, sUI], [22, 24, sData], [24, 26, sGlitch], [26, 30.01, sOutro],
+];
+const CHAPTERS = [[2, "KINETIC TYPE"], [6, "SHAPE MORPH"], [10, "3D PARTICLES"], [14, "LIQUID"], [18, "UI MOTION"], [22, "DATA VIZ"], [24, "GLITCH"]];
+// mask for the incoming scene at a cut, p: 0 → 1
+const WIPES = {
+  2: p => { ctx.beginPath(); ctx.arc(540, 960, 1150 * p, 0, TAU); },
+  6: p => { ctx.beginPath(); for (let i = 0; i < 8; i++) { const q = cl(p * 1.6 - i * .08); const y = i * 240; i % 2 ? ctx.rect(W - W * q, y, W * q, 241) : ctx.rect(0, y, W * q, 241); } },
+  10: p => { const s = lerp(0, 1.25, p); ctx.save(); ctx.translate(540, 960); ctx.rotate((1 - p) * -.6); ctx.beginPath(); ctx.rect(-W * s / 2, -H * s / 2, W * s, H * s); ctx.restore(); },
+  14: p => { const x = lerp(-900, W + 900, p); ctx.beginPath(); ctx.moveTo(x - 900, 0); ctx.lineTo(x, 0); ctx.lineTo(x - 900, H); ctx.lineTo(x - 1800, H); ctx.closePath(); ctx.rect(0, 0, Math.max(0, x - 1800), H); },
+  18: p => { ctx.beginPath(); for (let i = 0; i < 6; i++) { const q = cl(p * 1.5 - i * .1); ctx.rect(i * 180 + 90 - 90 * q, 0, 180 * q + 1, H); } },
+  22: p => { ctx.beginPath(); ctx.arc(540, 1960, 2300 * p, 0, TAU); },
+};
+function sceneAt(t) { for (const s of SCENES) if (t >= s[0] && t < s[1]) return s; return SCENES[SCENES.length - 1]; }
+
+function hud(t) {
+  if (t < 2 || t > 26) return;
+  const a = P(t, 2, 2.3) * (1 - P(t, 25.6, 25.9));
+  ctx.save(); ctx.globalCompositeOperation = "difference"; ctx.globalAlpha = a;
+  let ci = 0; CHAPTERS.forEach((c, i) => { if (t >= c[0]) ci = i; });
+  txt("MOTION REEL — 2026", 70, 96, { f: "Geist Mono", size: 26, ls: 6, color: "#fff", align: "left" });
+  txt(`0${ci + 1} / 07  ${CHAPTERS[ci][1]}`, 1010, 96, { f: "Geist Mono", size: 26, ls: 6, color: "#fff", align: "right" });
+  // progress segments
+  CHAPTERS.forEach((c, i) => {
+    const end = i + 1 < CHAPTERS.length ? CHAPTERS[i + 1][0] : 26, x = 70 + i * 136, w = 124;
+    ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(x, 1836, w, 4);
+    ctx.fillStyle = "#fff"; ctx.fillRect(x, 1836, w * P(t, c[0], end), 4);
+  });
+  const f = Math.round(t * FPS);
+  txt(`00:${String(Math.floor(t)).padStart(2, "0")}:${String(f % FPS).padStart(2, "0")}`, 70, 1886, { f: "Geist Mono", size: 24, ls: 4, color: "#fff", align: "left" });
+  txt("@otakrental", 1010, 1886, { f: "Geist Mono", size: 24, ls: 4, color: "#fff", align: "right" });
+  // corner marks
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = 3;
+  [[40, 40, 1, 1], [1040, 40, -1, 1], [40, 1880, 1, -1], [1040, 1880, -1, -1]].forEach(([x, y, dx, dy]) => { ctx.beginPath(); ctx.moveTo(x, y + 34 * dy); ctx.lineTo(x, y); ctx.lineTo(x + 34 * dx, y); ctx.stroke(); });
+  ctx.restore();
+}
+
+function renderAt(t) {
+  t = cl(t, 0, DUR);
+  ctx.save();
+  // tiny camera kick on every beat after the hook
+  if (t > 2 && t < 26) { const k = 4 * pulse(t, 14); ctx.translate(W / 2, H / 2); ctx.scale(1 + k * .002, 1 + k * .002); ctx.translate(-W / 2, -H / 2); }
+  const cur = sceneAt(t);
+  // transitions: the incoming scene is revealed through a mask around each cut
+  let drawn = false;
+  for (const T of Object.keys(WIPES).map(Number)) {
+    if (t > T - .16 && t < T + .22) {
+      const prev = SCENES.find(s => T > s[0] && T <= s[1]), next = SCENES.find(s => s[0] === T);
+      prev[2](Math.min(t, T - 1e-3));
+      ctx.save(); WIPES[T](eInOutCubic(P(t, T - .16, T + .22))); ctx.clip(); next[2](Math.max(t, T)); ctx.restore();
+      drawn = true; break;
+    }
+  }
+  if (!drawn) cur[2](t);
+  ctx.restore();
+  hud(t);
+}
+
+window.renderAt = renderAt;
+window.DURATION = DUR;
+window.reelReady = (async () => {
+  await document.fonts.ready;
+  await Promise.all(['40px "Anton"', '800 40px "Syne"', '700 40px "Geist"', '40px "Geist Mono"', 'italic 40px "Instrument Serif"'].map(f => document.fonts.load(f)));
+  await logo.decode().catch(() => {});
+  renderAt(0);
+  return true;
+})();
+if (!CAPTURE) {
+  let paused = false, last = performance.now(), cur = 0;
+  addEventListener("keydown", e => { if (e.code === "Space") { paused = !paused; e.preventDefault(); } if (e.code === "ArrowRight") cur += 1; if (e.code === "ArrowLeft") cur = Math.max(0, cur - 1); });
+  window.reelReady.then(() => {
+    last = performance.now();
+    const loop = now => { if (!paused) { cur += (now - last) / 1000; if (cur > DUR + 1) cur = 0; } last = now; renderAt(Math.min(cur, DUR)); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+}
+</script>
+</body>
+</html>
