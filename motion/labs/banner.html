@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>Labs. — Lynk.id banner</title>
-<!-- Lynk.id profile banner for "Labs." (1200×628), black & white. Render: node render.mjs → png/labs-banner-*.png -->
+<!-- "Labs." Lynk.id set, black & white: profile banner (1200×628) and profile photos (1080×1080, circle-safe).
+     Render: node render.mjs → png/labs-*.png -->
 <style>
 @font-face{font-family:"Geist";src:url(../fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
 @font-face{font-family:"Geist Mono";src:url(../fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
@@ -20,6 +21,9 @@ body{padding:30px;display:flex;flex-direction:column;gap:30px;align-items:flex-s
 .art::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 80% at 72% 50%,transparent 40%,rgba(0,0,0,.35) 100%)}
 .art.light::after{background:radial-gradient(ellipse 70% 80% at 72% 50%,transparent 45%,rgba(0,0,0,.06) 100%)}
 .abs{position:absolute}
+.art.sq{width:1080px;height:1080px}
+.art.sq::after{background:radial-gradient(circle at 50% 50%,transparent 46%,rgba(0,0,0,.3) 75%)}
+.art.sq.light::after{background:radial-gradient(circle at 50% 50%,transparent 46%,rgba(0,0,0,.05) 75%)}
 .art::after{z-index:0}
 .art > *{z-index:1}
 .mono{font-family:"Geist Mono",monospace;letter-spacing:.18em;text-transform:uppercase}
@@ -65,13 +69,30 @@ body{padding:30px;display:flex;flex-direction:column;gap:30px;align-items:flex-s
   <div class="hud mono" style="right:64px;bottom:44px"><span>Bahasa Indonesia</span><span>·</span><b>ID</b></div>
 </template>
 
+<template id="tpl-avatar">
+  <svg class="abs sph" style="left:0;top:0" width="1080" height="1080" viewBox="0 0 1080 1080" data-sph="540,540,330" opacity=".55"></svg>
+  <div class="abs" style="left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+    <div class="logo" style="font-size:262px;letter-spacing:-.075em;padding-right:.06em">Labs.</div>
+  </div>
+</template>
+<template id="tpl-mono">
+  <svg class="abs sph" style="left:0;top:0" width="1080" height="1080" viewBox="0 0 1080 1080" data-sph="540,540,350" opacity=".55"></svg>
+  <div class="abs" style="left:0;right:0;top:0;bottom:0;display:grid;place-items:center">
+    <div class="logo" style="font-size:520px;letter-spacing:-.02em;margin-top:-30px;padding-left:.05em">L.</div>
+  </div>
+</template>
+
+<section class="art sq" data-tpl="tpl-avatar" data-out="labs-avatar-dark"></section>
+<section class="art sq light" data-tpl="tpl-avatar" data-out="labs-avatar-light"></section>
+<section class="art sq" data-tpl="tpl-mono" data-out="labs-avatar-monogram-dark"></section>
+<section class="art sq light" data-tpl="tpl-mono" data-out="labs-avatar-monogram-light"></section>
 <section class="art" data-out="labs-banner-dark"></section>
 <section class="art light" data-out="labs-banner-light"></section>
 
 <script>
 // wireframe sphere + orbit, drawn as SVG lines (deterministic)
-function sphere(svg, fg) {
-  const cx = 300, cy = 314, r = 210, tilt = -0.42, yaw = 0.5;
+function sphere(svg, fg, cx = 300, cy = 314, r = 210) {
+  const tilt = -0.42, yaw = 0.5;
   const P = (lat, lon) => {               // lat/lon in radians → rotated, projected point
     let x = Math.cos(lat) * Math.sin(lon), y = Math.sin(lat), z = Math.cos(lat) * Math.cos(lon);
     const x1 = x * Math.cos(yaw) + z * Math.sin(yaw), z1 = -x * Math.sin(yaw) + z * Math.cos(yaw);
@@ -96,10 +117,11 @@ function sphere(svg, fg) {
   svg.innerHTML = out;
 }
 document.querySelectorAll(".art").forEach(a => {
-  a.innerHTML = document.getElementById("tpl").innerHTML;
+  a.innerHTML = document.getElementById(a.dataset.tpl || "tpl").innerHTML;
   const fg = getComputedStyle(a).getPropertyValue("--fg").trim();
   a.style.color = fg;
-  sphere(a.querySelector(".sph"), fg);
+  const svg = a.querySelector(".sph");
+  sphere(svg, fg, ...(svg.dataset.sph ? svg.dataset.sph.split(",").map(Number) : []));
 });
 </script>
 </body>

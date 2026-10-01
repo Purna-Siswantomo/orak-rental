@@ -1,4 +1,4 @@
-// Renders banner.html: every .art[data-out] → png/<data-out>.png (Lynk.id banner 1200×628)
+// Renders banner.html: every .art[data-out] → png/<data-out>.png (Lynk.id banner 1200×628, profile photos 1080×1080)
 //   node promo.mjs            -> 1×
 //   node promo.mjs --scale=2  -> @2x
 import http from "node:http";
