@@ -35,7 +35,7 @@ async function loadPlaywright() {
   return req(path.join(globalRoot, "playwright")).chromium;
 }
 
-const MIME = { ".html": "text/html", ".woff2": "font/woff2", ".png": "image/png", ".js": "text/javascript" };
+const MIME = { ".html": "text/html", ".woff2": "font/woff2", ".png": "image/png", ".js": "text/javascript", ".jpg": "image/jpeg", ".css": "text/css" };
 function serve() {
   const srv = http.createServer((req, res) => {
     const p = path.join(DIR, decodeURIComponent(new URL(req.url, "http://x").pathname));
