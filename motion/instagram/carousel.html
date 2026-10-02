@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Otak Rental — Instagram Carousel</title>
+<!--
+  Two 3-slide Instagram carousels (1080×1350 each), designed as one 3240×1350 panorama per post
+  so elements can run across the swipe. ?post=1 → Motion Graphic, ?post=2 → Website & SaaS.
+  Render: node render.mjs  (from this folder) → png/post{1,2}-slide{1,2,3}.png
+-->
+<style>
+@font-face{font-family:"Geist";src:url(../fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(../fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(../fonts/InstrumentSerif-normal.woff2) format("woff2");font-style:normal;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(../fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+:root{--cream:#FAF7F0;--paper:#FFFDF8;--ink:#05100E;--lime:#D4E751;--emerald:#17463A;--muted:#7F8277;--line:#E6DFD0;--coral:#EE5A32}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#15130F}
+body{width:5400px;height:1350px}
+.post{position:absolute;left:0;top:0;width:3240px;height:1350px;overflow:hidden;background:var(--cream);color:var(--ink);
+  font-family:"Geist",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;display:none}
+.post.on{display:block}
+.abs{position:absolute}
+.mono{font-family:"Geist Mono",monospace}
+.serif{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400}
+.glow{position:absolute;border-radius:50%;pointer-events:none}
+.grid{position:absolute;inset:0;background-size:60px 60px;
+  background-image:linear-gradient(to right, rgba(5,16,14,.045) 1px, transparent 1px),linear-gradient(to bottom, rgba(5,16,14,.045) 1px, transparent 1px)}
+.grain{position:absolute;left:0;top:0;height:1350px;mix-blend-mode:multiply;opacity:.32;pointer-events:none}
+.vig{position:absolute;top:0;width:1080px;height:1350px;background:radial-gradient(ellipse 85% 75% at 50% 45%, rgba(0,0,0,0) 55%, rgba(98,80,40,.07) 100%);pointer-events:none}
+.span{position:absolute;left:0;top:0;pointer-events:none}
+
+.slide{position:absolute;top:0;width:1080px;height:1350px;overflow:hidden}
+/* HUD */
+.cm{position:absolute;width:30px;height:30px;border:0 solid var(--ink)}
+.cm.tl{left:40px;top:40px;border-top-width:2px;border-left-width:2px}
+.cm.tr{right:40px;top:40px;border-top-width:2px;border-right-width:2px}
+.cm.bl{left:40px;bottom:40px;border-bottom-width:2px;border-left-width:2px}
+.cm.br{right:40px;bottom:40px;border-bottom-width:2px;border-right-width:2px}
+.hud{position:absolute;font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;display:flex;align-items:center;gap:12px}
+.hud b{font-weight:700}
+.hud img{width:34px;height:29px}
+.hud.tl{left:92px;top:58px}.hud.tr{right:92px;top:64px}.hud.bl{left:92px;bottom:64px}.hud.br{right:92px;bottom:64px}
+.dots{display:flex;gap:8px;align-items:center}
+.dots i{width:9px;height:9px;border-radius:50%;background:rgba(5,16,14,.2)}
+.dots i.on{width:28px;border-radius:9px;background:var(--ink)}
+
+.chip{display:inline-flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:12px 18px;
+  font-family:"Geist Mono",monospace;font-size:16px;letter-spacing:.16em;color:#40443d;text-transform:uppercase;white-space:nowrap;box-shadow:0 10px 24px -16px rgba(40,34,20,.3)}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(212,231,81,.35)}
+.chip.dark{background:var(--ink);color:var(--lime);border-color:var(--ink)}
+
+.h{white-space:nowrap}
+.sans{font-weight:820;letter-spacing:-.055em;line-height:.95}
+.ser{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;color:var(--emerald);letter-spacing:-.015em;line-height:.95}
+.mk{position:relative;display:inline-block;z-index:0}
+.mk::before{content:"";position:absolute;left:-.05em;right:-.07em;top:.5em;height:.4em;background:var(--lime);border-radius:.08em;z-index:-1}
+.echo{position:absolute;left:0;top:0;color:transparent;-webkit-text-stroke:1.6px var(--emerald)}
+
+.card{position:absolute;background:var(--paper);border:1.5px solid var(--line);border-radius:30px;box-shadow:0 34px 60px -38px rgba(40,34,20,.45)}
+.card.dark{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 40px 70px -34px rgba(5,16,14,.6)}
+.tg{display:inline-block;font-family:"Geist Mono",monospace;font-size:14px;letter-spacing:.06em;border-radius:9px;padding:7px 11px;border:1px solid var(--line);background:#fff;color:#474b44;white-space:nowrap}
+.dark .tg{background:transparent;border-color:rgba(255,255,255,.16);color:rgba(255,255,255,.82)}
+.badge-in{font-family:"Geist Mono",monospace;font-size:12px;font-weight:600;letter-spacing:.16em;background:var(--lime);color:var(--ink);padding:5px 10px;border-radius:999px}
+.badge{position:absolute;top:-17px;right:34px;background:var(--lime);color:var(--ink);font-family:"Geist Mono",monospace;font-size:14px;font-weight:600;letter-spacing:.16em;padding:8px 14px;border-radius:999px;box-shadow:0 10px 20px -10px rgba(5,16,14,.4)}
+
+/* price rows */
+.tier{display:flex;align-items:center;gap:30px;padding:0 38px}
+.tier .dur{width:150px;flex:none}
+.tier .dur b{display:block;font-size:104px;font-weight:840;letter-spacing:-.06em;line-height:.9}
+.tier .dur span{font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.dark .dur span,.dark .from{color:rgba(255,255,255,.5)}
+.tier .mid{flex:1;min-width:0;border-left:1.5px dashed var(--line);padding-left:30px}
+.dark .mid{border-left-color:rgba(255,255,255,.14)}
+.tier .t{font-size:34px;font-weight:760;letter-spacing:-.035em}
+.tier .d{font-size:18px;line-height:1.4;color:#63665e;margin-top:6px}
+.dark .d{color:rgba(255,255,255,.6)}
+.tier .meta{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.tier .pr{flex:none;text-align:right}
+.from{font-family:"Geist Mono",monospace;font-size:14px;letter-spacing:.2em;color:var(--muted)}
+.price{font-size:54px;font-weight:840;letter-spacing:-.05em;line-height:1;margin-top:6px;white-space:nowrap}
+.price small{font-size:26px;font-weight:650;letter-spacing:-.02em;margin-right:4px;color:#6f7168}
+.dark .price{color:var(--lime)} .dark .price small{color:rgba(212,231,81,.7)}
+.ico{width:56px;height:56px;border-radius:16px;background:var(--ink);display:grid;place-items:center;flex:none}
+.dark .ico{background:var(--lime)}
+
+/* chat mock */
+.chat{padding:0}
+.chat .top{display:flex;align-items:center;gap:16px;padding:22px 28px;border-bottom:1.5px solid var(--line)}
+.av{width:58px;height:58px;border-radius:50%;background:var(--cream);border:2px solid var(--ink);display:grid;place-items:center;overflow:hidden}
+.av img{width:42px;height:36px}
+.chat .nm{font-size:23px;font-weight:700;letter-spacing:-.02em}
+.chat .st{font-size:15px;color:#4f8a3a;display:flex;align-items:center;gap:7px;margin-top:3px}
+.chat .st i{width:9px;height:9px;border-radius:50%;background:#58B947}
+.bub{max-width:740px;font-size:22px;line-height:1.4;padding:16px 22px;border-radius:26px;letter-spacing:-.01em}
+.bub.me{background:var(--ink);color:#fff;border-bottom-right-radius:8px;margin-left:auto}
+.bub.us{background:var(--lime);color:var(--ink);border-bottom-left-radius:8px}
+.typing{display:inline-flex;gap:7px;background:#EFEBE1;padding:16px 20px;border-radius:22px;border-bottom-left-radius:8px}
+.typing i{width:10px;height:10px;border-radius:50%;background:#9B9C92}
+.inp{display:flex;align-items:center;gap:14px;margin:0 22px 22px;border:1.5px solid var(--line);border-radius:999px;padding:12px 14px 12px 24px;font-size:19px;color:#9a9b92}
+.inp .send{margin-left:auto;width:44px;height:44px;border-radius:50%;background:var(--ink);display:grid;place-items:center}
+.steps{display:flex;gap:18px}
+.step{flex:1;border-top:2px solid var(--ink);padding-top:16px}
+.step .n{font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.2em;color:var(--muted)}
+.step .s{font-size:24px;font-weight:720;letter-spacing:-.03em;margin-top:8px;line-height:1.15}
+.step .s em{font-style:normal;background:var(--lime);padding:0 6px;border-radius:6px}
+/* service cards (Konsultasi post) */
+.svc{height:146px;padding:0 28px;display:flex;align-items:center;gap:20px;border-radius:26px}
+.svc .no{position:absolute;top:16px;right:22px;font-family:"Geist Mono",monospace;font-size:14px;letter-spacing:.18em;color:var(--muted)}
+.svc.dark .no{color:rgba(255,255,255,.45)}
+.svc .nm{font-size:32px;font-weight:760;letter-spacing:-.03em}
+</style>
+</head>
+<body>
+
+<!-- =====================================================================
+     POST 1 · MOTION GRAPHIC
+     ===================================================================== -->
+<div class="post" id="p1">
+  <div class="grid"></div>
+  <div class="glow" style="left:560px;top:-260px;width:760px;height:760px;background:radial-gradient(circle, rgba(212,231,81,.22), rgba(212,231,81,0) 65%)"></div>
+  <div class="glow" style="left:2500px;top:820px;width:900px;height:900px;background:radial-gradient(circle, rgba(212,231,81,.18), rgba(212,231,81,0) 65%)"></div>
+
+  <!-- ============ SLIDE 1 · HOOK ============ -->
+  <section class="slide" style="left:0">
+    <div class="abs" style="left:92px;top:150px"><span class="chip"><i></i>Price list · Motion graphic</span></div>
+    <div class="abs h" style="left:86px;top:228px">
+      <div class="sans" style="font-size:156px">Bikin brand</div>
+      <div class="sans" style="font-size:156px">kamu</div>
+      <div style="position:relative;margin-top:-6px">
+        <span class="ser echo" style="font-size:262px;transform:translateX(-78px);opacity:.10">bergerak.</span>
+        <span class="ser echo" style="font-size:262px;transform:translateX(-52px);opacity:.18">bergerak.</span>
+        <span class="ser echo" style="font-size:262px;transform:translateX(-26px);opacity:.32">bergerak.</span>
+        <span class="ser" style="font-size:262px;position:relative"><span class="mk">bergerak.</span></span>
+      </div>
+    </div>
+    <!-- bouncing ball motion study -->
+    <svg class="abs" width="520" height="240" style="left:470px;top:350px" viewBox="0 0 520 240">
+      <path d="M20 40 Q 120 -10 200 200 Q 290 70 380 200 Q 440 130 500 200" fill="none" stroke="#05100E" stroke-width="2" stroke-dasharray="3 9" stroke-linecap="round" opacity=".45"/>
+      <line x1="150" y1="222" x2="520" y2="222" stroke="#05100E" stroke-width="2" opacity=".15"/>
+      <circle cx="20" cy="40" r="14" fill="#D4E751" opacity=".22"/>
+      <circle cx="96" cy="26" r="15" fill="#D4E751" opacity=".32"/>
+      <ellipse cx="160" cy="112" rx="13" ry="19" fill="#D4E751" opacity=".5"/>
+      <ellipse cx="200" cy="211" rx="26" ry="11" fill="#D4E751" opacity=".75"/>
+      <circle cx="290" cy="110" r="16" fill="#D4E751" opacity=".85"/>
+      <ellipse cx="380" cy="210" rx="24" ry="12" fill="#D4E751"/>
+      <circle cx="440" cy="152" r="17" fill="#D4E751" stroke="#05100E" stroke-width="3"/>
+      <ellipse cx="440" cy="222" rx="22" ry="4" fill="rgba(5,16,14,.16)"/>
+      <text x="232" y="38" font-family="Geist Mono" font-size="14" letter-spacing="2" fill="#7F8277">EASE · SQUASH · STRETCH</text>
+    </svg>
+    <!-- timeline panel -->
+    <div class="card dark" style="left:80px;top:872px;width:920px;height:356px;border-radius:30px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:20px 26px;border-bottom:1px solid rgba(255,255,255,.08)">
+        <i style="width:12px;height:12px;border-radius:50%;background:#EE5A32"></i><i style="width:12px;height:12px;border-radius:50%;background:#F1C27B"></i><i style="width:12px;height:12px;border-radius:50%;background:#D4E751"></i>
+        <span class="mono" style="margin-left:14px;font-size:15px;letter-spacing:.1em;color:rgba(255,255,255,.6)">otakrental_promo.comp</span>
+        <span class="mono" style="margin-left:auto;font-size:18px;letter-spacing:.08em;color:#D4E751">00:00:07:32</span>
+      </div>
+      <svg width="920" height="290" viewBox="0 0 920 290" style="display:block">
+        <g font-family="Geist Mono" font-size="12" fill="rgba(255,255,255,.35)" letter-spacing="1">
+          <text x="236" y="26">0s</text><text x="396" y="26">4s</text><text x="556" y="26">8s</text><text x="716" y="26">12s</text><text x="860" y="26">15s</text>
+        </g>
+        <g stroke="rgba(255,255,255,.12)">
+          <line x1="236" y1="36" x2="890" y2="36"/>
+          <line x1="236" y1="32" x2="236" y2="40"/><line x1="316" y1="34" x2="316" y2="38"/><line x1="396" y1="32" x2="396" y2="40"/><line x1="476" y1="34" x2="476" y2="38"/><line x1="556" y1="32" x2="556" y2="40"/><line x1="636" y1="34" x2="636" y2="38"/><line x1="716" y1="32" x2="716" y2="40"/><line x1="796" y1="34" x2="796" y2="38"/><line x1="876" y1="32" x2="876" y2="40"/>
+        </g>
+        <g font-family="Geist Mono" font-size="15" fill="rgba(255,255,255,.72)" letter-spacing="1">
+          <text x="54" y="80">Position</text><text x="54" y="124">Scale</text><text x="54" y="168">Rotation</text><text x="54" y="212">Opacity</text><text x="54" y="256">Sheen</text>
+        </g>
+        <g>
+          <rect x="30" y="68" width="12" height="16" rx="3" fill="#D4E751"/><rect x="30" y="112" width="12" height="16" rx="3" fill="#8FD6C0"/><rect x="30" y="156" width="12" height="16" rx="3" fill="#F1C27B"/><rect x="30" y="200" width="12" height="16" rx="3" fill="#EE5A32"/><rect x="30" y="244" width="12" height="16" rx="3" fill="#fff"/>
+        </g>
+        <g stroke="rgba(255,255,255,.06)"><line x1="20" y1="98" x2="900" y2="98"/><line x1="20" y1="142" x2="900" y2="142"/><line x1="20" y1="186" x2="900" y2="186"/><line x1="20" y1="230" x2="900" y2="230"/></g>
+        <!-- clip bars -->
+        <rect x="250" y="66" width="330" height="20" rx="6" fill="rgba(212,231,81,.16)"/>
+        <rect x="300" y="110" width="410" height="20" rx="6" fill="rgba(143,214,192,.16)"/>
+        <rect x="236" y="154" width="250" height="20" rx="6" fill="rgba(241,194,123,.16)"/>
+        <rect x="420" y="198" width="440" height="20" rx="6" fill="rgba(238,90,50,.16)"/>
+        <rect x="700" y="242" width="170" height="20" rx="6" fill="rgba(255,255,255,.12)"/>
+        <!-- keyframes -->
+        <g fill="#D4E751"><rect x="244" y="70" width="12" height="12" transform="rotate(45 250 76)"/><rect x="374" y="70" width="12" height="12" transform="rotate(45 380 76)"/><rect x="574" y="70" width="12" height="12" transform="rotate(45 580 76)"/></g>
+        <g fill="#8FD6C0"><rect x="294" y="114" width="12" height="12" transform="rotate(45 300 120)"/><rect x="494" y="114" width="12" height="12" transform="rotate(45 500 120)"/><rect x="704" y="114" width="12" height="12" transform="rotate(45 710 120)"/></g>
+        <g fill="#F1C27B"><rect x="230" y="158" width="12" height="12" transform="rotate(45 236 164)"/><rect x="480" y="158" width="12" height="12" transform="rotate(45 486 164)"/></g>
+        <g fill="#EE5A32"><rect x="414" y="202" width="12" height="12" transform="rotate(45 420 208)"/><rect x="614" y="202" width="12" height="12" transform="rotate(45 620 208)"/><rect x="854" y="202" width="12" height="12" transform="rotate(45 860 208)"/></g>
+        <g fill="#fff"><rect x="694" y="246" width="12" height="12" transform="rotate(45 700 252)"/><rect x="864" y="246" width="12" height="12" transform="rotate(45 870 252)"/></g>
+        <!-- playhead -->
+        <line x1="535" y1="36" x2="535" y2="290" stroke="#D4E751" stroke-width="2.5"/>
+        <path d="M525 22 h20 v10 l-10 10 l-10 -10z" fill="#D4E751"/>
+      </svg>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Motion ’26</span></div>
+    <div class="hud tr">Price list</div>
+    <div class="hud bl">Geser untuk lihat harga <svg width="26" height="16" viewBox="0 0 26 16"><path d="M1 8h22M16 1l7 7-7 7" fill="none" stroke="#05100E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="hud br"><span class="dots"><i class="on"></i><i></i><i></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+
+  <!-- ============ SLIDE 2 · PRICE LIST ============ -->
+  <section class="slide" style="left:1080px">
+    <div class="abs" style="left:92px;top:140px"><span class="chip"><i></i>Harga mulai dari · 2026</span></div>
+    <div class="abs h" style="left:88px;top:210px">
+      <div class="sans" style="font-size:104px">Harga jasa</div>
+      <div class="ser" style="font-size:122px;margin-top:2px"><span class="mk">motion graphic.</span></div>
+    </div>
+    <div class="card tier" style="left:80px;top:448px;width:920px;height:156px">
+      <div class="dur"><b style="font-size:88px">15</b><span>detik</span></div>
+      <div class="mid">
+        <div class="t" style="font-size:32px">Short Reel</div>
+        <div class="d" style="font-size:18px">Logo reveal, teaser, konten Reels / TikTok.</div>
+      </div>
+      <div class="pr"><div class="from">MULAI DARI</div><div class="price"><small>Rp</small>50K</div></div>
+    </div>
+    <div class="card dark tier" style="left:80px;top:622px;width:920px;height:156px">
+      <span class="badge">PALING LARIS</span>
+      <div class="dur"><b style="font-size:88px">30</b><span>detik</span></div>
+      <div class="mid">
+        <div class="t" style="font-size:32px">Promo Motion</div>
+        <div class="d" style="font-size:18px">Iklan &amp; launching produk, kinetic typography.</div>
+      </div>
+      <div class="pr"><div class="from">MULAI DARI</div><div class="price"><small>Rp</small>150K</div></div>
+    </div>
+    <div class="card tier" style="left:80px;top:796px;width:920px;height:156px">
+      <div class="dur"><b style="font-size:88px">45</b><span>detik</span></div>
+      <div class="mid">
+        <div class="t" style="font-size:32px">Story Motion</div>
+        <div class="d" style="font-size:18px">Promo dengan alur cerita &amp; transisi lengkap.</div>
+      </div>
+      <div class="pr"><div class="from">MULAI DARI</div><div class="price"><small>Rp</small>250K</div></div>
+    </div>
+    <div class="card tier" style="left:80px;top:970px;width:920px;height:156px">
+      <div class="dur"><b style="font-size:88px">60</b><span>detik</span></div>
+      <div class="mid">
+        <div class="t" style="font-size:32px">Explainer</div>
+        <div class="d" style="font-size:18px">Explainer produk / aplikasi, animasi UI.</div>
+      </div>
+      <div class="pr"><div class="from">MULAI DARI</div><div class="price"><small>Rp</small>350K</div></div>
+    </div>
+    <div class="abs" style="left:80px;top:1166px;width:920px;display:flex;gap:10px;flex-wrap:nowrap">
+      <span class="tg" style="font-size:15px">+ Voice over</span>
+      <span class="tg" style="font-size:15px">+ Subtitle</span>
+      <span class="tg" style="font-size:15px">+ Sound design</span>
+      <span class="tg" style="font-size:15px;background:var(--ink);color:var(--lime);border-color:var(--ink)">Add-on &amp; paket custom? Tanya via DM</span>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Motion ’26</span></div>
+    <div class="hud tr">MP4 · 1080p · 60fps</div>
+    <div class="hud bl" style="color:var(--muted)">Format 9:16 · 1:1 · 16:9</div>
+    <div class="hud br"><span class="dots"><i></i><i class="on"></i><i></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+
+  <!-- ============ SLIDE 3 · ORDER VIA DM ============ -->
+  <section class="slide" style="left:2160px">
+    <div class="abs" style="left:92px;top:140px"><span class="chip dark"><i></i>Slot bulan ini terbatas</span></div>
+    <div class="abs h" style="left:86px;top:204px">
+      <div class="sans" style="font-size:210px">Order</div>
+      <div class="ser" style="font-size:200px;margin-top:-10px">sekarang,</div>
+      <div class="sans" style="font-size:150px;margin-top:4px">lewat <span class="mk">DM.</span></div>
+    </div>
+    <!-- DM mock -->
+    <div class="card chat" style="left:80px;top:730px;width:920px;height:380px;border-radius:34px;overflow:hidden">
+      <div class="top">
+        <div class="av"><img src="../assets/logo-icon-dark.png" alt=""></div>
+        <div><div class="nm">otakrental</div><div class="st"><i></i>Aktif sekarang</div></div>
+        <svg style="margin-left:auto" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#05100E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+      </div>
+      <div style="padding:22px 28px;display:flex;flex-direction:column;gap:12px">
+        <div class="bub me">Halo kak, mau order motion 30 detik buat launching produk.</div>
+        <div class="bub us">Siap! Kirim brief &amp; referensinya ya, estimasi kami kirim &lt; 15 menit.</div>
+        <div><span class="typing"><i></i><i style="opacity:.7"></i><i style="opacity:.45"></i></span></div>
+      </div>
+    </div>
+    <div class="abs steps" style="left:80px;top:1140px;width:920px">
+      <div class="step"><div class="n">01</div><div class="s">DM kata <em>MOTION</em></div></div>
+      <div class="step"><div class="n">02</div><div class="s">Kirim brief &amp; referensi</div></div>
+      <div class="step"><div class="n">03</div><div class="s">Terima estimasi, mulai!</div></div>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Motion ’26</span></div>
+    <div class="hud tr"><b>@otakrental</b></div>
+    <div class="hud bl">Geser: contoh hasil <svg width="26" height="16" viewBox="0 0 26 16"><path d="M1 8h22M16 1l7 7-7 7" fill="none" stroke="#05100E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="hud br"><span class="dots"><i></i><i></i><i class="on"></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+</div>
+
+<!-- =====================================================================
+     POST 2 · WEBSITE & SAAS
+     ===================================================================== -->
+<div class="post" id="p2">
+  <div class="grid"></div>
+  <div class="glow" style="left:420px;top:620px;width:900px;height:900px;background:radial-gradient(circle, rgba(212,231,81,.2), rgba(212,231,81,0) 65%)"></div>
+  <div class="glow" style="left:2400px;top:-300px;width:900px;height:900px;background:radial-gradient(circle, rgba(212,231,81,.18), rgba(212,231,81,0) 65%)"></div>
+
+  <!-- ============ SLIDE 1 · HOOK ============ -->
+  <section class="slide" style="left:0">
+    <div class="abs" style="left:92px;top:150px"><span class="chip"><i></i>Price list · Website &amp; SaaS</span></div>
+    <div class="abs h" style="left:86px;top:226px">
+      <div class="sans" style="font-size:156px">Dari ide,</div>
+      <div class="ser" style="font-size:206px;margin-top:-4px">jadi <span class="mk">sistem</span></div>
+      <div class="sans" style="font-size:156px;margin-top:-4px">yang jalan.</div>
+    </div>
+    <!-- browser mock -->
+    <div class="card" style="left:80px;top:790px;width:800px;height:430px;border-radius:26px;overflow:hidden;transform:rotate(-2deg)">
+      <div style="display:flex;align-items:center;gap:9px;padding:16px 20px;border-bottom:1.5px solid var(--line);background:#fff">
+        <i style="width:12px;height:12px;border-radius:50%;background:#EE5A32"></i><i style="width:12px;height:12px;border-radius:50%;background:#F1C27B"></i><i style="width:12px;height:12px;border-radius:50%;background:#D4E751"></i>
+        <span class="mono" style="margin-left:18px;font-size:14px;letter-spacing:.06em;color:#6f7168;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:6px 16px">https://tokomu.app/dashboard</span>
+      </div>
+      <div style="display:flex;height:376px">
+        <div style="width:150px;background:var(--ink);padding:22px 18px;display:flex;flex-direction:column;gap:14px">
+          <div style="width:34px;height:34px;border-radius:10px;background:var(--lime)"></div>
+          <div style="height:10px;border-radius:5px;background:rgba(255,255,255,.5);width:90px;margin-top:10px"></div>
+          <div style="height:10px;border-radius:5px;background:rgba(255,255,255,.18);width:70px"></div>
+          <div style="height:10px;border-radius:5px;background:rgba(255,255,255,.18);width:84px"></div>
+          <div style="height:10px;border-radius:5px;background:rgba(255,255,255,.18);width:60px"></div>
+        </div>
+        <div style="flex:1;padding:22px 24px">
+          <div style="display:flex;gap:12px">
+            <div style="flex:1;border:1.5px solid var(--line);border-radius:16px;padding:14px 16px"><div class="mono" style="font-size:11px;letter-spacing:.14em;color:var(--muted)">OMZET HARI INI</div><div style="font-size:30px;font-weight:800;letter-spacing:-.04em;margin-top:6px">Rp12,4jt</div></div>
+            <div style="flex:1;border:1.5px solid var(--line);border-radius:16px;padding:14px 16px"><div class="mono" style="font-size:11px;letter-spacing:.14em;color:var(--muted)">ORDER</div><div style="font-size:30px;font-weight:800;letter-spacing:-.04em;margin-top:6px">128</div></div>
+            <div style="flex:1;border:1.5px solid var(--ink);background:var(--ink);color:var(--lime);border-radius:16px;padding:14px 16px"><div class="mono" style="font-size:11px;letter-spacing:.14em;color:rgba(212,231,81,.6)">GROWTH</div><div style="font-size:30px;font-weight:800;letter-spacing:-.04em;margin-top:6px">+32%</div></div>
+          </div>
+          <svg width="596" height="210" viewBox="0 0 596 210" style="margin-top:18px;display:block">
+            <g fill="#05100E">
+              <rect x="10" y="120" width="44" height="80" rx="8"/><rect x="74" y="96" width="44" height="104" rx="8"/><rect x="138" y="130" width="44" height="70" rx="8"/><rect x="202" y="72" width="44" height="128" rx="8"/><rect x="266" y="88" width="44" height="112" rx="8"/><rect x="330" y="52" width="44" height="148" rx="8"/><rect x="394" y="64" width="44" height="136" rx="8"/>
+            </g>
+            <rect x="458" y="16" width="44" height="184" rx="8" fill="#D4E751"/>
+            <path d="M32 110 C 100 80, 160 118, 224 62 S 350 40, 416 50 S 470 8, 480 6" fill="none" stroke="#EE5A32" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 8"/>
+            <line x1="0" y1="200" x2="596" y2="200" stroke="#E6DFD0" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <!-- terminal card -->
+    <div class="card dark" style="left:640px;top:1000px;width:370px;height:190px;border-radius:24px;padding:22px 24px;transform:rotate(3deg)">
+      <div class="mono" style="font-size:17px;line-height:1.9;color:rgba(255,255,255,.85)">
+        <div><span style="color:#D4E751">$</span> npm run deploy</div>
+        <div style="color:rgba(255,255,255,.5)">build selesai · 42s</div>
+        <div style="display:flex;align-items:center;gap:10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span style="color:#D4E751">LIVE</span> tokomu.app</div>
+      </div>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Dev ’26</span></div>
+    <div class="hud tr">Price list</div>
+    <div class="hud bl">Geser untuk lihat harga <svg width="26" height="16" viewBox="0 0 26 16"><path d="M1 8h22M16 1l7 7-7 7" fill="none" stroke="#05100E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="hud br"><span class="dots"><i class="on"></i><i></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+
+  <!-- ============ SLIDE 2 · PRICE LIST ============ -->
+  <section class="slide" style="left:1080px">
+    <div class="abs" style="left:92px;top:140px"><span class="chip"><i></i>Harga mulai dari · 2026</span></div>
+    <div class="abs h" style="left:88px;top:210px">
+      <div class="sans" style="font-size:104px">Harga jasa</div>
+      <div class="ser" style="font-size:122px;margin-top:2px"><span class="mk">website &amp; SaaS.</span></div>
+    </div>
+    <div class="card tier" style="left:80px;top:444px;width:920px;height:108px;border-radius:24px;padding:0 32px;gap:24px">
+      <div class="ico" style="width:52px;height:52px;border-radius:15px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="M2 9h20"/></svg></div>
+      <div class="mid" style="border-left:0;padding-left:0">
+        <div class="t" style="font-size:28px;display:flex;align-items:center;gap:12px">Landing Page</div>
+        <div class="d" style="font-size:16px;margin-top:4px">1 halaman, responsif, SEO dasar, tombol WhatsApp.</div>
+      </div>
+      <div class="pr"><div class="from" style="font-size:12px">MULAI DARI</div><div class="price" style="font-size:44px;margin-top:4px"><small style="font-size:22px">Rp</small>250K</div></div>
+    </div>
+    <div class="card tier" style="left:80px;top:566px;width:920px;height:108px;border-radius:24px;padding:0 32px;gap:24px">
+      <div class="ico" style="width:52px;height:52px;border-radius:15px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-1.5-5h-15Z"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg></div>
+      <div class="mid" style="border-left:0;padding-left:0">
+        <div class="t" style="font-size:28px;display:flex;align-items:center;gap:12px">Business Website</div>
+        <div class="d" style="font-size:16px;margin-top:4px">Website usaha multi-halaman, siap tampil di Google.</div>
+      </div>
+      <div class="pr"><div class="from" style="font-size:12px">MULAI DARI</div><div class="price" style="font-size:44px;margin-top:4px"><small style="font-size:22px">Rp</small>750K</div></div>
+    </div>
+    <div class="card tier" style="left:80px;top:688px;width:920px;height:108px;border-radius:24px;padding:0 32px;gap:24px">
+      <div class="ico" style="width:52px;height:52px;border-radius:15px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg></div>
+      <div class="mid" style="border-left:0;padding-left:0">
+        <div class="t" style="font-size:28px;display:flex;align-items:center;gap:12px">Company Profile</div>
+        <div class="d" style="font-size:16px;margin-top:4px">Profil perusahaan, layanan, portofolio &amp; kontak.</div>
+      </div>
+      <div class="pr"><div class="from" style="font-size:12px">MULAI DARI</div><div class="price" style="font-size:44px;margin-top:4px"><small style="font-size:22px">Rp</small>750K</div></div>
+    </div>
+    <div class="card dark tier" style="left:80px;top:810px;width:920px;height:108px;border-radius:24px;padding:0 32px;gap:24px">
+      <div class="ico" style="width:52px;height:52px;border-radius:15px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#05100E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
+      <div class="mid" style="border-left:0;padding-left:0">
+        <div class="t" style="font-size:28px;display:flex;align-items:center;gap:12px">Web System / Dashboard <span class="badge-in">PALING LARIS</span></div>
+        <div class="d" style="font-size:16px;margin-top:4px">Kasir, inventori, booking, dashboard admin.</div>
+      </div>
+      <div class="pr"><div class="from" style="font-size:12px">MULAI DARI</div><div class="price" style="font-size:44px;margin-top:4px"><small style="font-size:22px">Rp</small>2JT</div></div>
+    </div>
+    <div class="card tier" style="left:80px;top:932px;width:920px;height:108px;border-radius:24px;padding:0 32px;gap:24px">
+      <div class="ico" style="width:52px;height:52px;border-radius:15px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+      <div class="mid" style="border-left:0;padding-left:0">
+        <div class="t" style="font-size:28px;display:flex;align-items:center;gap:12px">Custom Web App</div>
+        <div class="d" style="font-size:16px;margin-top:4px">Aplikasi web sesuai alur bisnismu, multi-role.</div>
+      </div>
+      <div class="pr"><div class="from" style="font-size:12px">MULAI DARI</div><div class="price" style="font-size:44px;margin-top:4px"><small style="font-size:22px">Rp</small>3JT</div></div>
+    </div>
+    <div class="card tier" style="left:80px;top:1054px;width:920px;height:108px;border-radius:24px;padding:0 32px;gap:24px">
+      <div class="ico" style="width:52px;height:52px;border-radius:15px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></div>
+      <div class="mid" style="border-left:0;padding-left:0">
+        <div class="t" style="font-size:28px;display:flex;align-items:center;gap:12px">SaaS MVP</div>
+        <div class="d" style="font-size:16px;margin-top:4px">Auth, langganan &amp; payment, multi-tenant, cloud.</div>
+      </div>
+      <div class="pr"><div class="from" style="font-size:12px">MULAI DARI</div><div class="price" style="font-size:44px;margin-top:4px"><small style="font-size:22px">Rp</small>5JT</div></div>
+    </div>
+    <div class="abs" style="left:80px;top:1196px;width:920px;display:flex;gap:9px;flex-wrap:nowrap">
+      <span class="tg">Next.js</span><span class="tg">React</span><span class="tg">Node.js</span><span class="tg">PostgreSQL</span><span class="tg">Prisma</span><span class="tg">Docker</span>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Dev ’26</span></div>
+    <div class="hud tr">Source code included</div>
+    <div class="hud bl" style="color:var(--muted)">Docs · video demo · garansi 7 hari</div>
+    <div class="hud br"><span class="dots"><i></i><i></i><i class="on"></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+
+  <!-- ============ SLIDE 3 · ORDER VIA DM ============ -->
+  <section class="slide" style="left:2160px">
+    <div class="abs" style="left:92px;top:140px"><span class="chip dark"><i></i>Konsultasi gratis</span></div>
+    <div class="abs h" style="left:86px;top:204px">
+      <div class="sans" style="font-size:210px">Order</div>
+      <div class="ser" style="font-size:200px;margin-top:-10px">sekarang,</div>
+      <div class="sans" style="font-size:150px;margin-top:4px">lewat <span class="mk">DM.</span></div>
+    </div>
+    <div class="card chat" style="left:80px;top:730px;width:920px;height:380px;border-radius:34px;overflow:hidden">
+      <div class="top">
+        <div class="av"><img src="../assets/logo-icon-dark.png" alt=""></div>
+        <div><div class="nm">otakrental</div><div class="st"><i></i>Aktif sekarang</div></div>
+        <svg style="margin-left:auto" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#05100E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+      </div>
+      <div style="padding:22px 28px;display:flex;flex-direction:column;gap:12px">
+        <div class="bub me">Kak, bisa bikin sistem kasir + dashboard buat 3 cabang?</div>
+        <div class="bub us">Bisa! DM kebutuhannya, estimasi &amp; timeline kami kirim &lt; 15 menit.</div>
+        <div><span class="typing"><i></i><i style="opacity:.7"></i><i style="opacity:.45"></i></span></div>
+      </div>
+    </div>
+    <div class="abs steps" style="left:80px;top:1140px;width:920px">
+      <div class="step"><div class="n">01</div><div class="s">DM kata <em>WEBSITE</em></div></div>
+      <div class="step"><div class="n">02</div><div class="s">Ceritakan kebutuhanmu</div></div>
+      <div class="step"><div class="n">03</div><div class="s">Terima estimasi, mulai!</div></div>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Dev ’26</span></div>
+    <div class="hud tr"><b>@otakrental</b></div>
+    <div class="hud bl" style="color:var(--muted)">DP / termin tersedia</div>
+    <div class="hud br"><span class="dots"><i></i><i></i><i></i><i class="on"></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+</div>
+
+<!-- =====================================================================
+     POST 2 · NEW HOOK (slide 1 of the revised flow: hook → web examples video → price list → DM)
+     ===================================================================== -->
+<div class="post" id="p3">
+  <div class="grid"></div>
+  <div class="glow" style="left:180px;top:620px;width:1000px;height:900px;background:radial-gradient(circle, rgba(212,231,81,.24), rgba(212,231,81,0) 65%)"></div>
+  <section class="slide" style="left:0">
+    <div class="abs" style="left:92px;top:150px"><span class="chip"><i></i>Contoh hasil · Website &amp; SaaS</span></div>
+    <div class="abs h" style="left:86px;top:226px">
+      <div class="sans" style="font-size:156px">Mau website</div>
+      <div style="display:flex;align-items:center;gap:30px">
+        <div class="sans" style="font-size:156px">kamu</div>
+        <div class="mono" style="font-size:16px;letter-spacing:.16em;line-height:1.7;color:#474b44;margin-top:18px;border-left:2px solid var(--ink);padding-left:16px">2 CONTOH NYATA<br>DI SLIDE BERIKUTNYA</div>
+      </div>
+      <div class="ser" style="font-size:196px;margin-top:-4px">sekeren <span class="mk">ini?</span></div>
+    </div>
+    <!-- fanned previews of the two example sites -->
+    <div class="card" style="left:430px;top:820px;width:576px;height:300px;border-radius:22px;overflow:hidden;transform:rotate(5deg);border-color:rgba(5,16,14,.14)">
+      <img src="img/web-b.png" alt="" style="width:100%;height:100%;display:block;object-fit:cover">
+    </div>
+    <div class="card" style="left:70px;top:880px;width:576px;height:300px;border-radius:22px;overflow:hidden;transform:rotate(-4deg);border-color:rgba(5,16,14,.14);box-shadow:0 40px 70px -30px rgba(40,34,20,.55)">
+      <img src="img/web-a.png" alt="" style="width:100%;height:100%;display:block;object-fit:cover">
+    </div>
+    <!-- cursor -->
+    <svg class="abs" style="left:560px;top:1080px" width="54" height="62" viewBox="0 0 24 28"><path d="M3 2 L3 22 L8.5 17 L12 26 L15.5 24.5 L12 16 L19.5 16 Z" fill="#05100E" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    <!-- price sticker -->
+    <div class="abs" style="left:800px;top:700px;width:190px;height:190px;border-radius:50%;background:var(--lime);border:3px solid var(--ink);display:grid;place-items:center;transform:rotate(-12deg);box-shadow:0 18px 30px -16px rgba(5,16,14,.5)">
+      <div style="text-align:center;line-height:1">
+        <div class="mono" style="font-size:14px;letter-spacing:.18em">MULAI</div>
+        <div style="font-size:54px;font-weight:850;letter-spacing:-.05em;margin-top:6px">250K</div>
+        <div class="mono" style="font-size:12px;letter-spacing:.16em;margin-top:8px">LANDING PAGE</div>
+      </div>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Dev ’26</span></div>
+    <div class="hud tr">Website &amp; SaaS</div>
+    <div class="hud bl">Geser, lihat contohnya <svg width="26" height="16" viewBox="0 0 26 16"><path d="M1 8h22M16 1l7 7-7 7" fill="none" stroke="#05100E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="hud br"><span class="dots"><i class="on"></i><i></i><i></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+</div>
+
+
+<!-- =====================================================================
+     POST 4 · KONSULTASI TUGAS (5 slides, 5400×1350 panorama)
+     ===================================================================== -->
+<div class="post" id="p4" style="width:5400px">
+  <div class="grid"></div>
+  <div class="glow" style="left:500px;top:-300px;width:900px;height:900px;background:radial-gradient(circle, rgba(212,231,81,.22), rgba(212,231,81,0) 65%)"></div>
+  <div class="glow" style="left:2500px;top:700px;width:1000px;height:1000px;background:radial-gradient(circle, rgba(212,231,81,.18), rgba(212,231,81,0) 65%)"></div>
+  <div class="glow" style="left:4500px;top:500px;width:1000px;height:1000px;background:radial-gradient(circle, rgba(212,231,81,.24), rgba(212,231,81,0) 65%)"></div>
+  <!-- the DM paper plane's trail runs across all five slides and lands on slide 5 -->
+  <svg class="abs" width="5400" height="1350" style="pointer-events:none">
+    <path d="M 700 118 C 900 100, 1000 125, 1080 118 S 1700 104, 2160 118 S 2800 132, 3240 118 S 3900 104, 4320 118 S 4700 140, 4880 150" fill="none" stroke="#05100E" stroke-width="2" stroke-dasharray="3 10" stroke-linecap="round" opacity=".38"/>
+    <circle cx="1080" cy="118" r="14" fill="#D4E751" stroke="#05100E" stroke-width="3"/>
+    <circle cx="2160" cy="118" r="14" fill="#D4E751" stroke="#05100E" stroke-width="3"/>
+    <circle cx="3240" cy="118" r="14" fill="#D4E751" stroke="#05100E" stroke-width="3"/>
+    <circle cx="4320" cy="118" r="14" fill="#D4E751" stroke="#05100E" stroke-width="3"/>
+    <g transform="translate(4905 158) rotate(22) scale(2.4)"><path d="M-10 -10 L 12 0 L -10 10 L -5 0 Z" fill="#D4E751" stroke="#05100E" stroke-width="1.6" stroke-linejoin="round"/><path d="M-5 0 L 12 0" stroke="#05100E" stroke-width="1.4"/></g>
+  </svg>
+
+  <!-- ============ SLIDE 1 · DM aja ============ -->
+  <section class="slide" style="left:0">
+    <div class="abs" style="left:92px;top:150px"><span class="chip"><i></i>Konsultasi tugas</span></div>
+    <div class="abs h" style="left:84px;top:222px">
+      <div class="sans" style="font-size:210px">DM aja,</div>
+      <div class="ser" style="font-size:150px;margin-top:-4px">gak usah malu,</div>
+      <div class="sans" style="font-size:86px;margin-top:22px">sebelum semuanya</div>
+      <div class="sans" style="font-size:196px;margin-top:6px;display:flex;align-items:flex-end;height:210px">
+        <span>bera</span><span style="display:inline-block">t</span><span style="display:inline-block;transform:translateY(10px) rotate(6deg) scale(1.08)">t</span><span style="display:inline-block;transform:translateY(26px) rotate(14deg) scale(1.18)">t</span><span style="display:inline-block;transform:translateY(46px) rotate(26deg) scale(1.3);color:var(--emerald)">t</span>
+      </div>
+    </div>
+    <!-- a little "weight" tag hanging off the heavy t's -->
+    <div class="abs mono" style="left:760px;top:930px;transform:rotate(-8deg);background:var(--ink);color:var(--lime);font-size:18px;letter-spacing:.14em;padding:10px 16px;border-radius:10px">±100 KG</div>
+    <!-- DM bubbles -->
+    <div class="abs" style="left:80px;top:1098px;width:920px;display:flex;flex-direction:column;gap:12px">
+      <div class="bub me" style="font-size:22px">Kak, boleh tanya-tanya dulu? Aku bingung mulai dari mana…</div>
+      <div class="bub us" style="font-size:22px;max-width:560px">Boleh banget, santai aja. Ceritain dulu tugasnya.</div>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Konsultasi</span></div>
+    <div class="hud tr">01 / 05</div>
+    <div class="hud bl">Geser <svg width="26" height="16" viewBox="0 0 26 16"><path d="M1 8h22M16 1l7 7-7 7" fill="none" stroke="#05100E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="hud br"><span class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+
+  <!-- ============ SLIDE 2 · Otakmu lagi eror? ============ -->
+  <section class="slide" style="left:1080px">
+    <div class="abs" style="left:92px;top:150px"><span class="chip"><i></i>Diagnosa</span></div>
+    <div class="abs h" style="left:84px;top:222px">
+      <div class="sans" style="font-size:176px">Otakmu</div>
+      <div style="display:flex;align-items:baseline;gap:30px">
+        <div class="sans" style="font-size:176px">lagi</div>
+        <div style="position:relative">
+          <span class="ser" style="font-size:210px;position:absolute;left:-7px;top:3px;color:#EE5A32;opacity:.7">eror?</span>
+          <span class="ser" style="font-size:210px;position:absolute;left:7px;top:-3px;color:#6FC3D8;opacity:.7">eror?</span>
+          <span class="ser" style="font-size:210px;position:relative">eror?</span>
+        </div>
+      </div>
+    </div>
+    <!-- error dialog -->
+    <div class="card" style="left:110px;top:640px;width:860px;height:330px;border-radius:24px;overflow:hidden;border:2.5px solid var(--ink);box-shadow:10px 12px 0 var(--ink)">
+      <div style="height:54px;background:var(--ink);display:flex;align-items:center;padding:0 22px;gap:10px">
+        <i style="width:12px;height:12px;border-radius:50%;background:#EE5A32"></i><i style="width:12px;height:12px;border-radius:50%;background:#F1C27B"></i><i style="width:12px;height:12px;border-radius:50%;background:#D4E751"></i>
+        <span class="mono" style="margin-left:14px;font-size:15px;letter-spacing:.12em;color:rgba(255,255,255,.7)">OTAK.EXE — SYSTEM ERROR</span>
+      </div>
+      <div style="display:flex;gap:26px;padding:30px 34px 0">
+        <svg width="84" height="84" viewBox="0 0 24 24" fill="#F1C27B" stroke="#05100E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4" fill="none"/><path d="M12 17h.01" fill="none"/></svg>
+        <div>
+          <div style="font-size:36px;font-weight:780;letter-spacing:-.03em">otak.exe tidak merespons</div>
+          <div class="mono" style="font-size:17px;letter-spacing:.06em;color:#63665e;margin-top:10px;line-height:1.6">Terlalu banyak tab terbuka: 27 tugas,<br>3 deadline, 0 jam tidur.</div>
+        </div>
+      </div>
+      <div style="position:absolute;right:34px;bottom:30px;display:flex;gap:14px">
+        <span style="border:2px solid var(--ink);border-radius:12px;padding:12px 22px;font-size:20px;font-weight:650;background:#fff">Paksa tutup</span>
+        <span style="border:2px solid var(--ink);border-radius:12px;padding:12px 22px;font-size:20px;font-weight:750;background:var(--lime)">Sewa otak</span>
+      </div>
+    </div>
+    <svg class="abs" style="left:885px;top:915px" width="54" height="62" viewBox="0 0 24 28"><path d="M3 2 L3 22 L8.5 17 L12 26 L15.5 24.5 L12 16 L19.5 16 Z" fill="#05100E" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    <div class="abs h" style="left:84px;top:1030px">
+      <div class="sans" style="font-size:84px">Tenang pren,</div>
+      <div class="ser" style="font-size:100px;margin-top:-2px">ada <span class="mk">Otak Rental.</span></div>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Konsultasi</span></div>
+    <div class="hud tr">02 / 05</div>
+    <div class="hud bl" style="color:var(--muted)">Restart otak: DM @otakrental</div>
+    <div class="hud br"><span class="dots"><i></i><i class="on"></i><i></i><i></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+
+  <!-- ============ SLIDE 3 · Tugas numpuk? ============ -->
+  <section class="slide" style="left:2160px">
+    <div class="abs" style="left:92px;top:150px"><span class="chip"><i></i>Relate gak?</span></div>
+    <!-- row 1 -->
+    <div class="abs h" style="left:84px;top:230px">
+      <div class="mono" style="font-size:16px;letter-spacing:.2em;color:var(--muted)">01</div>
+      <div class="sans" style="font-size:112px;margin-top:6px">Tugas</div>
+      <div class="ser" style="font-size:132px;margin-top:-10px">numpuk?</div>
+    </div>
+    <svg class="abs" style="left:590px;top:212px" width="420" height="330" viewBox="0 0 420 330">
+      <g font-family="Geist" font-weight="700" font-size="26" fill="#05100E">
+        <g transform="translate(58 246) rotate(-4)"><rect width="300" height="74" rx="14" fill="#FFFDF8" stroke="#05100E" stroke-width="2.5"/><text x="24" y="47">Laprak Fisika</text></g>
+        <g transform="translate(84 166) rotate(4)"><rect width="300" height="74" rx="14" fill="#FFFDF8" stroke="#05100E" stroke-width="2.5"/><text x="24" y="47">Tubes Basis Data</text></g>
+        <g transform="translate(44 88) rotate(-3)"><rect width="300" height="74" rx="14" fill="#FFFDF8" stroke="#05100E" stroke-width="2.5"/><text x="24" y="47">Resume Jurnal</text></g>
+        <g transform="translate(92 8) rotate(6)"><rect width="300" height="74" rx="14" fill="#D4E751" stroke="#05100E" stroke-width="2.5"/><text x="24" y="47">Kuis Statistik</text></g>
+      </g>
+    </svg>
+    <div class="abs" style="left:80px;top:560px;width:920px;border-top:1.5px dashed var(--line)"></div>
+    <!-- row 2 -->
+    <div class="abs h" style="left:84px;top:590px">
+      <div class="mono" style="font-size:16px;letter-spacing:.2em;color:var(--muted)">02</div>
+      <div class="sans" style="font-size:112px;margin-top:6px">Deadline</div>
+      <div class="ser" style="font-size:132px;margin-top:-10px">mepet?</div>
+    </div>
+    <div class="abs" style="left:620px;top:660px;background:var(--ink);color:#fff;border-radius:999px;padding:18px 30px;display:flex;align-items:center;gap:16px;transform:rotate(-3deg);box-shadow:0 20px 40px -20px rgba(5,16,14,.6)">
+      <i style="width:14px;height:14px;border-radius:50%;background:#EE5A32;box-shadow:0 0 0 5px rgba(238,90,50,.3)"></i>
+      <span class="mono" style="font-size:48px;font-weight:600;color:#FF8A63;letter-spacing:.02em">00:59:12</span>
+    </div>
+    <div class="abs mono" style="left:660px;top:770px;font-size:16px;letter-spacing:.18em;color:#EE5A32">DL · MALAM INI 23.59</div>
+    <div class="abs" style="left:80px;top:920px;width:920px;border-top:1.5px dashed var(--line)"></div>
+    <!-- row 3 -->
+    <div class="abs h" style="left:84px;top:950px">
+      <div class="mono" style="font-size:16px;letter-spacing:.2em;color:var(--muted)">03</div>
+      <div class="sans" style="font-size:112px;margin-top:6px">Projek</div>
+      <div class="ser" style="font-size:132px;margin-top:-10px">gak jalan?</div>
+    </div>
+    <div class="card dark" style="left:640px;top:990px;width:360px;height:172px;border-radius:22px;padding:22px 24px;transform:rotate(3deg)">
+      <div class="mono" style="font-size:16px;line-height:1.8;color:rgba(255,255,255,.85)">
+        <div><span style="color:#D4E751">$</span> npm run build</div>
+        <div style="display:flex;align-items:center;gap:8px;color:#FF8A63"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF8A63" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Build failed · 12 error</div>
+      </div>
+      <div style="margin-top:14px;height:10px;border-radius:6px;background:rgba(255,255,255,.12)"><div style="width:12%;height:100%;border-radius:6px;background:#EE5A32"></div></div>
+      <div class="mono" style="font-size:13px;letter-spacing:.14em;color:rgba(255,255,255,.5);margin-top:8px">PROGRESS 12% · STUCK</div>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Konsultasi</span></div>
+    <div class="hud tr">03 / 05</div>
+    <div class="hud bl" style="color:var(--muted)">Kalau jawabannya "iya" semua…</div>
+    <div class="hud br"><span class="dots"><i></i><i></i><i class="on"></i><i></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+
+  <!-- ============ SLIDE 4 · Layanan ============ -->
+  <section class="slide" style="left:3240px">
+    <div class="abs" style="left:92px;top:150px"><span class="chip"><i></i>Otak Rental</span></div>
+    <div class="abs h" style="left:86px;top:220px">
+      <div class="sans" style="font-size:96px">Tempat kamu</div>
+      <div class="ser" style="font-size:132px;margin-top:-6px"><span class="mk">nyewa otak</span></div>
+      <div class="sans" style="font-size:52px;margin-top:10px;letter-spacing:-.04em">buat bantu mikirin:</div>
+    </div>
+    <div class="abs" style="left:80px;top:570px;width:920px;display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div class="card svc" style="position:relative"><span class="no">01</span><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="nm">Tugas kuliah</div></div>
+      <div class="card svc dark" style="position:relative"><span class="no">02</span><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#05100E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div class="nm">Project &amp; coding</div></div>
+      <div class="card svc" style="position:relative"><span class="no">03</span><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.207 1.207L5.35 15.879a1 1 0 0 0 .776.746L13 18"/><path d="m2.3 2.3 7.286 7.286"/><circle cx="11" cy="11" r="2"/></svg></div><div class="nm">Design</div></div>
+      <div class="card svc" style="position:relative"><span class="no">04</span><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></div><div class="nm">Editing</div></div>
+      <div class="card svc" style="position:relative"><span class="no">05</span><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div><div class="nm">Data &amp; laporan</div></div>
+      <div class="card svc" style="position:relative"><span class="no">06</span><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div><div class="nm">Proposal</div></div>
+    </div>
+    <div class="abs" style="left:80px;top:1086px;width:920px;display:flex;align-items:center;gap:14px;border:2px dashed var(--ink);border-radius:20px;padding:20px 26px;background:rgba(255,253,248,.7)">
+      <span style="width:40px;height:40px;border-radius:50%;background:var(--lime);border:2px solid var(--ink);display:grid;place-items:center;font-size:28px;font-weight:800;line-height:1;flex:none">+</span>
+      <span style="font-size:27px;font-weight:650;letter-spacing:-.02em">Dan berbagai kebutuhan akademik lainnya</span>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Konsultasi</span></div>
+    <div class="hud tr">04 / 05</div>
+    <div class="hud bl" style="color:var(--muted)">Konsultasi &amp; pendampingan · bukan joki skripsi/tesis</div>
+    <div class="hud br"><span class="dots"><i></i><i></i><i></i><i class="on"></i><i></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+
+  <!-- ============ SLIDE 5 · Hook / CTA ============ -->
+  <section class="slide" style="left:4320px">
+    <div class="abs" style="left:92px;top:150px"><span class="chip dark"><i></i>Sewa otak sekarang</span></div>
+    <div class="abs h" style="left:84px;top:222px">
+      <div class="sans" style="font-size:190px">Satu otak</div>
+      <div class="sans" style="font-size:190px">kurang?</div>
+      <div class="ser" style="font-size:160px;margin-top:-4px">Sewa satu <span class="mk">lagi.</span></div>
+    </div>
+    <!-- two brains: yours + the rented one -->
+    <div class="abs" style="left:150px;top:790px;width:300px;height:255px;display:grid;place-items:center;border-radius:36px;background:#FFFDF8;border:2px solid var(--line);transform:rotate(-5deg);box-shadow:0 30px 50px -30px rgba(40,34,20,.45)">
+      <img src="../assets/logo-icon-dark.png" alt="" style="width:200px;opacity:.35;filter:grayscale(1)">
+      <span class="mono" style="position:absolute;bottom:18px;font-size:14px;letter-spacing:.18em;color:var(--muted)">OTAK KAMU · 12%</span>
+    </div>
+    <div class="abs" style="left:490px;top:840px;font-size:90px;font-weight:800">+</div>
+    <div class="abs" style="left:600px;top:770px;width:330px;height:280px;display:grid;place-items:center;border-radius:36px;background:var(--lime);border:2.5px solid var(--ink);transform:rotate(4deg);box-shadow:10px 12px 0 var(--ink)">
+      <img src="../assets/logo-icon-dark.png" alt="" style="width:220px">
+      <span class="mono" style="position:absolute;bottom:18px;font-size:14px;letter-spacing:.18em">OTAK SEWAAN · 100%</span>
+    </div>
+    <div class="abs" style="left:80px;top:1112px;width:920px;display:flex;align-items:center;justify-content:space-between">
+      <span style="display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:var(--lime);border-radius:999px;padding:20px 30px;font-size:30px;font-weight:700;letter-spacing:-.02em">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#D4E751" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>DM @otakrental</span>
+      <span class="mono" style="font-size:15px;letter-spacing:.16em;line-height:1.7;text-align:right;color:#40443d">REVIEW BRIEF &lt; 15 MENIT<br>DP / TERMIN TERSEDIA</span>
+    </div>
+    <div class="hud tl"><img src="../assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Konsultasi</span></div>
+    <div class="hud tr"><b>@otakrental</b></div>
+    <div class="hud bl" style="color:var(--muted)">Sebelum semuanya beratttt</div>
+    <div class="hud br"><span class="dots"><i></i><i></i><i></i><i></i><i class="on"></i></span></div>
+    <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  </section>
+</div>
+
+<script>
+const post = (location.search.match(/post=(\d)/) || [, "1"])[1];
+const root = document.getElementById("p" + post);
+root.classList.add("on");
+
+// vignette per slide + seamless film grain over the whole panorama
+// posts are 3 slides wide by default; the Konsultasi post (p4) is 5 slides wide
+const PW = root.offsetWidth;
+for (let x = 0; x < PW; x += 1080) { const v = document.createElement("div"); v.className = "vig"; v.style.left = x + "px"; root.appendChild(v); }
+const cv = document.createElement("canvas"); cv.className = "grain"; cv.width = PW / 2; cv.height = 675; cv.style.width = PW + "px"; root.appendChild(cv);
+const ctx = cv.getContext("2d"), img = ctx.createImageData(PW / 2, 675);
+let s = 4242;
+for (let i = 0; i < img.data.length; i += 4) {
+  s = (s * 1664525 + 1013904223) >>> 0;
+  const v = 255 - ((s >>> 24) & 63) * (((s >>> 8) & 7) === 0 ? 1.4 : .5);
+  img.data[i] = v; img.data[i + 1] = v - 2; img.data[i + 2] = v - 6; img.data[i + 3] = 255;
+}
+ctx.putImageData(img, 0, 0);
+
+// swipe-continuity: a dashed motion path + lime dot that runs across the slide seams
+const NS = "http://www.w3.org/2000/svg";
+const sv = document.createElementNS(NS, "svg");
+sv.setAttribute("class", "span"); sv.setAttribute("width", PW); sv.setAttribute("height", 1350);
+sv.innerHTML = post === "3" || post === "4" ? "" : post === "1"
+  ? `<path d="M 990 520 C 1060 470, 1040 170, 1120 112 S 1700 96, 2000 112 S 2180 118, 2250 112" fill="none" stroke="#05100E" stroke-width="2" stroke-dasharray="3 10" stroke-linecap="round" opacity=".35"/>
+     <circle cx="1080" cy="176" r="15" fill="#D4E751" stroke="#05100E" stroke-width="3"/>
+     <circle cx="2160" cy="113" r="15" fill="#D4E751" stroke="#05100E" stroke-width="3"/>`
+  : `<path d="M 960 760 C 1040 700, 1010 170, 1120 112 S 1700 96, 2000 112 S 2180 118, 2250 112" fill="none" stroke="#05100E" stroke-width="2" stroke-dasharray="3 10" stroke-linecap="round" opacity=".35"/>
+     <circle cx="1080" cy="220" r="15" fill="#D4E751" stroke="#05100E" stroke-width="3"/>
+     <circle cx="2160" cy="113" r="15" fill="#D4E751" stroke="#05100E" stroke-width="3"/>`;
+root.insertBefore(sv, root.children[1]);
+
+window.ready = (async () => {
+  await document.fonts.ready;
+  await document.fonts.load('800 40px "Geist"'); await document.fonts.load('40px "Geist Mono"'); await document.fonts.load('italic 40px "Instrument Serif"');
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  return true;
+})();
+</script>
+</body>
+</html>

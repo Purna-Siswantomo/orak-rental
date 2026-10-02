@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Otak Rental — Contoh Website</title>
+<!--
+  8-second 4:5 (1080×1350) showcase of two example websites, stacked top/bottom in browser frames,
+  for the Website & SaaS carousel. Both brands are FICTIONAL. Motion is intentionally calm:
+  frames settle in, each page plays a Framer-style load-in, then scrolls gently once.
+  Render: node render.mjs --page web-examples.html --width 1080 --height 1350 --name otak-rental-web-examples --sound web_sound.py
+-->
+<style>
+@font-face{font-family:"Geist";src:url(fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-normal.woff2) format("woff2");font-style:normal;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+:root{--cream:#FAF7F0;--ink:#05100E;--lime:#D4E751;--emerald:#17463A;--line:#E6DFD0;--muted:#7F8277}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#15130F}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+body.capture{display:block;background:var(--cream)}
+#viewport{position:relative;width:1080px;height:1350px;transform-origin:0 0;flex:none}
+#stage{position:absolute;inset:0;overflow:hidden;background:var(--cream);color:var(--ink);font-family:"Geist",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.layer{position:absolute;inset:0}
+.abs{position:absolute;left:0;top:0}
+.mono{font-family:"Geist Mono",monospace}
+.serif{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400}
+svg{overflow:visible}
+#grid{background-size:60px 60px;background-image:linear-gradient(to right, rgba(5,16,14,.045) 1px, transparent 1px),linear-gradient(to bottom, rgba(5,16,14,.045) 1px, transparent 1px)}
+#glow{background:radial-gradient(ellipse 60% 40% at 50% 50%, rgba(212,231,81,.22), rgba(212,231,81,0) 70%)}
+#grain{width:1080px;height:1350px;mix-blend-mode:multiply;opacity:.28;pointer-events:none}
+#vig{background:radial-gradient(ellipse 85% 75% at 50% 46%, rgba(0,0,0,0) 55%, rgba(98,80,40,.08) 100%);pointer-events:none}
+/* HUD (Otak Rental frame) */
+#hud{font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+.cm{position:absolute;width:30px;height:30px;border:0 solid var(--ink)}
+.hud-t{position:absolute;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.hud-t img{width:32px;height:27px}
+.rec{display:inline-block;width:9px;height:9px;border-radius:50%;background:#EE5A32}
+.lbl{position:absolute;left:60px;width:960px;display:flex;align-items:center;justify-content:space-between;font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.lbl b{font-weight:700}
+.lbl .chips{display:flex;gap:8px}
+.lbl .chips span{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#FFFDF8;border-radius:9px;padding:6px 10px;font-size:12px;letter-spacing:.14em;color:#474b44}
+.lbl .chips i{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px rgba(212,231,81,.35)}
+
+/* browser frame */
+.win{position:absolute;left:60px;width:960px;height:500px;border-radius:22px;overflow:hidden;background:#fff;border:1px solid rgba(5,16,14,.12);
+  box-shadow:0 40px 80px -40px rgba(40,34,20,.55),0 2px 0 rgba(5,16,14,.04)}
+.bar{height:40px;background:#F2EFE8;border-bottom:1px solid rgba(5,16,14,.08);display:flex;align-items:center;padding:0 16px;gap:8px;position:relative}
+.bar i{width:11px;height:11px;border-radius:50%}
+.url{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(5,16,14,.08);border-radius:8px;padding:5px 16px;font-family:"Geist Mono",monospace;font-size:12.5px;color:#5d6158;letter-spacing:.02em}
+.vp{position:absolute;left:0;top:40px;width:1280px;height:613px;transform:scale(.75);transform-origin:0 0;overflow:hidden}
+.page{position:absolute;left:0;top:0;width:1280px}
+
+/* ---------- Site A · Roti Gembul (cartoon bakery profile) ---------- */
+.pa{background:#FFF4D6;color:#3B2A1A;font-family:"Geist",sans-serif}
+.pa nav{height:76px;display:flex;align-items:center;padding:0 56px;gap:40px}
+.pa .logo{display:flex;align-items:center;gap:10px;font-size:24px;font-weight:850;letter-spacing:-.03em}
+.pa .links{display:flex;gap:30px;margin-left:auto;font-size:16px;font-weight:600;color:rgba(59,42,26,.7)}
+.pa .btn{background:#FF7A59;color:#fff;font-weight:700;font-size:15px;padding:12px 22px;border-radius:999px;box-shadow:0 6px 0 #E0583A}
+.pa .hero{height:560px;display:flex;padding:18px 56px 0;position:relative}
+.pa .hl{width:620px;padding-top:44px}
+.pa .badge{display:inline-flex;align-items:center;gap:10px;background:#fff;border:2px solid #3B2A1A;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:700}
+.pa .badge i{width:10px;height:10px;border-radius:50%;background:#7BC47F}
+.pa h1{font-size:78px;font-weight:900;letter-spacing:-.05em;line-height:.98;margin-top:22px}
+.pa h1 .s{display:block;font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;color:#FF7A59;font-size:88px;letter-spacing:-.01em;margin-top:4px}
+.pa p.lead{font-size:19px;line-height:1.55;color:rgba(59,42,26,.72);max-width:470px;margin-top:20px}
+.pa .ctas{display:flex;gap:14px;margin-top:28px}
+.pa .b1{background:#3B2A1A;color:#FFF4D6;font-weight:700;font-size:16px;padding:15px 26px;border-radius:999px}
+.pa .b2{border:2px solid #3B2A1A;font-weight:700;font-size:16px;padding:13px 24px;border-radius:999px;background:#fff}
+.pa .menu{background:#fff;border-radius:44px 44px 0 0;padding:52px 56px 60px}
+.pa .mh{display:flex;align-items:end;justify-content:space-between}
+.pa h2{font-size:46px;font-weight:900;letter-spacing:-.045em}
+.pa h2 .s{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;color:#FF7A59;letter-spacing:0;font-size:52px}
+.pa .more{font-size:16px;font-weight:700;color:#FF7A59}
+.pa .cards{display:flex;gap:24px;margin-top:32px}
+.pa .card{flex:1;border:2px solid #3B2A1A;border-radius:30px;overflow:hidden;background:#fff;box-shadow:0 8px 0 #3B2A1A}
+.pa .card .art{height:190px;display:grid;place-items:center}
+.pa .card .ct{padding:20px 24px 24px;border-top:2px solid #3B2A1A}
+.pa .card .n{font-size:24px;font-weight:850;letter-spacing:-.03em}
+.pa .card .d{font-size:15px;color:rgba(59,42,26,.65);margin-top:6px}
+.pa .card .pr{display:inline-block;margin-top:14px;background:#FFF4D6;border:2px solid #3B2A1A;border-radius:999px;padding:6px 14px;font-weight:800;font-size:15px}
+
+/* ---------- Site B · Lumo Max (premium minimal product) ---------- */
+.pb{background:#FBFBFD;color:#1D1D1F;font-family:"Geist",sans-serif}
+.pb .gn{height:44px;display:flex;align-items:center;justify-content:center;gap:40px;font-size:12.5px;color:rgba(29,29,31,.8);letter-spacing:-.01em;background:rgba(251,251,253,.92)}
+.pb .sn{height:54px;display:flex;align-items:center;padding:0 150px;border-bottom:1px solid #D2D2D7}
+.pb .sn .t{font-size:21px;font-weight:650;letter-spacing:-.02em}
+.pb .sn .r{margin-left:auto;display:flex;align-items:center;gap:24px;font-size:12.5px;color:rgba(29,29,31,.8)}
+.pb .sn .buy{background:#0071E3;color:#fff;border-radius:999px;padding:4px 12px;font-size:12px}
+.pb .hero{height:640px;text-align:center;padding-top:30px;position:relative;overflow:hidden}
+.pb .eb{font-size:17px;font-weight:650;color:#BF4800}
+.pb h1{font-size:84px;font-weight:720;letter-spacing:-.045em;line-height:1;margin-top:8px}
+.pb .tg{font-size:28px;font-weight:620;letter-spacing:-.02em;margin-top:8px}
+.pb .lk{display:flex;gap:34px;justify-content:center;margin-top:14px;font-size:18px;color:#0066CC}
+.pb .dark{background:#000;color:#F5F5F7;height:640px;padding:84px 150px 0}
+.pb .dark .k{font-size:21px;font-weight:650;color:#86868B}
+.pb .dark h2{font-size:92px;font-weight:720;letter-spacing:-.045em;line-height:1.02;margin-top:12px}
+.pb .dark h2 .g{background:linear-gradient(90deg,#FF9F43,#FF5E8A 60%,#B36BFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pb .dark p{font-size:22px;line-height:1.5;color:#86868B;max-width:560px;margin-top:22px}
+.pb .sw{display:flex;gap:30px;margin-top:40px}
+.pb .sw div{text-align:center;font-size:13px;color:#86868B}
+.pb .sw i{display:block;width:44px;height:44px;border-radius:50%;margin:0 auto 10px;border:2px solid rgba(255,255,255,.25)}
+.pb .specs{display:flex;gap:14px;margin-top:40px}
+.pb .specs span{border:1px solid #333;border-radius:14px;padding:14px 20px;font-size:16px;color:#F5F5F7}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage"></div></div>
+<script>
+"use strict";
+const W = 1080, H = 1350, CX = 540, DUR = 8, FPS = 60;
+const stage = document.getElementById("stage");
+const CAPTURE = /capture/.test(location.search);
+if (CAPTURE) document.body.classList.add("capture");
+
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => cl((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eOutExpo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
+const eOutCubic = x => 1 - Math.pow(1 - x, 3);
+const eInOutCubic = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eInOutQuint = x => x < .5 ? 16 * x ** 5 : 1 - Math.pow(-2 * x + 2, 5) / 2;
+const spring = (x, f = 2.2, d = 7) => x <= 0 ? 0 : 1 - Math.exp(-d * x) * Math.cos(f * 2 * Math.PI * x);
+const pad = (n, l = 2) => String(Math.floor(n)).padStart(l, "0");
+function $(tag, o = {}, parent = stage) {
+  const el = document.createElement(tag);
+  if (o.cls) el.className = o.cls;
+  if (o.id) el.id = o.id;
+  if (o.html != null) el.innerHTML = o.html;
+  if (o.text != null) el.textContent = o.text;
+  if (o.style) Object.assign(el.style, o.style);
+  parent.appendChild(el);
+  return el;
+}
+const q = (root, sel) => root.querySelector(sel);
+const qa = (root, sel) => [...root.querySelectorAll(sel)];
+// Framer-style reveal: fade + rise + un-blur
+function reveal(el, k, dy = 24, blur = 8, sc = 0) {
+  el.style.opacity = k;
+  el.style.transform = `translateY(${(1 - k) * dy}px) scale(${1 - sc * (1 - k)})`;
+  el.style.filter = blur && k < 1 ? `blur(${(1 - k) * blur}px)` : "none";
+}
+
+/* ==========================================================================
+   STAGE
+   ========================================================================== */
+$("div", { cls: "layer", id: "grid" });
+$("div", { cls: "layer", id: "glow" });
+
+// ---------- labels ----------
+const lblA = $("div", { cls: "lbl", html: `<span><b>01</b> — Web profil · ilustrasi kartun</span><span class="chips"><span><i></i>Responsif</span><span><i></i>Animasi halus</span></span>`, style: { top: "132px" } });
+const lblB = $("div", { cls: "lbl", html: `<span><b>02</b> — Web produk · premium minimalis</span><span class="chips"><span><i></i>Responsif</span><span><i></i>Animasi halus</span></span>`, style: { top: "690px" } });
+
+// ---------- window A ----------
+const lockSvg = `<svg width="11" height="12" viewBox="0 0 24 24" fill="none" stroke="#7F8277" stroke-width="2.6" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+const bar = url => `<div class="bar"><i style="background:#EE5A32"></i><i style="background:#F1C27B"></i><i style="background:#9DCB6B"></i><div class="url">${lockSvg}${url}</div></div>`;
+const winA = $("div", { cls: "win", style: { top: "160px" }, html: bar("rotigembul.demo") + `<div class="vp"></div>` });
+const vpA = q(winA, ".vp");
+
+const BUN = (s = 1) => `<svg width="${40 * s}" height="${32 * s}" viewBox="0 0 40 32"><ellipse cx="20" cy="18" rx="18" ry="13" fill="#E7A45A" stroke="#3B2A1A" stroke-width="2.5"/><path d="M11 12 q4 -4 8 0 M21 11 q4 -4 8 0" fill="none" stroke="#3B2A1A" stroke-width="2" stroke-linecap="round"/><circle cx="15" cy="20" r="2" fill="#3B2A1A"/><circle cx="25" cy="20" r="2" fill="#3B2A1A"/><path d="M17 24 q3 3 6 0" fill="none" stroke="#3B2A1A" stroke-width="2" stroke-linecap="round"/></svg>`;
+const DONUT = `<svg width="150" height="150" viewBox="-75 -75 150 150"><circle r="62" fill="#E9B26B" stroke="#3B2A1A" stroke-width="4"/><path d="M-52 -8 C -50 -48, 50 -52, 54 -6 C 58 20, 40 18, 30 30 C 18 44, 4 24, -8 34 C -24 46, -30 24, -44 22 C -58 20, -54 6, -52 -8Z" fill="#FFB3C1" stroke="#3B2A1A" stroke-width="4"/><circle r="18" fill="#fff" stroke="#3B2A1A" stroke-width="4"/><g stroke-width="5" stroke-linecap="round"><path d="M-30 -30 l8 4" stroke="#7BC47F"/><path d="M20 -38 l6 -6" stroke="#FFD66B"/><path d="M34 -8 l8 2" stroke="#6FA8FF"/><path d="M-40 4 l2 8" stroke="#FFD66B"/><path d="M-4 -44 l6 4" stroke="#6FA8FF"/></g></svg>`;
+const CROISSANT = `<svg width="180" height="120" viewBox="-90 -60 180 120"><path d="M-82 30 C -86 0, -60 -40, 0 -42 C 60 -40, 86 0, 82 30 C 70 18, 52 12, 40 14 C 30 -4, -30 -4, -40 14 C -52 12, -70 18, -82 30Z" fill="#E8A33D" stroke="#3B2A1A" stroke-width="4" stroke-linejoin="round"/><path d="M-40 14 C -34 -8, -26 -24, -18 -36 M40 14 C 34 -8, 26 -24, 18 -36 M0 -4 L0 -40 M-62 16 C -60 0, -52 -16, -44 -26 M62 16 C 60 0, 52 -16, 44 -26" fill="none" stroke="#3B2A1A" stroke-width="3.5" stroke-linecap="round"/><path d="M-20 -30 q8 -4 14 0" fill="none" stroke="#FFF4D6" stroke-width="4" stroke-linecap="round"/></svg>`;
+const LOAF = `<svg width="170" height="140" viewBox="-85 -70 170 140"><path d="M-70 50 L -70 -10 C -80 -60, 80 -60, 70 -10 L 70 50 Q 0 62 -70 50Z" fill="#F2C07A" stroke="#3B2A1A" stroke-width="4" stroke-linejoin="round"/><path d="M-30 -36 q10 -12 20 0 M10 -36 q10 -12 20 0" fill="none" stroke="#3B2A1A" stroke-width="3.5" stroke-linecap="round"/><circle cx="-22" cy="4" r="6" fill="#3B2A1A"/><circle cx="22" cy="4" r="6" fill="#3B2A1A"/><ellipse cx="-38" cy="20" rx="10" ry="6" fill="#FFB3C1"/><ellipse cx="38" cy="20" rx="10" ry="6" fill="#FFB3C1"/><path d="M-10 18 q10 10 20 0" fill="none" stroke="#3B2A1A" stroke-width="4" stroke-linecap="round"/></svg>`;
+const pageA = $("div", { cls: "page pa", html: `
+  <nav><div class="logo">${BUN(1)}Roti Gembul</div><div class="links"><span>Menu</span><span>Tentang</span><span>Lokasi</span></div><span class="btn">Pesan Sekarang</span></nav>
+  <section class="hero">
+    <div class="hl">
+      <span class="badge r"><i></i>Fresh tiap pagi · sejak 2019</span>
+      <h1 class="r">Roti hangat,<span class="s">bikin hati senang.</span></h1>
+      <p class="lead r">Dipanggang tiap pagi dengan bahan pilihan. Empuk, wangi, dan selalu bikin nagih.</p>
+      <div class="ctas r"><span class="b1">Lihat Menu</span><span class="b2">Lokasi Toko</span></div>
+    </div>
+    <svg id="toon" width="560" height="520" viewBox="0 0 560 520" style="position:absolute;right:40px;top:10px">
+      <circle id="sunA" cx="300" cy="270" r="215" fill="#FFD66B"/>
+      <g id="cloud1"><path d="M40 120 a30 30 0 0 1 50 -22 a38 38 0 0 1 70 8 a26 26 0 0 1 10 50 h-120 a26 26 0 0 1 -10 -36z" fill="#fff" stroke="#3B2A1A" stroke-width="4"/></g>
+      <g id="cloud2"><path d="M430 80 a22 22 0 0 1 38 -14 a28 28 0 0 1 50 8 a20 20 0 0 1 4 36 h-86 a20 20 0 0 1 -6 -30z" fill="#fff" stroke="#3B2A1A" stroke-width="4"/></g>
+      <ellipse id="shadowA" cx="300" cy="470" rx="150" ry="18" fill="rgba(59,42,26,.15)"/>
+      <g id="mascot">
+        <g id="armR"><path d="M438 300 C 480 280, 500 240, 492 206" fill="none" stroke="#3B2A1A" stroke-width="18" stroke-linecap="round"/><path d="M438 300 C 480 280, 500 240, 492 206" fill="none" stroke="#E7A45A" stroke-width="10" stroke-linecap="round"/><circle cx="492" cy="200" r="16" fill="#E7A45A" stroke="#3B2A1A" stroke-width="4"/></g>
+        <path d="M162 320 C 130 340, 128 372, 146 392" fill="none" stroke="#3B2A1A" stroke-width="18" stroke-linecap="round"/><path d="M162 320 C 130 340, 128 372, 146 392" fill="none" stroke="#E7A45A" stroke-width="10" stroke-linecap="round"/>
+        <ellipse cx="250" cy="440" rx="26" ry="16" fill="#3B2A1A"/><ellipse cx="350" cy="440" rx="26" ry="16" fill="#3B2A1A"/>
+        <ellipse cx="300" cy="320" rx="150" ry="122" fill="#E7A45A" stroke="#3B2A1A" stroke-width="5"/>
+        <path d="M168 290 C 190 200, 410 200, 432 290 C 400 262, 200 262, 168 290Z" fill="#F2C07A"/>
+        <path d="M225 236 q18 -18 36 0 M281 228 q18 -18 36 0 M337 236 q18 -18 36 0" fill="none" stroke="#3B2A1A" stroke-width="5" stroke-linecap="round"/>
+        <g id="eyes"><ellipse cx="258" cy="318" rx="11" ry="15" fill="#3B2A1A"/><ellipse cx="342" cy="318" rx="11" ry="15" fill="#3B2A1A"/><circle cx="262" cy="312" r="4" fill="#fff"/><circle cx="346" cy="312" r="4" fill="#fff"/></g>
+        <ellipse cx="226" cy="350" rx="18" ry="10" fill="#FFB3C1"/><ellipse cx="374" cy="350" rx="18" ry="10" fill="#FFB3C1"/>
+        <path d="M280 352 q20 22 40 0" fill="#fff" stroke="#3B2A1A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <g id="donutA" transform="translate(80 330) scale(.62)">${DONUT.replace(/<\/?svg[^>]*>/g, "")}</g>
+      <g id="spark1"><path d="M0 -18 C 2 -2 2 -2 18 0 C 2 2 2 2 0 18 C -2 2 -2 2 -18 0 C -2 -2 -2 -2 0 -18Z" fill="#FF7A59" stroke="#3B2A1A" stroke-width="2.5"/></g>
+      <g id="spark2"><path d="M0 -14 C 2 -2 2 -2 14 0 C 2 2 2 2 0 14 C -2 2 -2 2 -14 0 C -2 -2 -2 -2 0 -14Z" fill="#7BC47F" stroke="#3B2A1A" stroke-width="2.5"/></g>
+    </svg>
+  </section>
+  <section class="menu">
+    <div class="mh r2"><h2>Menu favorit <span class="s">minggu ini</span></h2><span class="more">Lihat semua menu</span></div>
+    <div class="cards">
+      <div class="card r2"><div class="art" style="background:#FFE3EA">${DONUT}</div><div class="ct"><div class="n">Donat Gula Pink</div><div class="d">Lembut, manis, taburan warna-warni.</div><span class="pr">Rp8.000</span></div></div>
+      <div class="card r2"><div class="art" style="background:#FFF1C9">${CROISSANT}</div><div class="ct"><div class="n">Croissant Mentega</div><div class="d">Renyah di luar, berlapis di dalam.</div><span class="pr">Rp15.000</span></div></div>
+      <div class="card r2"><div class="art" style="background:#E3F4E4">${LOAF}</div><div class="ct"><div class="n">Roti Sobek Gembul</div><div class="d">Empuk, pas buat sarapan keluarga.</div><span class="pr">Rp22.000</span></div></div>
+    </div>
+  </section>` }, vpA);
+const aR = qa(pageA, ".r"), aR2 = qa(pageA, ".r2");
+const aNav = q(pageA, "nav");
+const toon = { svg: q(pageA, "#toon"), sun: q(pageA, "#sunA"), m: q(pageA, "#mascot"), arm: q(pageA, "#armR"), eyes: q(pageA, "#eyes"), c1: q(pageA, "#cloud1"), c2: q(pageA, "#cloud2"),
+  donut: q(pageA, "#donutA"), s1: q(pageA, "#spark1"), s2: q(pageA, "#spark2"), sh: q(pageA, "#shadowA") };
+
+// ---------- window B ----------
+const winB = $("div", { cls: "win", style: { top: "718px" }, html: bar("lumomax.demo") + `<div class="vp"></div>` });
+const vpB = q(winB, ".vp");
+const PHONES = (w = 600) => `<svg width="${w}" height="${w * .62}" viewBox="0 0 600 372">
+  <defs>
+    <linearGradient id="band" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F4F4F6"/><stop offset="1" stop-color="#B8B9C0"/></linearGradient>
+    <linearGradient id="cup" x1="0" x2="1"><stop offset="0" stop-color="#FDFDFE"/><stop offset=".55" stop-color="#D9DAE0"/><stop offset="1" stop-color="#A9AAB2"/></linearGradient>
+    <linearGradient id="cup2" x1="1" x2="0"><stop offset="0" stop-color="#FDFDFE"/><stop offset=".55" stop-color="#D9DAE0"/><stop offset="1" stop-color="#A9AAB2"/></linearGradient>
+    <radialGradient id="shd"><stop offset="0" stop-color="rgba(0,0,0,.22)"/><stop offset="1" stop-color="rgba(0,0,0,0)"/></radialGradient>
+  </defs>
+  <ellipse cx="300" cy="352" rx="250" ry="18" fill="url(#shd)"/>
+  <path d="M118 210 C 110 40, 490 40, 482 210" fill="none" stroke="#8E8F97" stroke-width="34" stroke-linecap="round"/>
+  <path d="M118 210 C 110 40, 490 40, 482 210" fill="none" stroke="url(#band)" stroke-width="28" stroke-linecap="round"/>
+  <path d="M150 170 C 150 80, 450 80, 450 170" fill="none" stroke="#2B2C31" stroke-width="16" stroke-linecap="round"/>
+  <rect x="104" y="170" width="26" height="70" rx="10" fill="#C9CAD1" stroke="#9A9BA3" stroke-width="2"/>
+  <rect x="470" y="170" width="26" height="70" rx="10" fill="#C9CAD1" stroke="#9A9BA3" stroke-width="2"/>
+  <rect x="44" y="214" width="140" height="150" rx="58" fill="url(#cup)" stroke="#9A9BA3" stroke-width="2"/>
+  <rect x="416" y="214" width="140" height="150" rx="58" fill="url(#cup2)" stroke="#9A9BA3" stroke-width="2"/>
+  <rect x="160" y="226" width="30" height="126" rx="15" fill="#2B2C31"/>
+  <rect x="410" y="226" width="30" height="126" rx="15" fill="#2B2C31"/>
+  <path d="M70 240 C 66 270, 66 310, 74 336" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".8"/>
+  <circle cx="530" cy="250" r="7" fill="#9A9BA3"/>
+</svg>`;
+const pageB = $("div", { cls: "page pb", html: `
+  <div class="gn"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#1D1D1F"/><path d="M6 13c2-4 4 4 6 0s4 4 6 0" fill="none" stroke="#FBFBFD" stroke-width="2" stroke-linecap="round"/></svg><span>Store</span><span>Headphone</span><span>Speaker</span><span>Aksesori</span><span>Dukungan</span>
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 14H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></div>
+  <div class="sn"><span class="t">Lumo Max</span><span class="r"><span>Ringkasan</span><span>Spesifikasi</span><span class="buy">Beli</span></span></div>
+  <section class="hero">
+    <div class="eb r">Baru</div>
+    <h1 class="r">Lumo Max</h1>
+    <div class="tg r">Sunyi. Sepenuhnya.</div>
+    <div class="lk r"><span>Pelajari lebih lanjut ›</span><span>Beli ›</span></div>
+    <div id="phones" style="margin-top:6px;display:inline-block">${PHONES(470)}</div>
+  </section>
+  <section class="dark">
+    <div class="k r2">Baterai</div>
+    <h2 class="r2">Hingga <span class="g">40 jam.</span></h2>
+    <p class="r2">Sekali cas, temani perjalanan pulang-pergi sepekan penuh.</p>
+    <div class="sw r2"><div><i style="background:#2B2C31"></i>Midnight</div><div><i style="background:#D9DAE0"></i>Silver</div><div><i style="background:#9EC3E6"></i>Sky</div><div><i style="background:#E8B4B8"></i>Rose</div></div>
+    <div class="specs r2"><span>ANC adaptif</span><span>Audio spasial</span><span>USB‑C</span></div>
+  </section>` }, vpB);
+const bR = qa(pageB, ".r"), bR2 = qa(pageB, ".r2");
+const bNav = [q(pageB, ".gn"), q(pageB, ".sn")];
+const phones = q(pageB, "#phones");
+
+// ---------- grain / vignette / HUD ----------
+$("div", { cls: "layer", id: "vig" });
+const grainCv = $("canvas", { cls: "abs", id: "grain" });
+grainCv.width = 540; grainCv.height = 675;
+const gctx = grainCv.getContext("2d");
+const GRAIN = [...Array(6)].map((_, k) => {
+  const img = gctx.createImageData(540, 675); let s = 555 + k * 101;
+  for (let i = 0; i < img.data.length; i += 4) {
+    s = (s * 1664525 + 1013904223) >>> 0; const v = 255 - ((s >>> 24) & 63) * (((s >>> 8) & 7) === 0 ? 1.4 : .5);
+    img.data[i] = v; img.data[i + 1] = v - 2; img.data[i + 2] = v - 6; img.data[i + 3] = 255;
+  } return img;
+});
+const hud = $("div", { cls: "layer", id: "hud" });
+[[40, 40, "Top", "Left"], [1010, 40, "Top", "Right"], [40, 1280, "Bottom", "Left"], [1010, 1280, "Bottom", "Right"]].forEach(([x, y, a, b]) =>
+  $("div", { cls: "cm", style: { left: x + "px", top: y + "px", ["border" + a + "Width"]: "2px", ["border" + b + "Width"]: "2px" } }, hud));
+$("div", { cls: "hud-t", html: `<img src="assets/logo-icon-dark.png" alt=""><b>OTAK RENTAL</b><span>/ Contoh website</span>`, style: { left: "92px", top: "58px" } }, hud);
+$("div", { cls: "hud-t", text: "Website & SaaS", style: { right: "92px", top: "64px" } }, hud);
+$("div", { cls: "hud-t", text: "Brand fiktif · untuk demo", style: { left: "92px", bottom: "40px", top: "auto" } }, hud).style.bottom = "38px";
+const hBR = $("div", { cls: "hud-t", html: `<span class="rec"></span><span class="tc">00:00:00:00</span>`, style: { right: "92px" } }, hud);
+hBR.style.bottom = "38px";
+const hTC = q(hBR, ".tc"), hRec = q(hBR, ".rec");
+
+/* ==========================================================================
+   RENDER
+   ========================================================================== */
+function renderAt(t) {
+  t = cl(t, 0, DUR);
+  const frame = Math.round(t * FPS);
+  gctx.putImageData(GRAIN[Math.floor(t * 12) % GRAIN.length], 0, 0);
+
+  // frames + labels settle in (the only "big" move)
+  [[lblA, winA, 0], [lblB, winB, .12]].forEach(([l, w, d]) => {
+    const k = eOutExpo(P(t, .05 + d, .95 + d));
+    l.style.opacity = cl(P(t, .1 + d, .5 + d)); l.style.transform = `translateY(${(1 - k) * 16}px)`;
+    w.style.opacity = cl(P(t, .05 + d, .35 + d)); w.style.transform = `translateY(${(1 - k) * 70}px) scale(${lerp(.96, 1, k)})`;
+  });
+
+  siteA(t); siteB(t);
+
+  hTC.textContent = `00:00:${pad(Math.floor(Math.min(frame, DUR * FPS) / FPS))}:${pad(Math.min(frame, DUR * FPS) % FPS)}`;
+  hRec.style.opacity = Math.floor(t * 2) % 2 ? .3 : 1;
+}
+
+function siteA(t) {
+  // gentle single scroll to the menu, then hold
+  const sc = 500 * eInOutQuint(P(t, 3.0, 5.4));
+  pageA.style.transform = `translateY(${-sc}px)`;
+  reveal(aNav, eOutCubic(P(t, .55, 1.0)), -12, 0);
+  aR.forEach((el, i) => reveal(el, eOutExpo(P(t, .75 + i * .12, 1.55 + i * .12)), 28, 10));
+  // cartoon: sun + mascot spring in, then idle loops
+  const pop = spring(t - 1.0, 1.5, 6) * (t > 1.0 ? 1 : 0);
+  toon.sun.setAttribute("r", 215 * eOutExpo(P(t, .85, 1.5)));
+  toon.m.setAttribute("transform", `translate(300 460) scale(${pop}) translate(-300 -460) translate(0 ${Math.sin(t * 3.2) * 5 * P(t, 1.6, 2)})`);
+  toon.sh.setAttribute("transform", `translate(300 470) scale(${pop * (1 - .05 * Math.sin(t * 3.2))} 1) translate(-300 -470)`);
+  const wave = t > 1.4 ? Math.sin((t - 1.4) * 9) * 22 : 0;
+  toon.arm.setAttribute("transform", `rotate(${wave} 438 300)`);
+  const blink = [2.6, 5.9].some(b => t > b && t < b + .12);
+  toon.eyes.setAttribute("transform", blink ? "translate(0 318) scale(1 .12) translate(0 -318)" : "");
+  toon.c1.setAttribute("transform", `translate(${Math.sin(t * .8) * 10 + (1 - eOutCubic(P(t, .9, 1.6))) * -120} 0)`);
+  toon.c2.setAttribute("transform", `translate(${Math.cos(t * .7) * 8 + (1 - eOutCubic(P(t, 1.0, 1.7))) * 120} 0)`);
+  const dk = eOutExpo(P(t, 1.3, 1.9));
+  toon.donut.setAttribute("transform", `translate(80 ${330 + Math.sin(t * 2.4) * 10 + (1 - dk) * 80}) rotate(${t * 20}) scale(${.62 * dk})`);
+  [[toon.s1, 470, 380, 1.5], [toon.s2, 150, 110, 1.65]].forEach(([s, x, y, st]) => {
+    const k = spring(t - st, 1.8, 6) * (t > st ? 1 : 0);
+    s.setAttribute("transform", `translate(${x} ${y}) rotate(${t * 40}) scale(${k * (1 + .15 * Math.sin(t * 5))})`);
+  });
+  // menu reveals as it scrolls into view
+  aR2.forEach((el, i) => reveal(el, eOutExpo(P(t, 3.9 + i * .12, 4.7 + i * .12)), 36, 6));
+}
+
+function siteB(t) {
+  const sc = 430 * eInOutQuint(P(t, 3.2, 5.6));
+  pageB.style.transform = `translateY(${-sc}px)`;
+  bNav.forEach(n => reveal(n, eOutCubic(P(t, .65, 1.1)), -10, 0));
+  bR.forEach((el, i) => reveal(el, eOutExpo(P(t, .95 + i * .12, 1.9 + i * .12)), 30, 12));
+  const pk = eOutExpo(P(t, 1.35, 2.5));
+  reveal(phones, pk, 70, 14, .08);
+  if (pk >= 1) phones.style.transform = `translateY(${Math.sin(t * 1.6) * 5}px)`;
+  // dark section: headline scales up like a product-page "whileInView"
+  bR2.forEach((el, i) => reveal(el, eOutExpo(P(t, 4.3 + i * .1, 5.2 + i * .1)), 34, 10, i === 1 ? .06 : 0));
+}
+
+/* ==========================================================================
+   BOOT
+   ========================================================================== */
+window.renderAt = renderAt;
+window.DURATION = DUR;
+window.reelReady = (async () => {
+  await document.fonts.ready;
+  await document.fonts.load('900 40px "Geist"'); await document.fonts.load('40px "Geist Mono"'); await document.fonts.load('italic 40px "Instrument Serif"');
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  renderAt(0);
+  return true;
+})();
+function fit() {
+  const vp = document.getElementById("viewport");
+  if (CAPTURE) { vp.style.transform = "none"; return; }
+  const z = Math.min(innerWidth / W, innerHeight / H);
+  vp.style.transform = `scale(${z})`;
+  vp.style.marginRight = (W * z - W) + "px"; vp.style.marginBottom = (H * z - H) + "px";
+}
+addEventListener("resize", fit); fit();
+if (!CAPTURE) {
+  let paused = false, last = performance.now(), cur = 0;
+  addEventListener("keydown", e => { if (e.code === "Space") { paused = !paused; e.preventDefault(); } });
+  window.reelReady.then(() => {
+    last = performance.now();
+    const loop = now => { if (!paused) { cur += (now - last) / 1000; if (cur > DUR + 1) cur = 0; } last = now; renderAt(Math.min(cur, DUR)); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+}
+</script>
+</body>
+</html>

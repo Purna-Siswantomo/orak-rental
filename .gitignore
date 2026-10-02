@@ -49,5 +49,8 @@ next-env.d.ts
 .vercel
 .env*
 
+# motion reel scratch output (final video is motion/otak-rental-reel.mp4)
+/motion/out/
+
 # gambar kerja sementara (bukan aset aplikasi)
 /scratchpad_images/

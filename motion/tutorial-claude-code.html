@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Tutorial — Motion pakai Claude Code (Opus 5.5)</title>
+<!--
+  59-second 1920×1080 tutorial: from typing the prompt in Claude Code on the web (Opus 5.5)
+  to the finished showreel. The Claude interface is redrawn in HTML/CSS as an illustration.
+  The result segment plays the real otak-rental-reel.mp4, extracted to frames first:
+    ffmpeg -i otak-rental-reel.mp4 -vf fps=60 -q:v 3 out/tut/reel/r%04d.jpg
+    python3 tutorial_sound.py out/tutorial-claude-code.wav
+    node render.mjs --page tutorial-claude-code.html --name tutorial-claude-code --sound tutorial_sound.py --sub 2
+-->
+<style>
+@font-face{font-family:"Geist";src:url(fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-normal.woff2) format("woff2");font-style:normal;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+:root{--cream:#FAF7F0;--paper:#FFFDF8;--ink:#05100E;--lime:#D4E751;--emerald:#17463A;--muted:#7F8277;--line:#E6DFD0;
+  --cb:#FAF9F5;--cp:#F3F1EA;--cl:#E6E3DA;--cm:#77756D;--ca:#D97757;--ct:#1F1E1D}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#111;overflow:hidden}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--cream);font-family:"Geist",sans-serif;color:var(--ink);
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.grid{position:absolute;inset:0;background-size:60px 60px;
+  background-image:linear-gradient(to right, rgba(5,16,14,.045) 1px, transparent 1px),linear-gradient(to bottom, rgba(5,16,14,.045) 1px, transparent 1px)}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse 80% 75% at 50% 45%, rgba(0,0,0,0) 55%, rgba(98,80,40,.09) 100%);pointer-events:none}
+.abs{position:absolute}
+.mono{font-family:"Geist Mono",monospace}
+.ser{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;color:var(--emerald)}
+.cm{position:absolute;width:30px;height:30px;border:0 solid var(--ink);z-index:40}
+.cm.tl{left:36px;top:30px;border-top-width:2px;border-left-width:2px}.cm.tr{right:36px;top:30px;border-top-width:2px;border-right-width:2px}
+.cm.bl{left:36px;bottom:30px;border-bottom-width:2px;border-left-width:2px}.cm.br{right:36px;bottom:30px;border-bottom-width:2px;border-right-width:2px}
+.spk{display:inline-block;flex:none}.spk svg{display:block;width:100%;height:100%}
+
+/* ---------- HUD ---------- */
+#hud{position:absolute;left:0;right:0;top:0;height:64px;z-index:30}
+#hud .l{position:absolute;left:84px;top:24px;display:flex;align-items:center;gap:12px;font-family:"Geist Mono",monospace;font-size:14px;letter-spacing:.16em;text-transform:uppercase}
+#hud .l img{width:30px;height:26px}
+#hud .r{position:absolute;right:84px;top:22px;display:flex;gap:6px}
+#hud .r span{font-family:"Geist Mono",monospace;font-size:12px;letter-spacing:.12em;padding:5px 9px;border-radius:7px;border:1px solid var(--line);background:var(--paper);color:#62655d}
+#hud .r span.on{background:var(--ink);color:var(--lime);border-color:var(--ink)}
+#hud .r span.done{background:var(--lime);color:var(--ink);border-color:var(--ink)}
+
+/* ---------- caption ---------- */
+#cap{position:absolute;left:84px;bottom:34px;z-index:30;display:flex;align-items:center;gap:16px;background:var(--ink);color:#fff;border-radius:18px;padding:14px 22px 14px 14px;
+  box-shadow:0 20px 40px -20px rgba(5,16,14,.7)}
+#cap .n{font-family:"Geist Mono",monospace;font-size:20px;font-weight:700;background:var(--lime);color:var(--ink);border-radius:11px;width:52px;height:52px;display:grid;place-items:center}
+#cap .tt{font-size:25px;font-weight:760;letter-spacing:-.03em;white-space:nowrap}
+#cap .sb{font-size:16.5px;color:rgba(255,255,255,.66);margin-top:2px;white-space:nowrap;height:22px}
+#cap .sb span{display:inline-block}
+
+/* ---------- camera + window ---------- */
+#cam{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#win{position:absolute;left:160px;top:76px;width:1600px;height:880px;border-radius:16px;overflow:hidden;background:var(--cb);border:1px solid #D3CFC3;
+  box-shadow:0 60px 110px -50px rgba(40,34,20,.55),0 10px 24px -14px rgba(40,34,20,.3);transform-origin:50% 100%}
+.chrome{height:44px;background:#ECE9E0;border-bottom:1px solid #DDD9CE;display:flex;align-items:center;gap:8px;padding:0 18px;position:relative}
+.chrome i{width:12px;height:12px;border-radius:50%;background:#FF5F57}.chrome i+i{background:#FEBC2E}.chrome i+i+i{background:#28C840}
+.chrome .url{position:absolute;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #DDD9CE;border-radius:9px;font-family:"Geist Mono",monospace;font-size:14px;padding:5px 90px;color:#5a5852;white-space:nowrap}
+.chrome .url b{color:var(--ct);font-weight:600}
+.app{position:absolute;left:0;right:0;top:44px;bottom:0;display:grid;grid-template-columns:280px 1fr}
+.side{background:var(--cp);border-right:1px solid var(--cl);padding:20px 16px;font-size:16px;position:relative}
+.side .brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:650;margin:2px 6px 20px}
+.side .nw{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--cl);border-radius:11px;padding:10px 12px;font-weight:600;font-size:15.5px}
+.side .lb{font-family:"Geist Mono",monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cm);margin:24px 8px 8px}
+.side .ss{padding:9px 10px;border-radius:9px;line-height:1.3;font-size:15px;color:var(--ct);overflow:hidden}
+.side .ss small{display:block;color:var(--cm);font-size:12.5px;margin-top:2px}
+.side .ss.on{background:#E7E4DA}
+.side .me{position:absolute;left:16px;right:16px;bottom:18px;display:flex;align-items:center;gap:10px;font-size:14.5px}
+.side .me .av{width:34px;height:34px;border-radius:50%;background:#D9D4C7;display:grid;place-items:center;font-weight:650;font-size:13px}
+.side .me small{display:block;color:var(--cm);font-size:12.5px}
+.main{position:relative;overflow:hidden;background:var(--cb)}
+/* home */
+#home{position:absolute;inset:0}
+#home .greet{position:absolute;left:0;right:0;top:250px;text-align:center;font-family:"Instrument Serif",serif;font-size:50px;letter-spacing:-.01em;color:var(--ct);display:flex;justify-content:center;align-items:center;gap:16px}
+.composer{position:absolute;background:#fff;border:1px solid #D3CFC3;border-radius:20px;box-shadow:0 6px 18px -8px rgba(40,34,20,.18);padding:16px 16px 12px}
+.composer .tx{font-size:20px;line-height:1.5;color:var(--ct);min-height:60px;white-space:pre-wrap}
+.composer .tx.ph{color:#a2a097}
+.caret{display:inline-block;width:2px;height:24px;background:var(--ct);vertical-align:-5px;margin-left:1px}
+.composer .row{display:flex;align-items:center;gap:8px;margin-top:12px}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:14.5px;border:1px solid var(--cl);border-radius:10px;padding:6px 11px;background:#fff;color:#3d3c38;white-space:nowrap}
+.chip.hov{background:#F3F1EA;border-color:#cfcbbf}
+.chip .ic{font-size:14px;color:var(--cm)}
+.model{margin-left:auto;font-size:15px;color:#3d3c38;padding:6px 10px;border-radius:9px;white-space:nowrap;font-weight:550}
+.model.hov{background:#F3F1EA}
+.send{width:40px;height:40px;border-radius:12px;background:var(--ca);display:grid;place-items:center;color:#fff;font-size:20px;font-weight:700;opacity:.45}
+.send.on{opacity:1}
+.menu{position:absolute;background:#fff;border:1px solid #D9D5CA;border-radius:16px;box-shadow:0 30px 60px -26px rgba(40,34,20,.45);padding:8px;font-size:16px;z-index:5;transform-origin:50% 0}
+.menu .hd{font-family:"Geist Mono",monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cm);padding:8px 12px 6px}
+.menu .search{margin:2px 4px 6px;border:1px solid var(--cl);border-radius:10px;padding:9px 12px;color:#a2a097;font-size:15px}
+.menu .it{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;white-space:nowrap}
+.menu .it.hov{background:#F3F1EA}
+.menu .it small{display:block;font-size:13px;color:var(--cm);margin-top:2px}
+.menu .it .ok{margin-left:auto;color:var(--ca);font-weight:700;font-size:17px}
+.menu .it .rp{width:26px;height:26px;border-radius:7px;background:#EDEAE1;display:grid;place-items:center;font-size:13px;color:#5a5852}
+/* session */
+#sess{position:absolute;inset:0;opacity:0}
+#sess .head{position:absolute;left:0;right:0;top:0;height:62px;border-bottom:1px solid var(--cl);display:flex;align-items:center;gap:12px;padding:0 24px;font-size:17px;background:var(--cb);z-index:3}
+#sess .head b{font-weight:650}
+.diff{font-family:"Geist Mono",monospace;font-size:14px;border:1px solid var(--cl);border-radius:8px;padding:5px 10px;background:#fff;margin-left:auto}
+.diff b{color:#2F8A4E;font-weight:600}.diff i{color:#C2452D;font-style:normal}
+.btn{font-size:14.5px;padding:8px 14px;border-radius:10px;border:1px solid var(--cl);background:#fff;white-space:nowrap}
+.btn.dk{background:var(--ct);color:#fff;border-color:var(--ct)}
+#view{position:absolute;left:0;right:0;top:62px;bottom:132px;overflow:hidden}
+#conv{position:absolute;left:50%;width:900px;margin-left:-450px;top:0;padding:26px 0 30px}
+.it{display:none;margin-bottom:16px}
+.ubub{margin-left:auto;max-width:720px;background:#EFEDE5;border-radius:20px;padding:14px 18px;font-size:18px;line-height:1.5;color:var(--ct)}
+.crow{display:flex;gap:14px;align-items:flex-start;font-size:18px;line-height:1.55;color:var(--ct)}
+.crow .spk{width:24px;height:24px;margin-top:3px}
+.think{display:inline-flex;align-items:center;gap:8px;font-size:15.5px;color:var(--cm);border:1px solid var(--cl);border-radius:9px;padding:5px 11px;background:#fff}
+.shim{background:linear-gradient(90deg,#9a988f 0%,#9a988f 40%,#E7E4DA 50%,#9a988f 60%,#9a988f 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+.tool{margin-left:38px;border:1px solid var(--cl);border-radius:14px;background:#fff;overflow:hidden}
+.tool .th{display:flex;align-items:center;gap:12px;padding:11px 14px;font-family:"Geist Mono",monospace;font-size:15px;color:#4a4943;white-space:nowrap}
+.tool .th b{color:var(--ct);font-weight:650}
+.tool .st{width:18px;height:18px;flex:none;position:relative}
+.tool .st .sp{position:absolute;inset:0;border-radius:50%;border:2.5px solid #E7E4DA;border-top-color:var(--ca)}
+.tool .st .ck{position:absolute;inset:0;border-radius:50%;background:#2F8A4E;color:#fff;font-size:11px;display:grid;place-items:center;font-family:"Geist",sans-serif;font-weight:800}
+.tool .th .meta{margin-left:auto;color:var(--cm);font-size:13.5px}
+.tool .th .meta b{color:#2F8A4E}
+.tool .bd{border-top:1px solid var(--cl);background:#FBFAF6;padding:12px 14px}
+.code{height:226px;overflow:hidden;position:relative;font-family:"Geist Mono",monospace;font-size:14px;line-height:1.6;background:#1A1917;color:#E8E6DF;border-radius:10px;padding:10px 0}
+.code .ln{display:flex;white-space:pre;padding:0 14px}
+.code .ln i{width:34px;flex:none;color:#6b6a63;font-style:normal;text-align:right;margin-right:14px}
+.k{color:#D9A0F0}.f{color:#8FC7F2}.s{color:#B8DB8A}.c{color:#7d7b73}.n{color:#F2B880}
+.sb-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.sb-grid div{border:1px solid var(--cl);border-radius:10px;background:#fff;padding:9px 10px;font-size:14px;line-height:1.3}
+.sb-grid div b{display:block;font-family:"Geist Mono",monospace;font-size:11.5px;color:var(--ca);letter-spacing:.06em}
+.sb-grid div small{display:block;font-family:"Geist Mono",monospace;font-size:11.5px;color:var(--cm);margin-top:3px}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.thumbs div{border-radius:8px;overflow:hidden;border:1px solid var(--cl);aspect-ratio:16/9;background:#eee;position:relative}
+.thumbs img{display:block;width:100%;height:100%;object-fit:cover}
+.thumbs span{position:absolute;left:6px;bottom:6px;font-family:"Geist Mono",monospace;font-size:11px;background:rgba(5,16,14,.75);color:#fff;border-radius:5px;padding:2px 6px}
+.prog{display:flex;gap:16px;align-items:center}
+.prog .pv{width:224px;height:126px;border-radius:9px;overflow:hidden;border:1px solid var(--cl);flex:none;background:#000}
+.prog .pv img{display:block;width:100%;height:100%;object-fit:cover}
+.prog .bar{height:12px;border-radius:7px;background:#ECE9E0;overflow:hidden;margin:10px 0}
+.prog .bar b{display:block;height:100%;background:linear-gradient(90deg,var(--ca),#E9A27F);border-radius:7px}
+.prog .ln1{font-family:"Geist Mono",monospace;font-size:15px;color:var(--ct)}
+.prog .ln2{font-family:"Geist Mono",monospace;font-size:13px;color:var(--cm)}
+.vcard{margin-left:38px;margin-top:10px;width:520px;border-radius:14px;overflow:hidden;border:1px solid var(--cl);background:#fff;box-shadow:0 20px 40px -26px rgba(40,34,20,.5)}
+.vcard .po{position:relative;height:292px;background:#000}
+.vcard .po img{display:block;width:100%;height:100%;object-fit:cover}
+.vcard .po .pl{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px;border-radius:50%;background:rgba(5,16,14,.7);color:#fff;display:grid;place-items:center;font-size:22px;padding-left:4px}
+.vcard .fn{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:15px}
+.vcard .fn small{color:var(--cm);font-family:"Geist Mono",monospace;font-size:12.5px;margin-left:auto}
+#sess .scomp{left:210px;right:210px;bottom:24px}
+/* cursor */
+#cursor{position:absolute;left:0;top:0;width:30px;height:38px;z-index:35;pointer-events:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3))}
+#ripple{position:absolute;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:3px solid var(--ca);z-index:34;opacity:0}
+/* morph / reel */
+#dim{position:absolute;inset:0;background:#05100E;opacity:0;z-index:20}
+#vid{position:absolute;overflow:hidden;z-index:21;display:none;background:#000}
+#vid img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#vPoster{z-index:2}
+/* intro / outro */
+#intro{position:absolute;inset:0;z-index:25}
+#outro{position:absolute;inset:0;z-index:22;display:none}
+.kick{display:inline-flex;align-items:center;gap:12px;font-family:"Geist Mono",monospace;font-size:17px;letter-spacing:.18em;text-transform:uppercase;border-radius:12px;padding:12px 18px;background:var(--ink);color:var(--lime)}
+.kick i{width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(212,231,81,.3)}
+.mkw{position:relative;display:inline-block;z-index:0}
+.mkw::before{content:"";position:absolute;left:-.04em;right:-.06em;top:.52em;height:.38em;background:var(--lime);border-radius:.08em;z-index:-1;transform-origin:0 50%;transform:scaleX(var(--mk,0))}
+.wd{display:inline-block}
+.pchip{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:11px 16px;font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.14em;color:#40443d;text-transform:uppercase;white-space:nowrap}
+.pchip b{color:var(--ink)}
+.quote{background:var(--ink);color:#EDEAE4;border-radius:20px;padding:24px 28px;font-family:"Geist Mono",monospace;font-size:20px;line-height:1.6;position:relative}
+.quote::before{content:"PROMPT";position:absolute;top:-13px;left:22px;background:var(--lime);color:var(--ink);font-size:12px;font-weight:700;letter-spacing:.18em;padding:4px 10px;border-radius:7px}
+.quote b{color:var(--lime);font-weight:600}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="grid"></div><div class="vig"></div>
+  <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="l"><img src="assets/logo-icon-dark.png" alt=""><b>Otak Rental</b><span style="opacity:.5">/ Tutorial Claude Code</span></div>
+    <div class="r"><span id="h1">01 BUKA</span><span id="h2">02 MODEL</span><span id="h3">03 PROMPT</span><span id="h4">04 PROSES</span><span id="h5">05 HASIL</span></div>
+  </div>
+
+  <!-- INTRO -->
+  <div id="intro">
+    <div class="abs" id="iKick" style="left:0;right:0;top:300px;text-align:center"><span class="kick"><i></i>Tutorial · Claude Code × Opus 5.5</span></div>
+    <div class="abs" id="iL1" style="left:0;right:0;top:380px;text-align:center;font-size:150px;font-weight:820;letter-spacing:-.055em;line-height:1"><span class="wd">Satu</span> <span class="wd">prompt,</span></div>
+    <div class="abs" id="iL2" style="left:0;right:0;top:530px;text-align:center;font-size:160px;line-height:1" class="ser"><span class="ser wd" style="letter-spacing:-.02em">jadi</span> <span class="ser wd mkw" id="iMk" style="letter-spacing:-.02em">showreel.</span></div>
+    <div class="abs" id="iSub" style="left:0;right:0;top:730px;text-align:center;font-size:28px;color:#3b3f38;letter-spacing:-.015em">Dari ngetik prompt sampai video MP4 jadi, step by step.</div>
+  </div>
+
+  <!-- CAMERA + WINDOW -->
+  <div id="cam">
+    <div id="win">
+      <div class="chrome"><i></i><i></i><i></i><span class="url">🔒 <b>claude.ai</b>/code</span></div>
+      <div class="app">
+        <div class="side">
+          <div class="brand"><i class="spk" style="width:24px;height:24px"></i>Claude Code</div>
+          <div class="nw"><span style="font-size:18px;line-height:1">+</span>New session</div>
+          <div class="lb">Sessions</div>
+          <div class="ss on" id="newSess" style="display:none">Motion showreel 15s<small id="newSessMeta">orak-rental · running…</small></div>
+          <div class="ss" id="s1">Price list carousel<small>orak-rental · +388</small></div>
+          <div class="ss">Website examples<small>orak-rental · +512</small></div>
+          <div class="ss">Konsultasi slide 2<small>orak-rental · +276</small></div>
+          <div class="me"><span class="av">PS</span><span>Purna S.<small>Pro plan</small></span></div>
+        </div>
+        <div class="main">
+          <!-- HOME -->
+          <div id="home">
+            <div class="greet"><i class="spk" style="width:40px;height:40px"></i>What should we work on?</div>
+            <div class="composer" id="hcomp" style="left:200px;right:200px;top:350px">
+              <div class="tx ph" id="htext">Describe a task or ask a question</div>
+              <div class="row">
+                <span class="chip" id="repo"><span class="ic">▣</span><span id="repoTxt">Select repository</span></span>
+                <span class="chip"><span class="ic">⎇</span>main</span>
+                <span class="chip"><span class="ic">☁</span>Default</span>
+                <span class="chip" style="margin-left:auto">Auto ▾</span>
+                <span class="model" id="model" style="margin-left:0"><span id="modelTxt">Sonnet 5.5</span> ▾</span>
+                <span class="send" id="send">↑</span>
+              </div>
+            </div>
+            <div class="menu" id="repoMenu" style="left:200px;top:500px;width:460px;display:none">
+              <div class="search">Search repositories…</div>
+              <div class="it" id="repoItem"><span class="rp">▣</span><div>purna-siswantomo/<b>orak-rental</b><small>Updated today</small></div></div>
+              <div class="it"><span class="rp">▣</span><div>purna-siswantomo/portfolio<small>Updated 3 days ago</small></div></div>
+              <div class="it"><span class="rp">▣</span><div>purna-siswantomo/tugas-akhir<small>Updated last week</small></div></div>
+            </div>
+            <div class="menu" id="modelMenu" style="right:200px;top:500px;width:380px;display:none">
+              <div class="hd">Model</div>
+              <div class="it" id="mOpus"><div><b>Opus 5.5</b><small>Most capable for complex work</small></div><span class="ok" id="okOpus" style="opacity:0">✓</span></div>
+              <div class="it" id="mSonnet"><div>Sonnet 5.5<small>Smart and efficient for everyday tasks</small></div><span class="ok" id="okSonnet">✓</span></div>
+              <div class="it"><div>Haiku 4.5<small>Fastest for quick answers</small></div></div>
+            </div>
+          </div>
+          <!-- SESSION -->
+          <div id="sess">
+            <div class="head"><i class="spk" style="width:20px;height:20px"></i><b>Motion showreel 15s</b><span class="chip"><span class="ic">⎇</span>claude/motion-showreel</span>
+              <span class="diff" id="diff"><b>+0</b> <i>−0</i></span><span class="btn dk">Create PR</span></div>
+            <div id="view"><div id="conv">
+              <div class="it" data-t="19.75"><div class="ubub" id="ubub"></div></div>
+              <div class="it" data-t="20.05"><div class="crow"><i class="spk"></i><span class="think" id="think"><span id="thinkTxt" class="shim">Thinking…</span></span></div></div>
+              <div class="it" data-t="21.7"><div class="crow" style="padding-left:38px">I'll build it from the brand in this repo: one deterministic HTML animation, rendered frame by frame to MP4 with real motion blur and sound.</div></div>
+              <div class="it" data-t="22.3"><div class="tool"><div class="th"><span class="st" data-done="22.85"><span class="sp"></span><span class="ck">✓</span></span><b>Read</b> CLAUDE.md · app/globals.css · public/logo.png</div></div></div>
+              <div class="it" data-t="22.95"><div class="tool"><div class="th"><span class="st" data-done="23.35"><span class="sp"></span><span class="ck">✓</span></span><b>Glob</b> public/fonts/*.woff2<span class="meta">4 files</span></div></div></div>
+              <div class="it" data-t="23.55"><div class="tool"><div class="th"><span class="st" data-done="24.3"><span class="sp"></span><span class="ck">✓</span></span><b>Plan</b> storyboard · 15 s · 1920×1080 · 60 fps</div>
+                <div class="bd"><div class="sb-grid" id="sbGrid">
+                  <div><b>01</b>Spark<small>0–2.6s</small></div><div><b>02</b>Deadline<small>2.6–5.9s</small></div><div><b>03</b>Formula<small>5.9–8.9s</small></div>
+                  <div><b>04</b>Layanan<small>8.9–11.4s</small></div><div><b>05</b>Bukti<small>11.4–12.9s</small></div><div><b>06</b>Otak Rental<small>12.9–15s</small></div></div></div></div></div>
+              <div class="it" data-t="24.7"><div class="tool"><div class="th"><span class="st" data-done="27.45"><span class="sp"></span><span class="ck">✓</span></span><b>Write</b> motion/showreel.html<span class="meta" id="lc1"><b>+0</b> lines</span></div>
+                <div class="bd"><div class="code" id="code"></div></div></div></div>
+              <div class="it" data-t="27.6"><div class="tool"><div class="th"><span class="st" data-done="28.85"><span class="sp"></span><span class="ck">✓</span></span><b>Write</b> motion/sound.py<span class="meta" id="lc2"><b>+0</b> lines</span></div>
+                <div class="bd"><svg id="wave" width="870" height="70" viewBox="0 0 870 70"><path id="wavePath" d="" fill="none" stroke="#D97757" stroke-width="2"/></svg></div></div></div>
+              <div class="it" data-t="29.0"><div class="tool"><div class="th"><span class="st" data-done="30.3"><span class="sp"></span><span class="ck">✓</span></span><b>Bash</b> node render.mjs --stills 3.4,7.2,10.2,14.6</div>
+                <div class="bd"><div class="thumbs" id="thumbs">
+                  <div><img src="out/tut/reel/r0205.jpg" alt=""><span>3.4s</span></div><div><img src="out/tut/reel/r0433.jpg" alt=""><span>7.2s</span></div>
+                  <div><img src="out/tut/reel/r0613.jpg" alt=""><span>10.2s</span></div><div><img src="out/tut/reel/r0877.jpg" alt=""><span>14.6s</span></div></div></div></div></div>
+              <div class="it" data-t="30.5"><div class="crow" style="padding-left:38px">Stills look right: clean layout, nothing clipped. Rendering the full video, 900 frames × 6 sub-frames for motion blur.</div></div>
+              <div class="it" data-t="31.0"><div class="tool"><div class="th"><span class="st" data-done="34.9"><span class="sp"></span><span class="ck">✓</span></span><b>Bash</b> node render.mjs<span class="meta" id="pmeta">rendering…</span></div>
+                <div class="bd"><div class="prog"><div class="pv"><img id="pvImg" src="out/tut/reel/r0001.jpg" alt=""></div>
+                  <div style="flex:1"><div class="ln1" id="pl1">frame 0 / 900</div><div class="bar"><b id="pbar" style="width:0%"></b></div><div class="ln2" id="pl2">60 fps · motion blur ×6 · 1920×1080</div></div></div></div></div></div>
+              <div class="it" data-t="35.25"><div class="crow"><i class="spk"></i><span><b>Done.</b> Your showreel is ready, and I committed and pushed it to <span class="mono" style="font-size:15.5px;background:#EFEDE5;border-radius:6px;padding:1px 6px">claude/motion-showreel</span>.</span></div>
+                <div class="vcard" id="vcard"><div class="po"><img src="out/tut/reel/r0613.jpg" alt=""><span class="pl">▶</span></div>
+                  <div class="fn">🎞 <b>otak-rental-reel.mp4</b><small>1920×1080 · 60 fps · 15 s</small></div></div></div>
+            </div></div>
+            <div class="composer scomp"><div class="tx ph" style="min-height:28px">Reply to Claude…</div>
+              <div class="row"><span class="chip"><span class="ic">▣</span>orak-rental</span><span class="model">Opus 5.5 ▾</span><span class="send">↑</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- cursor -->
+  <div id="ripple"></div>
+  <svg id="cursor" viewBox="0 0 30 38"><path d="M3 2 L3 30 L10 23.5 L15 35 L20 33 L15 21.5 L25 21.5 Z" fill="#fff" stroke="#05100E" stroke-width="2.2" stroke-linejoin="round"/></svg>
+
+  <!-- morph / reel -->
+  <div id="dim"></div>
+  <div id="vid"><img id="vPoster" src="out/tut/reel/r0613.jpg" alt=""><img id="vImg" src="out/tut/reel/r0001.jpg" alt=""></div>
+
+  <!-- OUTRO -->
+  <div id="outro">
+    <div class="abs" id="oKick" style="left:120px;top:170px"><span class="kick"><i></i>Prompt-nya</span></div>
+    <div class="abs" id="oL1" style="left:114px;top:250px;font-size:110px;font-weight:820;letter-spacing:-.055em;line-height:1">Cuma satu</div>
+    <div class="abs ser" id="oL2" style="left:112px;top:360px;font-size:124px;line-height:1"><span class="mkw" id="oMk">kalimat.</span></div>
+    <div class="abs quote" id="oQ" style="left:120px;top:540px;width:760px"><b>"</b>make a dynamic 15-second motion graphics video that shows what an incredible motion designer you are, like it's your showreel for a résumé. go all out.<b>"</b></div>
+    <div class="abs" id="oChips" style="left:120px;top:800px;display:flex;gap:10px"><span class="pchip"><b>Claude Code</b></span><span class="pchip"><b>Opus 5.5</b></span><span class="pchip">1920×1080 · 60 fps</span><span class="pchip">15 detik</span></div>
+    <div class="abs" id="oBar" style="left:120px;right:120px;bottom:70px;display:flex;align-items:center;gap:16px;border-top:1.5px solid rgba(5,16,14,.15);padding-top:22px">
+      <img src="assets/logo-icon-dark.png" alt="" style="width:46px"><div style="font-size:22px;font-weight:650;letter-spacing:-.02em">Tutorial lengkapnya ada di modul <span class="ser" style="font-size:26px">Motion pakai Claude Code.</span></div>
+      <span style="margin-left:auto;background:var(--lime);border:2px solid var(--ink);border-radius:999px;padding:12px 24px;font-weight:800;font-size:22px;letter-spacing:-.02em;box-shadow:0 5px 0 var(--ink)">DM @otakrental</span></div>
+  </div>
+
+  <!-- caption -->
+  <div id="cap"><span class="n" id="capN">01</span><div><div class="tt" id="capT"></div><div class="sb"><span id="capS"></span></div></div></div>
+</div>
+
+<script>
+// ---------- helpers ----------
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const seg = (t, a, b) => cl((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eob = x => { const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const mix = (a, b, k) => a + (b - a) * k;
+const SPK = '<svg viewBox="0 0 24 24"><g stroke="#D97757" stroke-width="2.6" stroke-linecap="round"><path d="M12 2.5v6.5M12 15v6.5M2.5 12H9M15 12h6.5M5.3 5.3l4.6 4.6M14.1 14.1l4.6 4.6M5.3 18.7l4.6-4.6M14.1 9.9l4.6-4.6"/></g></svg>';
+document.querySelectorAll(".spk").forEach(e => e.innerHTML = SPK);
+const DURATION = 59;
+const PROMPT = "make a dynamic 15-second motion graphics video that shows what an incredible motion designer you are, like it's your showreel for a résumé. go all out.";
+$("ubub").textContent = PROMPT;
+const fr = n => `out/tut/reel/r${String(Math.max(1, Math.min(900, n))).padStart(4, "0")}.jpg`;
+
+// ---------- code panel ----------
+const CODE = [
+  ['<span class="k">const</span> DURATION = <span class="n">15</span>, FPS = <span class="n">60</span>;'],
+  ['<span class="k">const</span> C = { cream: <span class="s">"#FAF7F0"</span>, ink: <span class="s">"#05100E"</span>, lime: <span class="s">"#D4E751"</span> };'],
+  [''],
+  ['<span class="k">function</span> <span class="f">renderAt</span>(t) {'],
+  ['  <span class="k">const</span> s1 = <span class="f">seg</span>(t, <span class="n">0.0</span>, <span class="n">2.6</span>);      <span class="c">// 01 spark</span>'],
+  ['  drop.y = <span class="f">bounce</span>(s1) * <span class="n">420</span>;'],
+  ['  <span class="f">burst</span>(petals, <span class="f">eob</span>(<span class="f">seg</span>(t, <span class="n">1.1</span>, <span class="n">1.6</span>)));'],
+  ['  <span class="k">const</span> s2 = <span class="f">seg</span>(t, <span class="n">2.6</span>, <span class="n">5.9</span>);      <span class="c">// 02 deadline</span>'],
+  ['  <span class="f">typeIn</span>(<span class="s">"Deadline"</span>, s2, { stagger: <span class="n">.05</span> });'],
+  ['  chips.<span class="f">forEach</span>((c, i) => <span class="f">crash</span>(c, s2 - i * <span class="n">.06</span>));'],
+  ['  <span class="f">countdown</span>(<span class="n">72</span> * <span class="n">3600</span> * (<span class="n">1</span> - s2));'],
+  ['  <span class="k">const</span> s3 = <span class="f">seg</span>(t, <span class="n">5.9</span>, <span class="n">8.9</span>);      <span class="c">// 03 formula</span>'],
+  ['  tiles.<span class="f">forEach</span>((k, i) => <span class="f">flip3d</span>(k, s3, i));'],
+  ['  <span class="f">rollUp</span>(total, <span class="n">1100000</span>, <span class="f">eo</span>(s3));'],
+  ['  <span class="k">const</span> s4 = <span class="f">seg</span>(t, <span class="n">8.9</span>, <span class="n">11.35</span>);    <span class="c">// 04 layanan</span>'],
+  ['  camera.tilt = <span class="f">mix</span>(<span class="n">0</span>, <span class="n">18</span>, <span class="f">eio</span>(s4));'],
+  ['  bento.<span class="f">forEach</span>(b => b.<span class="f">rise</span>(s4));'],
+  ['  <span class="k">const</span> s5 = <span class="f">seg</span>(t, <span class="n">11.35</span>, <span class="n">12.85</span>); <span class="c">// 05 bukti</span>'],
+  ['  <span class="f">beats</span>([<span class="s">"420+"</span>, <span class="s">"100%"</span>, <span class="s">"0%"</span>, <span class="s">"4,9/5"</span>], s5);'],
+  ['  <span class="k">const</span> s6 = <span class="f">seg</span>(t, <span class="n">12.85</span>, <span class="n">15</span>);    <span class="c">// 06 otak rental</span>'],
+  ['  <span class="f">implode</span>(dots, <span class="f">eio</span>(s6));'],
+  ['  logo.<span class="f">pop</span>(<span class="f">eob</span>(<span class="f">seg</span>(t, <span class="n">13.3</span>, <span class="n">13.8</span>)));'],
+  ['  <span class="f">sheen</span>(wordmark, <span class="f">seg</span>(t, <span class="n">14.2</span>, <span class="n">14.9</span>));'],
+  ['}'],
+  ['window.renderAt = renderAt; window.DURATION = DURATION;'],
+];
+const codeEl = $("code");
+CODE.forEach((l, i) => { const d = document.createElement("div"); d.className = "ln"; d.innerHTML = `<i>${i + 1}</i>${l[0] || " "}`; codeEl.appendChild(d); });
+const codeLines = [...codeEl.children];
+
+// ---------- waveform ----------
+let wd = "", wlen = 0;
+{ let px = 0, py = 35; const pts = [];
+  for (let x = 0; x <= 870; x += 3) {
+    const env = .35 + .65 * Math.abs(Math.sin(x * .021) * Math.sin(x * .0047 + 1));
+    const y = 35 + Math.sin(x * .9) * Math.cos(x * .37) * 30 * env;
+    pts.push(`${x},${y.toFixed(1)}`); wlen += Math.hypot(x - px, y - py); px = x; py = y;
+  }
+  wd = "M" + pts.join(" L"); }
+$("wavePath").setAttribute("d", wd);
+$("wavePath").style.strokeDasharray = wlen;
+
+// ---------- conversation scroll (measured once) ----------
+const items = [...document.querySelectorAll("#conv .it")];
+const times = items.map(e => +e.dataset.t);
+let needs = [];
+function measure() {
+  const sessEl = $("sess"); const prev = sessEl.style.opacity; sessEl.style.opacity = 0;
+  const viewH = $("view").clientHeight;
+  needs = items.map((_, i) => { items.forEach((e, j) => e.style.display = j <= i ? "block" : "none"); return Math.max(0, $("conv").offsetHeight - viewH); });
+  items.forEach(e => e.style.display = "none"); sessEl.style.opacity = prev;
+}
+
+// ---------- camera keyframes [t, scale, cx, cy] ----------
+const CAM = [[0, 1, 960, 516], [5.2, 1, 960, 516], [6.2, 1.28, 1100, 560], [8.5, 1.28, 1100, 560], [9.1, 1.6, 1330, 600], [11.6, 1.6, 1330, 600],
+  [12.4, 1.45, 1100, 520], [18.3, 1.45, 1100, 520], [19.5, 1.1, 960, 520], [35.0, 1.1, 960, 520], [36.3, 1.32, 1100, 640], [40, 1.32, 1100, 640]];
+function camAt(t) {
+  let i = 0; while (i < CAM.length - 1 && t >= CAM[i + 1][0]) i++;
+  if (i >= CAM.length - 1) return CAM[CAM.length - 1].slice(1);
+  const [t0, s0, x0, y0] = CAM[i], [t1, s1, x1, y1] = CAM[i + 1];
+  const k = eio(seg(t, t0, t1));
+  return [mix(s0, s1, k), mix(x0, x1, k), mix(y0, y1, k)];
+}
+
+// ---------- cursor keyframes [t, target, dx, dy] ----------
+const CUR = [[5.3, [1560, 980]], [6.4, "repo"], [6.95, "repo"], [7.25, "repoItem"], [8.75, "repoItem", 0, 60], [9.25, "model"], [9.75, "model"], [10.2, "mOpus"], [10.75, "mOpus"],
+  [11.7, "htext", -250, 0], [12.25, "htext", -250, 0], [12.9, "htext", 120, 140], [17.3, "htext", 120, 140], [17.85, "send"], [18.6, "send"]];
+const CLICKS = [6.55, 7.3, 9.35, 10.4, 12.1, 18.0];
+function ptOf(k) {
+  if (Array.isArray(k[1])) return k[1];
+  const r = $(k[1]).getBoundingClientRect();
+  return [r.left + r.width / 2 + (k[2] || 0) * 1, r.top + r.height / 2 + (k[3] || 0)];
+}
+function curAt(t) {
+  let i = 0; while (i < CUR.length - 1 && t >= CUR[i + 1][0]) i++;
+  if (i >= CUR.length - 1) return ptOf(CUR[CUR.length - 1]);
+  const a = ptOf(CUR[i]), b = ptOf(CUR[i + 1]); const k = eio(seg(t, CUR[i][0], CUR[i + 1][0]));
+  return [mix(a[0], b[0], k), mix(a[1], b[1], k)];
+}
+
+// ---------- captions ----------
+const CAPS = [[4.6, "01", "Buka claude.ai/code", "Login akun Pro, lalu pilih repo berisi brand-mu"],
+  [8.45, "02", "Pilih model Opus 5.5", "Model paling teliti untuk animasi yang rumit"],
+  [12.25, "03", "Tulis prompt, lalu kirim", "Satu kalimat bahasa biasa sudah cukup"],
+  [19.5, "04", "Claude bekerja sendiri", "Membaca brand di repo"],
+  [24.6, "04", "Claude bekerja sendiri", "Menulis animasi & efek suara"],
+  [28.95, "04", "Claude bekerja sendiri", "Cek still dulu sebelum render"],
+  [30.95, "04", "Claude bekerja sendiri", "Render 900 frame + motion blur"],
+  [35.15, "04", "Claude bekerja sendiri", "Selesai, langsung di-push ke GitHub"],
+  [37.3, "05", "Hasilnya", "otak-rental-reel.mp4 · 1920×1080 · 60 fps"]];
+
+// ---------- image helper ----------
+const pend = [];
+function setImg(img, src) { if (img.getAttribute("src") !== src) { img.setAttribute("src", src); pend.push(img.decode().catch(() => {})); } }
+
+// ---------- render ----------
+function renderAt(t) {
+  pend.length = 0;
+  // intro
+  const io = 1 - eio(seg(t, 3.0, 3.7));
+  $("intro").style.display = t < 3.8 ? "block" : "none";
+  $("intro").style.opacity = io;
+  $("intro").style.transform = `translateY(${-70 * (1 - io)}px)`;
+  const ik = eo(seg(t, .15, .6)); $("iKick").style.opacity = ik; $("iKick").style.transform = `translateY(${(1 - ik) * 30}px)`;
+  document.querySelectorAll("#iL1 .wd, #iL2 .wd").forEach((w, i) => { const k = eob(seg(t, .35 + i * .14, .95 + i * .14)); w.style.opacity = cl(k * 1.4); w.style.transform = `translateY(${(1 - k) * 90}px)`; });
+  $("iMk").style.setProperty("--mk", eio(seg(t, 1.05, 1.6)));
+  const is = eo(seg(t, 1.3, 1.8)); $("iSub").style.opacity = is; $("iSub").style.transform = `translateY(${(1 - is) * 20}px)`;
+
+  // window entrance
+  const we = eo(seg(t, 3.25, 4.6));
+  $("win").style.transform = `translateY(${(1 - we) * 760}px) scale(${mix(.88, 1, we)})`;
+  $("win").style.opacity = cl(we * 3);
+
+  // camera
+  const [s, cx, cy] = camAt(t);
+  $("cam").style.transform = `translate(${960 - cx * s}px, ${540 - cy * s}px) scale(${s})`;
+
+  // HUD steps
+  const step = t < 8.45 ? 1 : t < 12.25 ? 2 : t < 19.5 ? 3 : t < 37.3 ? 4 : 5;
+  for (let i = 1; i <= 5; i++) $("h" + i).className = t < 4.4 ? "" : i < step ? "done" : i === step ? "on" : "";
+  const hudOn = t < 37.6 ? cl((t - 3.4) / .6) : 1 - cl((t - 37.6) / .4);
+  $("hud").style.opacity = t > 53.4 ? cl((t - 54.2) / .6) : hudOn;
+
+  // ---- home state ----
+  const repoSel = t >= 7.35;
+  $("repoTxt").innerHTML = repoSel ? "purna-siswantomo/<b>orak-rental</b>" : "Select repository";
+  $("repo").className = "chip" + ((t > 6.2 && t < 7.4) ? " hov" : "");
+  const rmK = t >= 6.6 && t < 7.45 ? eo(seg(t, 6.6, 6.8)) * (1 - seg(t, 7.35, 7.45)) : 0;
+  $("repoMenu").style.display = rmK > 0 ? "block" : "none";
+  $("repoMenu").style.opacity = rmK; $("repoMenu").style.transform = `translateY(${(1 - rmK) * -10}px) scale(${mix(.97, 1, rmK)})`;
+  $("repoItem").className = "it" + (t > 7.15 ? " hov" : "");
+  const opus = t >= 10.45;
+  $("modelTxt").textContent = opus ? "Opus 5.5" : "Sonnet 5.5";
+  $("model").className = "model" + ((t > 9.1 && t < 10.6) ? " hov" : "");
+  const mmK = t >= 9.4 && t < 10.62 ? eo(seg(t, 9.4, 9.6)) * (1 - seg(t, 10.5, 10.62)) : 0;
+  $("modelMenu").style.display = mmK > 0 ? "block" : "none";
+  $("modelMenu").style.opacity = mmK; $("modelMenu").style.transform = `translateY(${(1 - mmK) * -10}px) scale(${mix(.97, 1, mmK)})`;
+  $("mOpus").className = "it" + (t > 10.05 ? " hov" : "");
+  $("mSonnet").className = "it" + (t > 9.6 && t <= 10.05 ? " hov" : "");
+  $("okOpus").style.opacity = opus ? 1 : 0; $("okSonnet").style.opacity = opus ? 0 : 1;
+  // typing
+  const nTyped = Math.round(PROMPT.length * cl((t - 12.45) / 4.75));
+  const ht = $("htext");
+  if (t < 12.15) { ht.className = "tx ph"; ht.textContent = "Describe a task or ask a question"; }
+  else { ht.className = "tx"; ht.innerHTML = PROMPT.slice(0, nTyped).replace(/&/g, "&amp;").replace(/</g, "&lt;") + ((Math.floor(t * 2.2) % 2 === 0 || nTyped < PROMPT.length) && t < 18.1 ? '<span class="caret"></span>' : ""); }
+  $("send").className = "send" + (nTyped > 0 ? " on" : "");
+
+  // home → session
+  const hs = eio(seg(t, 18.15, 19.0));
+  $("home").style.opacity = 1 - hs; $("home").style.transform = `translateY(${hs * 40}px)`;
+  $("home").style.display = hs >= 1 ? "none" : "block";
+  const ss = eo(seg(t, 18.6, 19.4));
+  $("sess").style.opacity = ss;
+  $("newSess").style.display = t >= 18.4 ? "block" : "none";
+  $("newSess").style.opacity = eo(seg(t, 18.4, 18.8));
+  $("newSessMeta").textContent = t >= 35.25 ? "orak-rental · +1,029" : "orak-rental · running…";
+  $("s1").className = "ss";
+
+  // conversation items
+  let scroll = 0;
+  items.forEach((e, i) => {
+    const ti = times[i]; const vis = t >= ti;
+    e.style.display = vis ? "block" : "none";
+    const k = eo(seg(t, ti, ti + .45));
+    e.style.opacity = k; e.style.transform = `translateY(${(1 - k) * 18}px)`;
+    const prev = i ? needs[i - 1] : 0;
+    scroll += eio(seg(t, ti, ti + .55)) * (needs[i] - prev);
+  });
+  $("conv").style.transform = `translateY(${-scroll}px)`;
+  document.querySelectorAll("#conv .st").forEach(st => { const d = t >= +st.dataset.done; st.children[0].style.display = d ? "none" : "block"; st.children[1].style.display = d ? "grid" : "none";
+    st.children[0].style.transform = `rotate(${t * 540}deg)`; });
+  // thinking
+  if (t < 21.6) { $("thinkTxt").className = "shim"; $("thinkTxt").textContent = "Thinking…"; $("thinkTxt").style.backgroundPosition = `${100 - ((t * 60) % 100) * 1.5}% 0`; }
+  else { $("thinkTxt").className = ""; $("thinkTxt").textContent = "✓ Thought for 9s"; }
+  // storyboard stagger
+  [...$("sbGrid").children].forEach((c, i) => { const k = eob(seg(t, 23.7 + i * .1, 24.1 + i * .1)); c.style.opacity = cl(k * 1.5); c.style.transform = `translateY(${(1 - k) * 14}px)`; });
+  // code writing
+  const cw = seg(t, 24.85, 27.4);
+  const shown = Math.ceil(cw * codeLines.length);
+  codeLines.forEach((l, i) => l.style.visibility = i < shown ? "visible" : "hidden");
+  const lineH = 22.4, maxVis = 9;
+  codeEl.style.paddingTop = "10px";
+  const off = Math.max(0, shown - maxVis) * lineH;
+  codeLines.forEach(l => l.style.transform = `translateY(${-off}px)`);
+  $("lc1").innerHTML = `<b>+${Math.round(803 * eo(cw))}</b> lines`;
+  const sw = seg(t, 27.75, 28.8);
+  $("lc2").innerHTML = `<b>+${Math.round(226 * eo(sw))}</b> lines`;
+  $("wavePath").style.strokeDashoffset = wlen * (1 - sw);
+  // diff counter
+  const dl = Math.round(803 * eo(cw) + 226 * eo(sw));
+  $("diff").innerHTML = `<b>+${dl.toLocaleString("en-US")}</b> <i>−0</i>`;
+  // stills
+  [...$("thumbs").children].forEach((c, i) => { const k = eob(seg(t, 29.5 + i * .18, 29.9 + i * .18)); c.style.opacity = cl(k * 1.5); c.style.transform = `scale(${mix(.8, 1, k)})`; });
+  // render progress
+  const rp = seg(t, 31.2, 34.6);
+  const pf = Math.round(900 * rp);
+  $("pbar").style.width = (rp * 100).toFixed(1) + "%";
+  $("pl1").textContent = rp < 1 ? `frame ${pf} / 900  ·  ${Math.round(rp * 100)}%` : "frame 900 / 900  ·  100%";
+  $("pl2").textContent = t < 34.75 ? "60 fps · motion blur ×6 · 1920×1080" : "ffmpeg → H.264 + AAC  ✓  6.1 MB";
+  $("pmeta").textContent = t < 34.9 ? `${(rp * 5400).toFixed(0)} samples` : "done";
+  setImg($("pvImg"), fr(Math.max(1, pf)));
+
+  // morph to fullscreen + reel
+  const mk = eio(seg(t, 37.4, 38.25));
+  const shrink = eio(seg(t, 53.25, 54.05));
+  const vid = $("vid");
+  if (t >= 37.4) {
+    vid.style.display = "block";
+    let r;
+    if (t < 53.25) {
+      const c = $("vcard").querySelector(".po").getBoundingClientRect();
+      r = [mix(c.left, 0, mk), mix(c.top, 0, mk), mix(c.width, 1920, mk), mix(c.height, 1080, mk), mix(14, 0, mk)];
+    } else r = [mix(0, 1030, shrink), mix(0, 300, shrink), mix(1920, 770, shrink), mix(1080, 433, shrink), mix(0, 22, shrink)];
+    vid.style.left = r[0] + "px"; vid.style.top = r[1] + "px"; vid.style.width = r[2] + "px"; vid.style.height = r[3] + "px"; vid.style.borderRadius = r[4] + "px";
+    vid.style.boxShadow = shrink > 0 ? `0 50px 90px -40px rgba(40,34,20,${.6 * shrink})` : "none";
+    vid.style.border = shrink > 0 ? `2px solid rgba(5,16,14,${.12 * shrink})` : "none";
+    $("vPoster").style.opacity = 1 - eio(seg(t, 38.25, 38.6));
+    const rt = t - 38.25;
+    setImg($("vImg"), fr(rt < 0 ? 1 : Math.floor(rt * 60) + 1));
+  } else vid.style.display = "none";
+  $("dim").style.opacity = t < 53.25 ? eio(seg(t, 37.5, 38.25)) : 1 - shrink;
+
+  // outro
+  $("outro").style.display = t >= 53.4 ? "block" : "none";
+  const ok = (a, el, dy = 40) => { const k = eo(seg(t, a, a + .6)); $(el).style.opacity = k; $(el).style.transform = `translateY(${(1 - k) * dy}px)`; };
+  ok(53.7, "oKick"); ok(53.85, "oL1", 70); ok(54.0, "oL2", 70); ok(54.5, "oQ"); ok(54.9, "oChips", 24); ok(55.3, "oBar", 24);
+  $("oMk").style.setProperty("--mk", eio(seg(t, 54.4, 54.9)));
+  $("cam").style.opacity = t > 53.3 ? 0 : 1;
+
+  // cursor
+  const cv = t > 5.3 && t < 18.7;
+  const [px, py] = curAt(t);
+  $("cursor").style.opacity = cv ? cl((t - 5.3) / .3) * (1 - seg(t, 18.3, 18.7)) : 0;
+  let pressed = 0; CLICKS.forEach(c => { if (t >= c && t < c + .14) pressed = 1; });
+  $("cursor").style.transform = `translate(${px - 3}px, ${py - 2}px) scale(${pressed ? .86 : 1})`;
+  let rk = -1; CLICKS.forEach(c => { if (t >= c && t < c + .5) rk = seg(t, c, c + .5); });
+  $("ripple").style.opacity = rk >= 0 ? (1 - rk) * .9 : 0;
+  $("ripple").style.transform = `translate(${px}px, ${py}px) scale(${rk >= 0 ? mix(.3, 1.4, eo(rk)) : 0})`;
+
+  // caption
+  let ci = -1; CAPS.forEach((c, i) => { if (t >= c[0]) ci = i; });
+  const capEl = $("cap");
+  const capOut = t < 37.3 ? 0 : seg(t, 40.4, 40.9);
+  if (ci < 0 || t > 41) capEl.style.opacity = 0;
+  else {
+    const c = CAPS[ci]; const k = eo(seg(t, c[0], c[0] + .45));
+    const newStep = ci === 0 || CAPS[ci - 1][1] !== c[1];
+    $("capN").textContent = c[1]; $("capT").textContent = c[2]; $("capS").textContent = c[3];
+    capEl.style.opacity = (newStep ? k : 1) * (1 - capOut);
+    capEl.style.transform = `translateY(${newStep ? (1 - k) * 30 : 0}px)`;
+    $("capS").style.opacity = newStep ? 1 : k; $("capS").style.transform = `translateY(${newStep ? 0 : (1 - k) * 10}px)`;
+    capEl.style.background = t >= 37.3 ? "rgba(5,16,14,.72)" : "var(--ink)";
+  }
+  return Promise.all(pend);
+}
+
+window.renderAt = renderAt; window.DURATION = DURATION;
+window.reelReady = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  measure();
+  renderAt(0);
+})();
+if (!location.search.includes("capture")) {
+  window.reelReady.then(() => { const t0 = performance.now(); const loop = async () => { await renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); });
+}
+</script>
+</body>
+</html>

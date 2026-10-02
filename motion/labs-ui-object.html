@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Labs. — satu objek, UI motion</title>
+<!--
+  16-second 1440×1440 "one object" UI motion study for Labs. (black & white):
+  a single white object morphs through button → loader → check → now playing → player → scrubber →
+  volume → toggle → tabs → chart → command palette → render progress → done → button (loops).
+    python3 labs_ui_sound.py out/labs-ui-object.wav
+    node render.mjs --page labs-ui-object.html --width 1440 --height 1440 --name labs-ui-object --sound labs_ui_sound.py --sub 4
+-->
+<style>
+@font-face{font-family:"Geist";src:url(fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+:root{--bg:#0A0A0A;--fg:#F4F4F2;--ink:#0A0A0A;--dim:rgba(10,10,10,.48);--soft:rgba(10,10,10,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;overflow:hidden}
+#stage{position:relative;width:1440px;height:1440px;overflow:hidden;background:var(--bg);color:var(--fg);font-family:"Geist",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.grid{position:absolute;inset:0;background-size:72px 72px;background-image:linear-gradient(to right,rgba(244,244,242,.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(244,244,242,.05) 1px,transparent 1px)}
+.vig{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 38%,rgba(0,0,0,.6) 100%);pointer-events:none}
+.mono{font-family:"Geist Mono",monospace;letter-spacing:.16em;text-transform:uppercase}
+.cm{position:absolute;width:34px;height:34px;border:0 solid var(--fg);z-index:9}
+.cm.tl{left:48px;top:48px;border-top-width:2px;border-left-width:2px}.cm.tr{right:48px;top:48px;border-top-width:2px;border-right-width:2px}
+.cm.bl{left:48px;bottom:48px;border-bottom-width:2px;border-left-width:2px}.cm.br{right:48px;bottom:48px;border-bottom-width:2px;border-right-width:2px}
+.hud{position:absolute;font-size:16px;color:rgba(244,244,242,.5);display:flex;gap:14px;align-items:center;white-space:nowrap;z-index:9}
+.hud b{color:var(--fg);font-weight:600}
+/* the object */
+#obj{position:absolute;left:720px;top:720px;background:var(--fg);color:var(--ink);overflow:hidden;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.04)}
+.ly{position:absolute;left:50%;top:50%;opacity:0}
+.row{display:flex;align-items:center}
+.ic{display:block}
+/* L0 button */
+#L0 .btn{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:12px;font-size:32px;font-weight:650;letter-spacing:-.02em}
+/* L3 pill */
+#L3{display:flex;align-items:center;gap:16px;padding:0 16px}
+#L3 canvas{width:48px;height:48px;border-radius:50%;background:var(--ink);flex:none}
+#L3 .t{font-size:22px;font-weight:650;letter-spacing:-.02em;white-space:nowrap}
+#L3 .t span{font-weight:400;color:var(--dim);font-size:19px;margin-left:8px}
+.eq{display:flex;gap:4px;align-items:center;height:26px;margin-left:auto}
+.eq i{display:block;width:4px;border-radius:2px;background:var(--ink)}
+/* L4 player */
+#L4{display:flex;gap:22px;padding:22px}
+#L4 canvas{width:160px;height:160px;border-radius:20px;background:var(--ink);flex:none}
+#L4 .col{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative}
+#L4 .tt{font-size:28px;font-weight:700;letter-spacing:-.03em;white-space:nowrap}
+#L4 .sb{font-size:19px;color:var(--dim);margin-top:4px}
+#L4 .ctl{display:flex;align-items:center;gap:26px;margin-top:22px}
+#L4 .pl{width:58px;height:58px;border-radius:50%;background:var(--ink);display:grid;place-items:center}
+#L4 .eq{position:absolute;right:0;top:4px;height:20px}
+/* L5 scrubber */
+#L5{padding:20px 26px}
+#L5 .top{display:flex;justify-content:space-between;font-size:18px}
+#L5 .top b{font-weight:650}
+#L5 .top span{color:var(--dim);font-size:16px}
+#L5 .tr{position:relative;height:24px;margin:10px 0 4px}
+#L5 .tr .base{position:absolute;left:0;right:0;top:11px;height:2px;background:var(--soft)}
+#L5 .tr .fill{position:absolute;left:0;top:11px;height:2px;background:var(--ink)}
+#L5 .tr .tk{position:absolute;top:7px;width:1.5px;height:10px;background:rgba(10,10,10,.25)}
+#L5 .tr .kn{position:absolute;top:2px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 4px var(--fg)}
+#L5 .tm{display:flex;justify-content:space-between;font-family:"Geist Mono",monospace;font-size:15px;color:var(--dim)}
+#L5 .tm b{color:var(--ink);font-weight:600}
+/* L6 volume */
+#L6 .val{position:absolute;left:50%;top:22px;transform:translateX(-50%);font-family:"Geist Mono",monospace;font-size:24px;font-weight:600;padding:3px 8px;border-radius:8px}
+#L6 .tr{position:absolute;left:50%;top:76px;bottom:76px;width:4px;margin-left:-2px;border-radius:2px;background:var(--soft)}
+#L6 .fill{position:absolute;left:0;right:0;bottom:0;border-radius:2px;background:var(--ink)}
+#L6 .kn{position:absolute;left:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 5px var(--fg)}
+#L6 .spk{position:absolute;left:50%;bottom:24px;transform:translateX(-50%)}
+/* L7 toggle */
+#L7{display:flex;align-items:center;padding:0 28px 0 34px}
+#L7 .tt{font-size:27px;font-weight:700;letter-spacing:-.025em}
+#L7 .sb{font-size:18px;color:var(--dim);margin-top:4px;position:relative;height:24px;width:220px}
+#L7 .sb span{position:absolute;left:0;top:0;white-space:nowrap}
+#L7 .sw{margin-left:auto;width:108px;height:58px;border-radius:29px;position:relative}
+#L7 .sw i{position:absolute;top:5px;width:48px;height:48px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+/* L8 segmented + small version in chart */
+.seg{position:relative;display:flex}
+.seg .act{position:absolute;top:0;bottom:0;border-radius:999px;background:var(--ink)}
+.seg span{position:relative;flex:1;text-align:center;z-index:1;white-space:nowrap}
+#L8{padding:9px}
+#L8 .seg{height:68px}
+#L8 .seg span{line-height:68px;font-size:22px;font-weight:550}
+/* L9 chart */
+#L9{padding:26px 30px}
+#L9 .seg{width:300px;height:34px}
+#L9 .seg span{line-height:34px;font-size:14px;font-weight:550}
+#L9 .num{font-size:66px;font-weight:800;letter-spacing:-.05em;line-height:1;margin-top:22px}
+#L9 .lb{font-size:17px;color:var(--dim);margin-top:6px}
+#L9 .pct{position:absolute;right:30px;top:94px;font-family:"Geist Mono",monospace;font-size:16px;font-weight:600}
+#L9 svg{position:absolute;left:30px;top:200px}
+#L9 .tip{position:absolute;background:var(--ink);color:var(--fg);border-radius:9px;padding:7px 11px;font-family:"Geist Mono",monospace;font-size:13px;line-height:1.35;white-space:nowrap}
+#L9 .tip small{display:block;color:rgba(244,244,242,.55);font-size:11px}
+#L9 .xl{position:absolute;left:30px;right:30px;bottom:18px;display:flex;justify-content:space-between;font-family:"Geist Mono",monospace;font-size:12px;color:var(--dim)}
+/* L10 palette */
+#L10{padding:12px}
+#L10 .srch{display:flex;align-items:center;gap:12px;height:56px;padding:0 14px;border-bottom:1px solid var(--soft);font-size:21px}
+#L10 .srch .ph{color:var(--dim)}
+#L10 .srch .esc{margin-left:auto;font-family:"Geist Mono",monospace;font-size:13px;color:var(--dim)}
+#L10 .it{display:flex;align-items:center;height:42px;padding:0 14px;border-radius:12px;font-size:18px;margin-top:4px}
+#L10 .it .k{margin-left:auto;font-family:"Geist Mono",monospace;font-size:13px;color:var(--dim)}
+#L10 .it.on{background:rgba(10,10,10,.08)}
+.caret{display:inline-block;width:2px;height:24px;background:var(--ink);vertical-align:-4px;margin-left:1px}
+/* L11 progress / L12 done */
+#L11,#L12{display:flex;align-items:center;padding:0 32px;font-size:23px;font-weight:650;letter-spacing:-.02em}
+#L11 .n{margin-left:auto;font-family:"Geist Mono",monospace;font-size:16px;color:var(--dim);font-weight:500}
+#L11 .bar{position:absolute;left:32px;right:32px;bottom:18px;height:3px;border-radius:2px;background:var(--soft)}
+#L11 .bar b{display:block;height:100%;border-radius:2px;background:var(--ink)}
+#L12 .dot{width:14px;height:14px;border-radius:50%;background:var(--ink);margin-right:14px}
+#L12 .bk{margin-left:auto;font-weight:500;color:var(--dim);font-size:20px}
+#cursor{position:absolute;left:0;top:0;width:34px;height:42px;z-index:8;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))}
+#ripple{position:absolute;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;border:2px solid var(--fg);z-index:7;opacity:0}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="grid"></div><div class="vig"></div>
+  <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  <div class="hud mono" style="left:112px;top:74px"><b>Labs.</b><span>/ satu objek · UI motion</span></div>
+  <div class="hud mono" style="right:112px;top:74px"><span>N° 002</span><span>·</span><span>2026</span></div>
+  <div class="hud mono" style="left:112px;bottom:74px"><span id="sec"></span></div>
+  <div class="hud mono" style="right:112px;bottom:74px"><span id="tc"></span></div>
+
+  <div id="ow" style="position:absolute;left:0;top:0;width:1440px;height:1440px;transform-origin:720px 720px;transform:scale(1.9)">
+  <div id="obj">
+    <div class="ly" id="L0" style="width:300px;height:92px"><div class="btn">Mulai <svg class="ic" width="26" height="26" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="#0A0A0A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="ly" id="L1" style="width:150px;height:150px"><svg width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="34" fill="none" stroke="rgba(10,10,10,.12)" stroke-width="7"/><circle id="arc" cx="75" cy="75" r="34" fill="none" stroke="#0A0A0A" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 999" transform="rotate(-90 75 75)"/></svg></div>
+    <div class="ly" id="L2" style="width:150px;height:150px"><svg width="150" height="150" viewBox="0 0 150 150"><path id="chk" d="M52 77 L68 93 L99 59" fill="none" stroke="#0A0A0A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="80" stroke-dashoffset="80"/></svg></div>
+    <div class="ly" id="L3" style="width:480px;height:76px"><canvas id="cv3" width="96" height="96"></canvas><div class="t">Everything Moves<span>Sedang diputar</span></div><div class="eq" id="eq3"><i></i><i></i><i></i><i></i></div></div>
+    <div class="ly" id="L4" style="width:500px;height:204px"><canvas id="cv4" width="320" height="320"></canvas>
+      <div class="col"><div class="tt">Everything Moves</div><div class="sb">Labs. Studio</div>
+        <div class="ctl"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M6 5v14M19 5 9 12l10 7z" fill="#0A0A0A" stroke="#0A0A0A" stroke-width="2" stroke-linejoin="round"/></svg>
+          <div class="pl" id="playBtn"><svg width="26" height="26" viewBox="0 0 24 24"><path id="plIcon" d="M8 5l11 7-11 7z" fill="#F4F4F2"/><g id="paIcon" fill="#F4F4F2" opacity="0"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></g></svg></div>
+          <svg width="26" height="26" viewBox="0 0 24 24"><path d="M18 5v14M5 5l10 7-10 7z" fill="#0A0A0A" stroke="#0A0A0A" stroke-width="2" stroke-linejoin="round"/></svg></div>
+        <div class="eq" id="eq4"><i></i><i></i><i></i></div></div></div>
+    <div class="ly" id="L5" style="width:520px;height:104px"><div class="top"><b>Everything Moves</b><span>Labs. Studio</span></div>
+      <div class="tr"><div class="base"></div><i class="tk" style="left:25%"></i><i class="tk" style="left:50%"></i><i class="tk" style="left:75%"></i><div class="fill" id="sFill"></div><div class="kn" id="sKnob"></div></div>
+      <div class="tm"><b id="sCur">0:50</b><span>3:28</span></div></div>
+    <div class="ly" id="L6" style="width:104px;height:420px"><div class="val" id="vVal">42</div><div class="tr"><div class="fill" id="vFill"></div><div class="kn" id="vKnob"></div></div>
+      <svg class="spk" width="28" height="28" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#0A0A0A"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="#0A0A0A" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+    <div class="ly" id="L7" style="width:440px;height:112px"><div><div class="tt">Motion blur</div><div class="sb"><span id="tOff">Nonaktif</span><span id="tOn" style="opacity:0">Aktif · 6 sampel</span></div></div>
+      <div class="sw" id="tSw"><i id="tKnob"></i></div></div>
+    <div class="ly" id="L8" style="width:540px;height:86px"><div class="seg" id="seg8"><div class="act" id="seg8a"></div><span>Harian</span><span>Mingguan</span><span>Bulanan</span></div></div>
+    <div class="ly" id="L9" style="width:560px;height:430px"><div class="seg" id="seg9"><div class="act" style="left:66.66%;width:33.33%"></div><span style="color:var(--dim)">Harian</span><span style="color:var(--dim)">Mingguan</span><span style="color:#F4F4F2">Bulanan</span></div>
+      <div class="num" id="cNum">12.480</div><div class="lb">Penonton reel · 30 hari terakhir</div><div class="pct">↑ 18,4%</div>
+      <svg width="500" height="170" viewBox="0 0 500 170" id="chart"><g stroke="rgba(10,10,10,.08)" stroke-width="1"><line x1="0" y1="20" x2="500" y2="20"/><line x1="0" y1="85" x2="500" y2="85"/><line x1="0" y1="150" x2="500" y2="150"/></g>
+        <line id="cGuide" x1="0" y1="10" x2="0" y2="150" stroke="rgba(10,10,10,.25)" stroke-dasharray="3 4" opacity="0"/>
+        <path id="cLine" d="" fill="none" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><g id="cDots"></g>
+        <circle id="cHot" r="8" fill="#F4F4F2" stroke="#0A0A0A" stroke-width="3" opacity="0"/></svg>
+      <div class="tip" id="cTip" style="opacity:0"><small id="cTipW">Pekan 6</small><span id="cTipV">1.480</span></div>
+      <div class="xl"><span>Pkn 1</span><span>Pkn 4</span><span>Pkn 8</span></div></div>
+    <div class="ly" id="L10" style="width:500px;height:304px"><div class="srch"><svg width="22" height="22" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="#0A0A0A" stroke-width="2.2"/><path d="M16.5 16.5 21 21" stroke="#0A0A0A" stroke-width="2.2" stroke-linecap="round"/></svg><span id="pTx"></span><span class="esc">Esc</span></div>
+      <div id="pList"></div></div>
+    <div class="ly" id="L11" style="width:440px;height:86px"><span>Merender…</span><span class="n" id="rN">0 / 900</span><div class="bar"><b id="rBar" style="width:0"></b></div></div>
+    <div class="ly" id="L12" style="width:470px;height:86px"><span class="dot"></span><span>Video dirender</span><span class="bk">Buka</span></div>
+  </div>
+  </div>
+
+  <div id="ripple"></div>
+  <svg id="cursor" viewBox="0 0 30 38"><path d="M3 2 L3 30 L10 23.5 L15 35 L20 33 L15 21.5 L25 21.5 Z" fill="#F4F4F2" stroke="#0A0A0A" stroke-width="2" stroke-linejoin="round"/></svg>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const seg = (t, a, b) => cl((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = (x, c = 1.15) => 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2);
+const mix = (a, b, k) => a + (b - a) * k;
+const DURATION = 16.4;
+
+// ---------------- states: [layer, w, h, radius, morph start, section label] ----------------
+const ST = [
+  ["L0", 300, 92, 46, -9, "01 · Tombol"], ["L1", 150, 150, 75, .7, "02 · Memuat"], ["L2", 150, 150, 75, 2.05, "03 · Berhasil"],
+  ["L3", 480, 76, 38, 2.5, "04 · Sedang diputar"], ["L4", 500, 204, 34, 3.4, "05 · Pemutar"], ["L5", 520, 104, 28, 4.7, "06 · Timeline"],
+  ["L6", 104, 420, 52, 6.55, "07 · Volume"], ["L7", 440, 112, 56, 8.3, "08 · Toggle"], ["L8", 540, 86, 43, 9.4, "09 · Tab"],
+  ["L9", 560, 430, 30, 10.75, "10 · Grafik"], ["L10", 500, 304, 24, 12.75, "11 · Perintah"], ["L11", 440, 86, 43, 14.1, "12 · Render"],
+  ["L12", 470, 86, 43, 15.2, "13 · Selesai"], ["L0", 300, 92, 46, 15.85, "01 · Tombol"]];
+const MD = .48;
+const layers = [...new Set(ST.map(s => s[0]))].reduce((o, id) => (o[id] = $(id), o), {});
+Object.values(layers).forEach(l => { l.style.marginLeft = (-parseFloat(l.style.width) / 2) + "px"; l.style.marginTop = (-parseFloat(l.style.height) / 2) + "px"; });
+
+// ---------------- mini wireframe sphere (album art) ----------------
+function sphere(cv, yaw, lw) {
+  const c = cv.getContext("2d"), W = cv.width, r = W * .3, cx = W / 2, cy = W / 2, tilt = -.42, D = Math.PI / 180;
+  c.clearRect(0, 0, W, W);
+  const P = (la, lo) => { let x = Math.cos(la) * Math.sin(lo), y = Math.sin(la), z = Math.cos(la) * Math.cos(lo);
+    const x1 = x * Math.cos(yaw) + z * Math.sin(yaw), z1 = -x * Math.sin(yaw) + z * Math.cos(yaw);
+    return [cx + x1 * r, cy - (y * Math.cos(tilt) - z1 * Math.sin(tilt)) * r, y * Math.sin(tilt) + z1 * Math.cos(tilt)]; };
+  const seg2 = pts => { for (let i = 1; i < pts.length; i++) { const a = pts[i - 1], b = pts[i], f = (a[2] + b[2]) / 2 > 0;
+    c.strokeStyle = `rgba(244,244,242,${f ? .8 : .18})`; c.lineWidth = lw; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); } };
+  for (let a = -60; a <= 60; a += 20) { const p = []; for (let o = 0; o <= 360; o += 10) p.push(P(a * D, o * D)); seg2(p); }
+  for (let o = 0; o < 180; o += 20) { const p = []; for (let a = -90; a <= 270; a += 10) p.push(P(a * D, o * D)); seg2(p); }
+  c.strokeStyle = "rgba(244,244,242,.9)"; c.lineWidth = lw * 1.2; c.beginPath(); c.arc(cx, cy, r, 0, 7); c.stroke();
+  c.save(); c.translate(cx, cy); c.rotate(-16 * D); c.setLineDash([lw * 1.5, lw * 4]); c.strokeStyle = "rgba(244,244,242,.6)";
+  c.beginPath(); c.ellipse(0, 0, r * 1.42, r * .34, 0, 0, 7); c.stroke(); c.restore();
+}
+
+// ---------------- chart ----------------
+const CV = [30, 44, 38, 56, 50, 64, 61, 82], CX = i => 10 + i * (480 / 7), CY = v => 150 - v * 1.55;
+let cPath = ""; CV.forEach((v, i) => cPath += (i ? " L" : "M") + CX(i).toFixed(1) + " " + CY(v).toFixed(1));
+$("cLine").setAttribute("d", cPath);
+const cLen = $("cLine").getTotalLength(); $("cLine").style.strokeDasharray = cLen;
+CV.forEach((v, i) => { const c = document.createElementNS("http://www.w3.org/2000/svg", "circle"); c.setAttribute("cx", CX(i)); c.setAttribute("cy", CY(v)); c.setAttribute("r", 4.5); c.setAttribute("fill", "#0A0A0A"); $("cDots").appendChild(c); });
+const dots = [...$("cDots").children];
+
+// ---------------- palette ----------------
+const CMDS = [["Render video", "⌘ R"], ["Render still", "⇧ ⌘ R"], ["Ekspor MP4", "⌘ E"], ["Bagikan tautan", "⌘ L"], ["Undang kolaborator", "⌘ I"]];
+CMDS.forEach(([n, k], i) => { const d = document.createElement("div"); d.className = "it"; d.innerHTML = `<span>${n}</span><span class="k">${k}</span>`; $("pList").appendChild(d); });
+const pItems = [...$("pList").children];
+
+// ---------------- cursor ----------------
+const HOME = [1130, 1250];
+const CUR = [[0, HOME], [.48, "L0", 30, 10], [.68, "L0", 30, 10], [1.05, [880, 900]], [2.75, [870, 880]], [3.18, "L3", 120, 6], [3.42, "L3", 120, 6], [3.75, [900, 900]],
+  [4.08, "playBtn"], [4.32, "playBtn"], [4.7, [930, 930]], [5.28, "sKnob"], [6.3, "sKnob"], [6.62, [900, 950]], [7.08, "vKnob"], [8.02, "vKnob"], [8.35, [930, 900]],
+  [8.95, "tSw"], [9.15, "tSw"], [9.42, [960, 880]], [9.98, "s8b"], [10.15, "s8b"], [10.4, "s8c"], [10.58, "s8c"], [10.85, [1000, 980]],
+  [11.85, "d5"], [12.15, "d5"], [12.35, "d7"], [12.65, "d7"], [12.95, [990, 1020]], [13.82, "p0", 60, 0], [14.02, "p0", 60, 0], [14.4, [960, 940]], [15.4, [960, 950]], [16.3, HOME]];
+const CLICKS = [.6, 3.33, 4.22, 9.08, 10.08, 10.5, 13.96];
+const PRESS = [[.6, "L0"], [3.33, "L3"], [9.08, "L7"], [13.96, "L10"]];
+function ptOf(k) {
+  if (Array.isArray(k[1])) return k[1] === HOME ? HOME : [720 + (k[1][0] - 720) * 1.55, 720 + (k[1][1] - 720) * 1.55];
+  const id = k[1] === "s8b" || k[1] === "s8c" ? null : k[1];
+  let el = id ? $(id) : $("seg8").children[k[1] === "s8b" ? 2 : 3];
+  if (k[1] === "d5" || k[1] === "d7") el = dots[k[1] === "d5" ? 5 : 7];
+  if (k[1] === "p0") el = pItems[0];
+  const r = el.getBoundingClientRect();
+  return [r.left + r.width / 2 + (k[2] || 0), r.top + r.height / 2 + (k[3] || 0)];
+}
+function curAt(t) {
+  let i = 0; while (i < CUR.length - 1 && t >= CUR[i + 1][0]) i++;
+  if (i >= CUR.length - 1) return ptOf(CUR[CUR.length - 1]);
+  const a = ptOf(CUR[i]), b = ptOf(CUR[i + 1]), k = eio(seg(t, CUR[i][0], CUR[i + 1][0]));
+  return [mix(a[0], b[0], k), mix(a[1], b[1], k)];
+}
+
+// ---------------- render ----------------
+function renderAt(t) {
+  // state + morph
+  let s = 0; ST.forEach((st, i) => { if (t >= st[4]) s = i; });
+  const cur = ST[s], prev = ST[Math.max(0, s - 1)];
+  const d = cur[0] === "L2" ? .2 : MD;
+  const k = s === 0 ? 1 : seg(t, cur[4], cur[4] + d);
+  const kb = s === 0 ? 1 : back(k, cur[0] === "L2" ? 0 : 1.1);
+  let w = mix(prev[1], cur[1], kb), h = mix(prev[2], cur[2], kb), r = mix(prev[3], cur[3], eio(k));
+  // command palette shrinks once the query filters the list
+  if (cur[0] === "L10") { h = mix(304, 184, eio(seg(t, 13.4, 13.75))); layers.L10.style.height = h + "px"; layers.L10.style.marginTop = -h / 2 + "px"; }
+  // press dip
+  let press = 1; PRESS.forEach(([c]) => { if (t >= c - .02 && t < c + .3) press = 1 - .045 * Math.sin(Math.PI * seg(t, c - .02, c + .3)); });
+  const ob = $("obj");
+  ob.style.width = w + "px"; ob.style.height = h + "px"; ob.style.marginLeft = -w / 2 + "px"; ob.style.marginTop = -h / 2 + "px";
+  ob.style.borderRadius = Math.min(r, w / 2, h / 2) + "px"; ob.style.transform = `scale(${press})`;
+  // layer opacity / blur
+  Object.entries(layers).forEach(([id, el]) => {
+    let op = 0, bl = 0, sc = 1;
+    if (id === cur[0]) { const ki = s === 0 ? 1 : seg(t, cur[4] + d * .35, cur[4] + d); op = eo(ki); bl = (1 - ki) * 10; sc = mix(.94, 1, eo(ki)); }
+    else if (id === prev[0] && k < 1) { const ko = seg(t, cur[4], cur[4] + d * .4); op = 1 - ko; bl = ko * 10; sc = mix(1, 1.04, ko); }
+    el.style.opacity = op; el.style.filter = bl > .05 ? `blur(${bl.toFixed(2)}px)` : "none"; el.style.transform = `scale(${sc})`;
+  });
+
+  // ---- content details ----
+  // loader
+  const lp = seg(t, .95, 2.0), arcLen = 2 * Math.PI * 34;
+  const dash = mix(.08, 1, eio(lp)) * arcLen;
+  $("arc").setAttribute("stroke-dasharray", `${dash} 999`);
+  $("arc").setAttribute("transform", `rotate(${-90 + (lp < 1 ? t * 420 : 2.0 * 420)} 75 75)`);
+  $("chk").setAttribute("stroke-dashoffset", 80 * (1 - eo(seg(t, 2.1, 2.45))));
+  // eq bars
+  [...$("eq3").children].forEach((b, i) => b.style.height = (8 + 16 * Math.abs(Math.sin(t * (5 + i * 1.7) + i))) + "px");
+  [...$("eq4").children].forEach((b, i) => b.style.height = (t > 4.25 ? 5 + 14 * Math.abs(Math.sin(t * (6 + i * 2.1) + i)) : 5) + "px");
+  // spheres
+  sphere($("cv3"), .5 + t * .9, 2); sphere($("cv4"), .5 + t * .9, 2.6);
+  // play → pause
+  const pz = t >= 4.22; $("plIcon").setAttribute("opacity", pz ? 0 : 1); $("paIcon").setAttribute("opacity", pz ? 1 : 0);
+  // scrubber
+  const sp = mix(.24, .75, eio(seg(t, 5.42, 6.28)));
+  $("sKnob").style.left = (sp * 100) + "%"; $("sFill").style.width = (sp * 100) + "%";
+  const secs = Math.round(208 * sp); $("sCur").textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+  // volume
+  const vv = mix(42, 100, eio(seg(t, 7.18, 8.0)));
+  const vtrH = 420 - 152;
+  $("vKnob").style.top = ((1 - vv / 100) * vtrH) + "px"; $("vFill").style.height = (vv / 100 * vtrH) + "px";
+  $("vVal").textContent = Math.round(vv);
+  const full = t >= 7.98; $("vVal").style.background = full ? "#0A0A0A" : "transparent"; $("vVal").style.color = full ? "#F4F4F2" : "#0A0A0A";
+  // toggle
+  const tk = eio(seg(t, 9.08, 9.36));
+  $("tKnob").style.left = mix(5, 55, tk) + "px";
+  $("tSw").style.background = `rgba(10,10,10,${mix(.13, 1, tk)})`;
+  $("tOff").style.opacity = 1 - tk; $("tOn").style.opacity = tk;
+  $("tOff").style.transform = `translateY(${-tk * 10}px)`; $("tOn").style.transform = `translateY(${(1 - tk) * 10}px)`;
+  // segmented
+  const sgp = t < 10.08 ? 0 : t < 10.5 ? eio(seg(t, 10.08, 10.36)) : 1 + eio(seg(t, 10.5, 10.78));
+  $("seg8a").style.left = `calc(${sgp * 33.333}% + 0px)`; $("seg8a").style.width = "33.333%";
+  [...$("seg8").children].slice(1).forEach((sp2, i) => { const a = 1 - Math.min(1, Math.abs(sgp - i)); sp2.style.color = `rgba(${a > .5 ? "244,244,242" : "10,10,10"},${a > .5 ? 1 : .55})`; });
+  // chart
+  const cd = eio(seg(t, 11.15, 11.8));
+  $("cLine").style.strokeDashoffset = cLen * (1 - cd);
+  dots.forEach((dt, i) => dt.setAttribute("opacity", cd >= i / 7 ? 1 : 0));
+  $("cNum").textContent = Math.round(12480 * eo(seg(t, 11.0, 11.7))).toLocaleString("id-ID");
+  const tipK = eo(seg(t, 11.88, 12.08)), mv = eio(seg(t, 12.18, 12.5));
+  const tx = mix(CX(5), CX(7), mv), ty = mix(CY(CV[5]), CY(CV[7]), mv);
+  $("cHot").setAttribute("cx", tx); $("cHot").setAttribute("cy", ty); $("cHot").setAttribute("opacity", tipK);
+  $("cGuide").setAttribute("x1", tx); $("cGuide").setAttribute("x2", tx); $("cGuide").setAttribute("opacity", tipK);
+  $("cTip").style.opacity = tipK; $("cTip").style.left = (30 + tx - 46) + "px"; $("cTip").style.top = (200 + ty - 62) + "px";
+  $("cTipW").textContent = mv < .5 ? "Pekan 6" : "Pekan 8"; $("cTipV").textContent = Math.round(mix(1480, 1800, mv)).toLocaleString("id-ID");
+  // palette
+  const q = "rend", nq = Math.round(q.length * seg(t, 13.25, 13.7));
+  const typing = t >= 13.2;
+  $("pTx").innerHTML = typing ? `${q.slice(0, nq)}<span class="caret" style="opacity:${Math.floor(t * 3) % 2 || nq < q.length ? 1 : 0}"></span>` : `<span class="ph">Ketik perintah…</span>`;
+  pItems.forEach((it, i) => {
+    const keep = i < 2 || nq === 0; const gone = nq > 0 ? seg(t, 13.3 + i * .03, 13.5 + i * .03) : 0;
+    it.style.display = (!keep && gone >= 1) ? "none" : "flex"; it.style.opacity = keep ? 1 : 1 - gone;
+    it.className = "it" + (i === 0 ? " on" : "");
+  });
+  // render progress
+  const rp = eio(seg(t, 14.55, 15.15));
+  $("rBar").style.width = (rp * 100) + "%"; $("rN").textContent = `${Math.round(rp * 900)} / 900`;
+
+  // HUD
+  $("sec").textContent = cur[5];
+  const fN = Math.round(t * 60); $("tc").textContent = `TC 00:00:${String(Math.floor(fN / 60)).padStart(2, "0")}:${String(fN % 60).padStart(2, "0")}`;
+
+  // cursor (after layout of everything above)
+  const [px, py] = curAt(t);
+  let pr = 0; CLICKS.forEach(c => { if (t >= c && t < c + .13) pr = 1; });
+  $("cursor").style.transform = `translate(${px - 4}px, ${py - 3}px) scale(${pr ? .86 : 1})`;
+  let rk = -1; CLICKS.forEach(c => { if (t >= c && t < c + .5) rk = seg(t, c, c + .5); });
+  $("ripple").style.opacity = rk >= 0 ? (1 - rk) * .7 : 0;
+  $("ripple").style.transform = `translate(${px}px, ${py}px) scale(${rk >= 0 ? mix(.3, 1.3, eo(rk)) : 0})`;
+}
+
+window.renderAt = renderAt; window.DURATION = DURATION;
+window.reelReady = (async () => { await document.fonts.ready; renderAt(0); })();
+if (!location.search.includes("capture")) {
+  window.reelReady.then(() => { const t0 = performance.now(); const loop = () => { renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); });
+}
+</script>
+</body>
+</html>

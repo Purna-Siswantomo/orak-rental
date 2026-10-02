@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Labs. — Lynk.id banner</title>
+<!-- "Labs." Lynk.id set, black & white: profile banner (1200×628) and profile photos (1080×1080, circle-safe).
+     Render: node render.mjs → png/labs-*.png -->
+<style>
+@font-face{font-family:"Geist";src:url(../fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(../fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(../fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#777}
+body{padding:30px;display:flex;flex-direction:column;gap:30px;align-items:flex-start}
+.art{--bg:#0A0A0A;--fg:#F4F4F2;--dim:rgba(244,244,242,.55);--faint:rgba(244,244,242,.06);--line:rgba(244,244,242,.18);
+  position:relative;width:1200px;height:628px;overflow:hidden;background:var(--bg);color:var(--fg);flex:none;
+  font-family:"Geist",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.art.light{--bg:#F4F4F2;--fg:#0A0A0A;--dim:rgba(10,10,10,.55);--faint:rgba(10,10,10,.06);--line:rgba(10,10,10,.2)}
+.art::before{content:"";position:absolute;inset:0;background-size:40px 40px;
+  background-image:linear-gradient(to right,var(--faint) 1px,transparent 1px),linear-gradient(to bottom,var(--faint) 1px,transparent 1px)}
+.art::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 80% at 72% 50%,transparent 40%,rgba(0,0,0,.35) 100%)}
+.art.light::after{background:radial-gradient(ellipse 70% 80% at 72% 50%,transparent 45%,rgba(0,0,0,.06) 100%)}
+.abs{position:absolute}
+.art.sq{width:1080px;height:1080px}
+.art.sq::after{background:radial-gradient(circle at 50% 50%,transparent 46%,rgba(0,0,0,.3) 75%)}
+.art.sq.light::after{background:radial-gradient(circle at 50% 50%,transparent 46%,rgba(0,0,0,.05) 75%)}
+.art::after{z-index:0}
+.art > *{z-index:1}
+.mono{font-family:"Geist Mono",monospace;letter-spacing:.18em;text-transform:uppercase}
+.cm{position:absolute;width:22px;height:22px;border:0 solid var(--fg);z-index:3}
+.cm.tl{left:28px;top:28px;border-top-width:1.5px;border-left-width:1.5px}.cm.tr{right:28px;top:28px;border-top-width:1.5px;border-right-width:1.5px}
+.cm.bl{left:28px;bottom:28px;border-bottom-width:1.5px;border-left-width:1.5px}.cm.br{right:28px;bottom:28px;border-bottom-width:1.5px;border-right-width:1.5px}
+.hud{position:absolute;font-size:11.5px;color:var(--dim);display:flex;gap:12px;align-items:center;z-index:3}
+.hud b{color:var(--fg);font-weight:600}
+.logo{font-size:178px;font-weight:820;letter-spacing:-.07em;line-height:.8}
+.ser{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400}
+.tag{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:11.5px;color:var(--fg);background:rgba(127,127,127,.04)}
+.tag i{width:6px;height:6px;border-radius:50%;background:var(--fg)}
+.lbl{position:absolute;font-size:10.5px;color:var(--fg);white-space:nowrap;z-index:2;background:var(--bg);padding:6px 9px;border:1px solid var(--line);border-radius:8px}
+.lbl small{display:block;font-family:"Geist",sans-serif;letter-spacing:0;text-transform:none;font-size:13px;color:var(--dim);margin-top:3px}
+.dot{position:absolute;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:var(--bg);border:1.5px solid var(--fg);z-index:2}
+</style>
+</head>
+<body>
+
+<template id="tpl">
+  <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  <div class="hud mono" style="left:64px;top:44px"><b>Labs.</b><span>/ studio eksperimen digital</span></div>
+  <div class="hud mono" style="right:64px;top:44px"><span>N° 001</span><span>·</span><span>Est. 2026</span></div>
+
+  <svg class="abs sph" style="left:560px;top:0" width="640" height="628" viewBox="0 0 640 628"></svg>
+  <div class="dot" style="left:858px;top:178px"></div>
+  <div class="lbl mono" style="left:970px;top:86px">01 · Motion<small>video tanpa After Effects</small></div>
+  <div class="dot" style="left:1010px;top:330px"></div>
+  <div class="lbl mono" style="left:1000px;top:356px">02 · AI<small>Claude Code &amp; Design</small></div>
+  <div class="dot" style="left:800px;top:452px"></div>
+  <div class="lbl mono" style="left:900px;top:496px">03 · Modul<small>panduan siap pakai</small></div>
+  <svg class="abs" style="left:0;top:0;z-index:1" width="1200" height="628"><g fill="none" stroke="currentColor" stroke-width="1" opacity=".5">
+    <path d="M862 174 L 940 112 L 970 112"/><path d="M1012 334 L 1024 356"/><path d="M804 456 L 870 520 L 900 520"/></g></svg>
+
+  <div class="abs logo" style="left:58px;top:168px">Labs.</div>
+  <div class="abs ser" style="left:66px;top:322px;font-size:46px;letter-spacing:-.01em;color:var(--fg)">make things move.</div>
+  <div class="abs" style="left:66px;top:404px;width:430px;font-size:17px;line-height:1.5;color:var(--dim)">Modul, template, dan tutorial untuk kreator yang ingin berkarya lebih cepat dengan AI.</div>
+  <div class="abs" style="left:66px;top:486px;display:flex;gap:8px">
+    <span class="tag mono"><i></i>Motion</span><span class="tag mono"><i></i>AI tools</span><span class="tag mono"><i></i>Modul PDF</span>
+  </div>
+
+  <div class="hud mono" style="left:64px;bottom:44px"><span>Modul · Template · Tutorial</span></div>
+  <div class="hud mono" style="right:64px;bottom:44px"><span>Bahasa Indonesia</span><span>·</span><b>ID</b></div>
+</template>
+
+<template id="tpl-avatar">
+  <svg class="abs sph" style="left:0;top:0" width="1080" height="1080" viewBox="0 0 1080 1080" data-sph="540,540,330" opacity=".55"></svg>
+  <div class="abs" style="left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+    <div class="logo" style="font-size:262px;letter-spacing:-.075em;padding-right:.06em">Labs.</div>
+  </div>
+</template>
+<template id="tpl-mono">
+  <svg class="abs sph" style="left:0;top:0" width="1080" height="1080" viewBox="0 0 1080 1080" data-sph="540,540,350" opacity=".55"></svg>
+  <div class="abs" style="left:0;right:0;top:0;bottom:0;display:grid;place-items:center">
+    <div class="logo" style="font-size:520px;letter-spacing:-.02em;margin-top:-30px;padding-left:.05em">L.</div>
+  </div>
+</template>
+
+<section class="art sq" data-tpl="tpl-avatar" data-out="labs-avatar-dark"></section>
+<section class="art sq light" data-tpl="tpl-avatar" data-out="labs-avatar-light"></section>
+<section class="art sq" data-tpl="tpl-mono" data-out="labs-avatar-monogram-dark"></section>
+<section class="art sq light" data-tpl="tpl-mono" data-out="labs-avatar-monogram-light"></section>
+<section class="art" data-out="labs-banner-dark"></section>
+<section class="art light" data-out="labs-banner-light"></section>
+
+<script>
+// wireframe sphere + orbit, drawn as SVG lines (deterministic)
+function sphere(svg, fg, cx = 300, cy = 314, r = 210) {
+  const tilt = -0.42, yaw = 0.5;
+  const P = (lat, lon) => {               // lat/lon in radians → rotated, projected point
+    let x = Math.cos(lat) * Math.sin(lon), y = Math.sin(lat), z = Math.cos(lat) * Math.cos(lon);
+    const x1 = x * Math.cos(yaw) + z * Math.sin(yaw), z1 = -x * Math.sin(yaw) + z * Math.cos(yaw);
+    const y2 = y * Math.cos(tilt) - z1 * Math.sin(tilt), z2 = y * Math.sin(tilt) + z1 * Math.cos(tilt);
+    return [cx + x1 * r, cy - y2 * r, z2];
+  };
+  let out = "";
+  const line = (pts) => {                 // split into front/back segments with different opacity
+    for (let i = 1; i < pts.length; i++) {
+      const [a, b] = [pts[i - 1], pts[i]]; const front = (a[2] + b[2]) / 2 > 0;
+      out += `<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="${fg}" stroke-opacity="${front ? .55 : .14}" stroke-width="${front ? 1 : .8}"/>`;
+    }
+  };
+  for (let la = -75; la <= 75; la += 15) { const pts = []; for (let lo = 0; lo <= 360; lo += 6) pts.push(P(la * Math.PI / 180, lo * Math.PI / 180)); line(pts); }
+  for (let lo = 0; lo < 180; lo += 15) { const pts = []; for (let la = -90; la <= 270; la += 6) pts.push(P(la * Math.PI / 180, lo * Math.PI / 180)); line(pts); }
+  // outline + orbit ring
+  out += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${fg}" stroke-opacity=".7" stroke-width="1.2"/>`;
+  out += `<ellipse cx="${cx}" cy="${cy}" rx="${r * 1.38}" ry="${r * .34}" transform="rotate(-16 ${cx} ${cy})" fill="none" stroke="${fg}" stroke-opacity=".5" stroke-dasharray="2 6"/>`;
+  out += `<circle cx="${cx + r * 1.32}" cy="${cy - r * .48}" r="5" fill="${fg}"/>`;
+  // dotted points on the front face
+  for (let i = 0; i < 26; i++) { const [x, y, z] = P((Math.sin(i * 7.3) * 70) * Math.PI / 180, (i * 47 % 360) * Math.PI / 180); if (z > .1) out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.8" fill="${fg}" fill-opacity=".85"/>`; }
+  svg.innerHTML = out;
+}
+document.querySelectorAll(".art").forEach(a => {
+  a.innerHTML = document.getElementById(a.dataset.tpl || "tpl").innerHTML;
+  const fg = getComputedStyle(a).getPropertyValue("--fg").trim();
+  a.style.color = fg;
+  const svg = a.querySelector(".sph");
+  sphere(svg, fg, ...(svg.dataset.sph ? svg.dataset.sph.split(",").map(Number) : []));
+});
+</script>
+</body>
+</html>

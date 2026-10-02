@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Labs. — portfolio reel (30s)</title>
+<!--
+  30-second 1920×1080 brand reel for "Labs.", in the black & white style of the Labs. banner and logo:
+  a rotating wireframe sphere that becomes the period of the wordmark, then an index of the works we made.
+  Work clips are extracted first (see out/labs/w*/), stills come from instagram/png and modul/.
+    python3 labs_sound.py out/labs-reel.wav
+    node render.mjs --page labs-reel.html --name labs-reel --sound labs_sound.py --sub 4
+-->
+<style>
+@font-face{font-family:"Geist";src:url(fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+:root{--bg:#0A0A0A;--fg:#F4F4F2;--dim:rgba(244,244,242,.5);--faint:rgba(244,244,242,.055);--line:rgba(244,244,242,.2)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;overflow:hidden}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--fg);font-family:"Geist",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.grid{position:absolute;inset:0;background-size:60px 60px;background-image:linear-gradient(to right,var(--faint) 1px,transparent 1px),linear-gradient(to bottom,var(--faint) 1px,transparent 1px)}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse 75% 75% at 50% 50%,transparent 45%,rgba(0,0,0,.55) 100%);pointer-events:none;z-index:8}
+.abs{position:absolute}
+.mono{font-family:"Geist Mono",monospace;letter-spacing:.18em;text-transform:uppercase}
+.ser{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400}
+.cm{position:absolute;width:30px;height:30px;border:0 solid var(--fg);z-index:9}
+.cm.tl{left:40px;top:40px;border-top-width:2px;border-left-width:2px}.cm.tr{right:40px;top:40px;border-top-width:2px;border-right-width:2px}
+.cm.bl{left:40px;bottom:40px;border-bottom-width:2px;border-left-width:2px}.cm.br{right:40px;bottom:40px;border-bottom-width:2px;border-right-width:2px}
+.hud{position:absolute;font-size:14px;color:var(--dim);display:flex;gap:14px;align-items:center;z-index:9;white-space:nowrap}
+.hud b{color:var(--fg);font-weight:600}
+canvas{position:absolute;left:0;top:0;z-index:2}
+.mask{overflow:hidden;padding:0 .1em .12em;margin:0 -.1em}
+.mask > span{display:inline-block}
+#lock{position:absolute;left:0;right:0;top:300px;text-align:center;z-index:3}
+#wm{font-size:300px;font-weight:820;letter-spacing:-.07em;line-height:.86;display:inline-flex;align-items:flex-end}
+#wm .mask{display:inline-block;padding:0 .02em .1em;margin:0 -.02em}
+#pd{visibility:hidden}
+#tagl{font-size:64px;margin-top:6px}
+#lmono{font-size:15px;color:var(--dim);margin-top:26px}
+.lbl{position:absolute;font-size:13px;white-space:nowrap;z-index:3;background:var(--bg);padding:8px 12px;border:1px solid var(--line);border-radius:9px}
+.lbl small{display:block;font-family:"Geist",sans-serif;letter-spacing:0;text-transform:none;font-size:16px;color:var(--dim);margin-top:4px}
+/* statement */
+#st{position:absolute;left:0;right:0;top:330px;text-align:center;z-index:3}
+#st .k{font-size:15px;color:var(--dim);margin-bottom:26px}
+#st .l1{font-size:124px;font-weight:820;letter-spacing:-.055em;line-height:1.02}
+#st .l2{font-size:136px;line-height:1.02;letter-spacing:-.015em}
+/* works */
+#works{position:absolute;inset:0;z-index:3}
+#idx{position:absolute;left:120px;top:270px;width:600px}
+#idx .k{font-size:14px;color:var(--dim);margin-bottom:22px}
+#idx .row{display:flex;align-items:center;gap:18px;height:44px;font-family:"Geist Mono",monospace;font-size:17px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+#idx .row i{display:block;height:1.5px;background:var(--fg);width:0}
+#idx .row span.n{color:var(--dim)}
+#ttl{position:absolute;left:120px;top:690px;width:640px;height:150px;overflow:hidden}
+#ttl div{position:absolute;left:0;top:0;font-size:60px;font-weight:800;letter-spacing:-.045em;line-height:1.05;white-space:nowrap}
+#ttl div small{display:block;font-family:"Geist Mono",monospace;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:400;margin-top:14px}
+#frame{position:absolute;overflow:hidden;background:#141414;filter:grayscale(1) contrast(1.06) brightness(.97)}
+#frame .lay{position:absolute;inset:0;display:none}
+#frame .lay img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#frame .strip{position:absolute;top:0;bottom:0;left:0;display:flex}
+#frame .strip img{position:static;flex:none;height:100%;object-fit:cover}
+#fdec{position:absolute;left:0;top:0;z-index:4;pointer-events:none}
+#fdec .c{position:absolute;width:18px;height:18px;border:0 solid var(--fg)}
+#fdec .ft{position:absolute;font-size:13px;color:var(--dim);white-space:nowrap}
+#fdec .ft b{color:var(--fg);font-weight:600}
+#prog{position:absolute;height:2px;display:flex;gap:6px}
+#prog i{flex:1;background:rgba(244,244,242,.15);position:relative;overflow:hidden}
+#prog i b{position:absolute;left:0;top:0;bottom:0;background:var(--fg)}
+/* stats */
+#stats{position:absolute;left:0;right:0;top:300px;z-index:3}
+#stats .col{position:absolute;top:0;width:420px;margin-left:-210px;text-align:center}
+#stats .num{font-size:230px;font-weight:820;letter-spacing:-.07em;line-height:.9;font-variant-numeric:tabular-nums}
+#stats .lb{font-size:16px;color:var(--dim);margin-top:22px}
+#stats .ln{position:absolute;left:0;right:0;top:390px;text-align:center;font-size:48px;color:var(--fg)}
+#fade{position:absolute;inset:0;background:#000;opacity:0;z-index:20}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="grid"></div>
+  <canvas id="cv" width="1920" height="1080"></canvas>
+
+  <!-- sphere labels (intro) -->
+  <div class="lbl mono" id="lb1">01 · Motion<small>video tanpa After Effects</small></div>
+  <div class="lbl mono" id="lb2">02 · AI<small>Claude Code &amp; Design</small></div>
+  <div class="lbl mono" id="lb3">03 · Modul<small>panduan siap pakai</small></div>
+
+  <!-- wordmark lockup -->
+  <div id="lock">
+    <div class="mask" style="display:inline-block;padding:0 .05em .12em"><div id="wm"><span class="mask"><span>L</span></span><span class="mask"><span>a</span></span><span class="mask"><span>b</span></span><span class="mask"><span>s</span></span><span id="pd">.</span></div></div>
+    <div class="mask"><div id="tagl" class="ser">make things move.</div></div>
+    <div id="lmono" class="mono">Studio eksperimen digital · Vol. 01</div>
+  </div>
+
+  <!-- statement -->
+  <div id="st">
+    <div class="k mono" id="stk">Vol. 01 · 2026 · 08 karya</div>
+    <div class="mask"><div class="l1" id="stl1">Kumpulan karya</div></div>
+    <div class="mask"><div class="l2 ser" id="stl2">yang kita buat bersama.</div></div>
+  </div>
+
+  <!-- works -->
+  <div id="works">
+    <div id="idx"><div class="k mono">Index — Vol. 01</div></div>
+    <div id="ttl"></div>
+    <div id="frame"></div>
+    <div id="fdec">
+      <i class="c" id="c1" style="border-top-width:1.5px;border-left-width:1.5px"></i><i class="c" id="c2" style="border-top-width:1.5px;border-right-width:1.5px"></i>
+      <i class="c" id="c3" style="border-bottom-width:1.5px;border-left-width:1.5px"></i><i class="c" id="c4" style="border-bottom-width:1.5px;border-right-width:1.5px"></i>
+      <div class="ft mono" id="fl"></div><div class="ft mono" id="fr"></div>
+      <div id="prog"></div>
+    </div>
+  </div>
+
+  <!-- stats -->
+  <div id="stats">
+    <div class="col" style="left:540px"><div class="num" id="n1">0</div><div class="lb mono">video motion</div></div>
+    <div class="col" style="left:960px"><div class="num" id="n2">0</div><div class="lb mono">modul PDF</div></div>
+    <div class="col" style="left:1380px"><div class="num" id="n3">0</div><div class="lb mono">slide carousel</div></div>
+    <div class="ln ser" id="sln">dan eksperimen berikutnya sedang dimasak.</div>
+  </div>
+
+  <div class="vig"></div>
+  <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+  <div class="hud mono" id="hudL" style="left:96px;top:56px"><b>Labs.</b><span>/ studio eksperimen digital</span></div>
+  <div class="hud mono" id="hudR" style="right:96px;top:56px"><span>N° 001</span><span>·</span><span>Vol. 01</span><span>·</span><span>2026</span></div>
+  <div class="hud mono" id="hudBL" style="left:96px;bottom:56px"><span id="sec">00 · Intro</span></div>
+  <div class="hud mono" id="hudBR" style="right:96px;bottom:56px"><span id="tc">TC 00:00:00:00</span></div>
+  <div id="fade"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const seg = (t, a, b) => cl((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eo5 = x => 1 - Math.pow(1 - x, 5);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const mix = (a, b, k) => a + (b - a) * k;
+const DURATION = 30, FG = "244,244,242";
+
+// ---------------- works ----------------
+const IG = ["post1-slide1", "post1-slide2", "post2-hook", "konsultasi-slide1", "konsultasi-slide4"].map(n => `instagram/png/${n}.png`);
+const WORKS = [
+  { n: "Showreel Otak Rental", m: "Motion · 15 dtk · 16:9", ar: 16 / 9, seq: "w1", tag: "1920×1080 · 60 fps" },
+  { n: "Kopi Nalar", m: "Promo produk · 15 dtk · 4:5", ar: 4 / 5, seq: "w2", tag: "1080×1350 · 60 fps" },
+  { n: "Motion Reel", m: "Reel 30 dtk · 9:16", ar: 9 / 16, seq: "w3", tag: "1080×1920 · 60 fps" },
+  { n: "Everything Moves", m: "Motion 30 dtk · 16:9", ar: 16 / 9, seq: "w4", tag: "1920×1080 · 60 fps" },
+  { n: "Website Examples", m: "Web profil · animasi · 4:5", ar: 4 / 5, seq: "w5", tag: "1080×1350 · 60 fps" },
+  { n: "Carousel Instagram", m: "12 slide · 3 postingan", ar: 4 / 5, stills: IG, step: .42, tag: "1080×1350 · PNG" },
+  { n: "Modul Digital", m: "3 modul PDF · A4", ar: 1 / 1.4142, stills: ["modul/cover.png", "modul/cover-claude-design.png", "modul/cover-claude-code.png"], step: .62, tag: "A4 · 15–24 hal." },
+  { n: "Tutorial Claude Code", m: "Tutorial 59 dtk · 16:9", ar: 16 / 9, seq: "w8", tag: "1920×1080 · 60 fps" },
+];
+const T0 = 9.6, STEP = 1.68, TR = .55, FH = 520, FX = 1300, FY = 520;
+const TI = WORKS.map((_, i) => T0 + i * STEP);   // moment work i is fully in
+const frameEl = $("frame"), idx = $("idx"), ttl = $("ttl"), prog = $("prog");
+WORKS.forEach((w, i) => {
+  const lay = document.createElement("div"); lay.className = "lay";
+  if (w.seq) { const im = document.createElement("img"); im.src = `out/labs/${w.seq}/f001.jpg`; lay.appendChild(im); w.img = im; }
+  else { const s = document.createElement("div"); s.className = "strip"; w.stills.forEach(src => { const im = document.createElement("img"); im.src = src; s.appendChild(im); }); lay.appendChild(s); w.strip = s; }
+  frameEl.appendChild(lay); w.lay = lay;
+  const r = document.createElement("div"); r.className = "row"; r.innerHTML = `<i></i><span class="n">${String(i + 1).padStart(2, "0")}</span><span>${w.n}</span>`; idx.appendChild(r); w.row = r;
+  const tt = document.createElement("div"); tt.innerHTML = `${w.n}<small>${w.m}</small>`; ttl.appendChild(tt); w.tt = tt;
+  const p = document.createElement("i"); p.innerHTML = "<b></b>"; prog.appendChild(p); w.pb = p.firstChild;
+});
+const pend = [];
+function setImg(img, src) { if (img.getAttribute("src") !== src) { img.setAttribute("src", src); pend.push(img.decode().catch(() => {})); } }
+
+// ---------------- sphere ----------------
+const cv = $("cv"), ctx = cv.getContext("2d");
+function proj(lat, lon, yaw, cx, cy, r) {
+  const tilt = -0.42;
+  let x = Math.cos(lat) * Math.sin(lon), y = Math.sin(lat), z = Math.cos(lat) * Math.cos(lon);
+  const x1 = x * Math.cos(yaw) + z * Math.sin(yaw), z1 = -x * Math.sin(yaw) + z * Math.cos(yaw);
+  const y2 = y * Math.cos(tilt) - z1 * Math.sin(tilt), z2 = y * Math.sin(tilt) + z1 * Math.cos(tilt);
+  return [cx + x1 * r, cy - y2 * r, z2];
+}
+function sphere(s) {
+  const { cx, cy, r, yaw, draw, alpha, fill, orbit, odot } = s;
+  if (alpha <= 0 || r <= .5) return;
+  const lw = Math.max(1, 1.4 * Math.min(1, r / 260));
+  const la = alpha * (1 - fill);
+  const D = Math.PI / 180;
+  if (la > 0.01) {
+    const lines = [];
+    for (let a = -75; a <= 75; a += 15) { const pts = []; for (let o = 0; o <= 360; o += 5) pts.push([a * D, o * D]); lines.push(pts); }
+    for (let o = 0; o < 180; o += 15) { const pts = []; for (let a = -90; a <= 270; a += 5) pts.push([a * D, o * D]); lines.push(pts); }
+    lines.forEach((pts, j) => {
+      const f = cl(draw * 1.7 - j * .032);
+      const nn = Math.floor((pts.length - 1) * eo(f));
+      for (let i = 1; i <= nn; i++) {
+        const a = proj(...pts[i - 1], yaw, cx, cy, r), b = proj(...pts[i], yaw, cx, cy, r);
+        const front = (a[2] + b[2]) / 2 > 0;
+        ctx.strokeStyle = `rgba(${FG},${(front ? .62 : .14) * la})`; ctx.lineWidth = front ? lw : lw * .8;
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+      }
+    });
+    // outline
+    ctx.strokeStyle = `rgba(${FG},${.85 * la})`; ctx.lineWidth = lw * 1.2;
+    ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * eo(cl(draw * 1.4))); ctx.stroke();
+    // surface dots
+    for (let i = 0; i < 30; i++) {
+      const p = proj(Math.sin(i * 7.3) * 70 * D, (i * 47 % 360) * D, yaw, cx, cy, r);
+      if (p[2] > .1 && draw > .5 + i * .012) { ctx.fillStyle = `rgba(${FG},${.9 * la * cl((draw - .5 - i * .012) * 8)})`; ctx.beginPath(); ctx.arc(p[0], p[1], Math.max(1.2, 2.2 * r / 300), 0, 7); ctx.fill(); }
+    }
+  }
+  // orbit
+  if (orbit > 0) {
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(-16 * D);
+    ctx.setLineDash([2, 7]); ctx.strokeStyle = `rgba(${FG},${.5 * orbit * alpha})`; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.ellipse(0, 0, r * 1.42, r * .34, 0, 0, Math.PI * 2 * eo(orbit)); ctx.stroke(); ctx.setLineDash([]);
+    if (odot > 0) { const a = odot; ctx.fillStyle = `rgba(${FG},${orbit * alpha})`; ctx.beginPath(); ctx.arc(Math.cos(a) * r * 1.42, Math.sin(a) * r * .34, Math.max(2, 6 * r / 300), 0, 7); ctx.fill(); }
+    ctx.restore();
+  }
+  // morph into a solid dot
+  if (fill > 0) { ctx.fillStyle = `rgba(${FG},${alpha * fill})`; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill(); }
+}
+
+// ---------------- lockup ----------------
+const letters = [...document.querySelectorAll("#wm .mask > span")];
+function lockup(t, a, out) {   // a = start, out = exit start (or null)
+  const vis = t >= a - .2 && (out == null || t < out + .7);
+  $("lock").style.display = vis ? "block" : "none";
+  if (!vis) return 0;
+  letters.forEach((l, i) => { const k = eo5(seg(t, a + .15 + i * .07, a + .85 + i * .07)); l.style.transform = `translateY(${(1 - k) * 105}%)`; });
+  const tk = eo5(seg(t, a + 1.05, a + 1.75)); $("tagl").style.transform = `translateY(${(1 - tk) * 110}%)`;
+  const mk = eo(seg(t, a + 1.4, a + 2.0)); $("lmono").style.opacity = mk; $("lmono").style.transform = `translateY(${(1 - mk) * 14}px)`;
+  const ok = out == null ? 0 : eio(seg(t, out, out + .6));
+  $("lock").style.transform = `translateY(${-ok * 90}px)`; $("lock").style.opacity = 1 - ok;
+  return 1 - ok;
+}
+function periodPos() { const r = $("pd").getBoundingClientRect(); return [r.left + r.width * .46, r.bottom - r.height * .2, 300 * .07]; }
+
+// ---------------- render ----------------
+function renderAt(t) {
+  pend.length = 0;
+  ctx.clearRect(0, 0, 1920, 1080);
+
+  // HUD
+  const hk = eo(seg(t, .3, 1.1));
+  ["hudL", "hudR", "hudBL", "hudBR"].forEach(id => $(id).style.opacity = hk);
+  const fN = Math.floor(t * 60), ss = Math.floor(fN / 60);
+  $("tc").textContent = `TC 00:00:${String(ss).padStart(2, "0")}:${String(fN % 60).padStart(2, "0")}`;
+  $("sec").textContent = t < 4.3 ? "00 · Intro" : t < 7.2 ? "01 · Labs." : t < 9.2 ? "02 · Manifesto" : t < 23.2 ? "03 · Karya" : t < 26.4 ? "04 · Angka" : "05 · Labs.";
+
+  // ---- lockup (two appearances) ----
+  let lockA = 0;
+  if (t < 9) lockA = lockup(t, 4.45, 6.85); else lockA = lockup(t, 27.35, null);
+
+  // ---- sphere ----
+  const yaw = .5 + t * .38;
+  let S = null;
+  if (t < 7.6) {
+    const r0 = 300 * eo(seg(t, .15, 1.5));
+    S = { cx: 960, cy: 540, r: r0, yaw, draw: seg(t, .25, 2.6), alpha: 1, fill: 0, orbit: seg(t, 1.5, 2.7), odot: t > 2.2 ? (t - 2.2) * 1.6 : 0 };
+    if (t >= 4.3) {
+      const [px, py, pr] = periodPos();
+      const k = eio(seg(t, 4.3, 5.35));
+      S.cx = mix(960, px, k); S.cy = mix(540, py, k); S.r = 300 * Math.pow(pr / 300, k);
+      S.orbit *= 1 - seg(t, 4.3, 4.8); S.fill = eio(seg(t, 4.95, 5.4));
+      if (t >= 5.35) S.alpha = lockA;
+    }
+  } else if (t >= 26.3) {
+    const r0 = 250 * eo(seg(t, 26.35, 27.2));
+    S = { cx: 960, cy: 520, r: r0, yaw, draw: seg(t, 26.4, 27.7), alpha: 1, fill: 0, orbit: seg(t, 26.9, 27.6) * (1 - seg(t, 27.6, 27.95)), odot: (t - 26.9) * 1.8 };
+    if (t >= 27.6) {
+      const [px, py, pr] = periodPos();
+      const k = eio(seg(t, 27.6, 28.5));
+      S.cx = mix(960, px, k); S.cy = mix(520, py, k); S.r = 250 * Math.pow(pr / 250, k); S.fill = eio(seg(t, 28.1, 28.5));
+    }
+  }
+  if (S) sphere(S);
+
+  // intro labels with leader lines
+  const lbA = eo(seg(t, 2.5, 3.1)) * (1 - eio(seg(t, 3.7, 4.2)));
+  const LB = [["lb1", -50, 1.2, 330, -260], ["lb2", 15, 1.05, 400, 40], ["lb3", 130, 1.0, -560, 210]];
+  LB.forEach(([id, ang, rr, dx, dy], i) => {
+    const el = $(id); const k = eo(seg(t, 2.5 + i * .15, 3.1 + i * .15)) * (1 - eio(seg(t, 3.7, 4.2)));
+    el.style.display = k > 0 ? "block" : "none"; if (!k) return;
+    const a = ang * Math.PI / 180, ax = 960 + Math.cos(a) * 300 * rr, ay = 540 + Math.sin(a) * 300 * rr;
+    const lx = 960 + dx, ly = 540 + dy;
+    el.style.left = lx + "px"; el.style.top = ly + "px"; el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * 12}px)`;
+    const ex = dx > 0 ? lx - 2 : lx + el.offsetWidth + 2, ey = ly + 18;
+    ctx.strokeStyle = `rgba(${FG},${.55 * k})`; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(mix(ax, ex, k), mix(ay, ey, k)); ctx.stroke();
+    ctx.fillStyle = "#0A0A0A"; ctx.strokeStyle = `rgba(${FG},${k})`; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(ax, ay, 5, 0, 7); ctx.fill(); ctx.stroke();
+  });
+
+  // ---- statement ----
+  const stOn = t > 7.0 && t < 9.4;
+  $("st").style.display = stOn ? "block" : "none";
+  if (stOn) {
+    const k1 = eo5(seg(t, 7.15, 7.85)), k2 = eo5(seg(t, 7.35, 8.05)), kk = eo(seg(t, 7.1, 7.6));
+    const x1 = eio(seg(t, 8.75, 9.25)), x2 = eio(seg(t, 8.85, 9.35));
+    $("stl1").style.transform = `translateY(${(1 - k1) * 110 - x1 * 110}%)`;
+    $("stl2").style.transform = `translateY(${(1 - k2) * 110 - x2 * 110}%)`;
+    $("stk").style.opacity = kk * (1 - x1); $("stk").style.transform = `translateY(${(1 - kk) * 12}px)`;
+  }
+
+  // ---- works ----
+  const wOn = t > 9.0 && t < 23.5;
+  $("works").style.display = wOn ? "block" : "none";
+  if (wOn) {
+    const open = eio(seg(t, 9.05, 9.75)), close = eio(seg(t, 22.85, 23.4));
+    // which work
+    let cur = 0; TI.forEach((ti, i) => { if (t >= ti - TR) cur = i; });
+    const k = cur === 0 ? 1 : eio(seg(t, TI[cur] - TR, TI[cur]));
+    const prev = Math.max(0, cur - 1);
+    const ar = cur === 0 ? WORKS[0].ar : mix(WORKS[prev].ar, WORKS[cur].ar, k);
+    const fw = FH * ar, fh = FH * open * (1 - close) + 2 * (open > 0 ? 1 - open * (1 - close) : 0);
+    const lineW = fw * eo(seg(t, 9.0, 9.4)) * (1 - eio(seg(t, 23.15, 23.45)));
+    const W2 = fh > 3 ? fw : lineW;
+    frameEl.style.left = (FX - W2 / 2) + "px"; frameEl.style.top = (FY - fh / 2) + "px"; frameEl.style.width = W2 + "px"; frameEl.style.height = Math.max(1.5, fh) + "px";
+    frameEl.style.background = fh > 3 ? "#141414" : "var(--fg)";
+    WORKS.forEach((w, i) => {
+      const show = (i === cur) || (i === prev && k < 1 && cur > 0);
+      w.lay.style.display = show ? "block" : "none";
+      if (!show) return;
+      const inK = i === cur ? (cur === 0 ? 1 : k) : 1, outK = i === prev && i !== cur ? k : 0;
+      w.lay.style.transform = `translateX(${(1 - inK) * 100 - outK * 38}%)`;
+      w.lay.style.opacity = 1 - outK * .9;
+      const lt = t - (TI[i] - TR);
+      if (w.seq) setImg(w.img, `out/labs/${w.seq}/f${String(Math.max(1, Math.min(144, Math.floor(lt * 60) + 1))).padStart(3, "0")}.jpg`);
+      else {
+        const n = w.stills.length, ph = Math.max(0, lt - .25) / w.step; const si = Math.min(n - 1, Math.floor(ph)); const fr = eio(cl((ph - si) * 2.2 - 1.2));
+        const pos = Math.min(n - 1, si + (si < n - 1 ? fr : 0));
+        [...w.strip.children].forEach(im => { im.style.width = fw + "px"; });
+        w.strip.style.transform = `translateX(${-pos * fw}px)`;
+      }
+    });
+    // decorations
+    const fa = cl(open * 1.4) * (1 - close);
+    const L = FX - fw / 2, T = FY - FH / 2, R = FX + fw / 2, B = FY + FH / 2, o = 14;
+    [["c1", L - o, T - o], ["c2", R + o - 18, T - o], ["c3", L - o, B + o - 18], ["c4", R + o - 18, B + o - 18]].forEach(([id, x, y]) => { const e = $(id); e.style.left = x + "px"; e.style.top = y + "px"; e.style.opacity = fa; });
+    $("fl").style.left = L + "px"; $("fl").style.top = (T - 40) + "px"; $("fl").innerHTML = `<b>${String(cur + 1).padStart(2, "0")}</b> / 08`; $("fl").style.opacity = fa;
+    $("fr").textContent = WORKS[cur].tag; $("fr").style.left = (R - $("fr").offsetWidth) + "px"; $("fr").style.top = (T - 40) + "px"; $("fr").style.opacity = fa;
+    prog.style.left = L + "px"; prog.style.top = (B + 30) + "px"; prog.style.width = fw + "px"; prog.style.opacity = fa;
+    WORKS.forEach((w, i) => { const p = cl((t - (TI[i] - TR)) / (STEP)); w.pb.style.width = (i < cur ? 100 : i === cur ? p * 100 : 0) + "%"; });
+    // index column
+    const ci = eo(seg(t, 9.1, 9.8)) * (1 - eio(seg(t, 22.8, 23.3)));
+    idx.style.opacity = ci; idx.style.transform = `translateX(${(1 - ci) * -40}px)`;
+    WORKS.forEach((w, i) => {
+      const rk = eo(seg(t, 9.2 + i * .06, 9.7 + i * .06));
+      const act = i === cur ? (cur === 0 ? 1 : k) : (i === prev && cur > 0 ? 1 - k : 0);
+      w.row.style.opacity = rk * (.32 + .68 * act);
+      w.row.style.transform = `translateX(${(1 - rk) * -20 + act * 8}px)`;
+      w.row.firstChild.style.width = (act * 34) + "px";
+    });
+    // title swap
+    ttl.style.opacity = ci;
+    WORKS.forEach((w, i) => {
+      let y = 160, op = 0;
+      if (i === cur) { const kk = cur === 0 ? eo5(seg(t, 9.4, 10.1)) : eo5(seg(t, TI[cur] - TR + .2, TI[cur] + .3)); y = (1 - kk) * 110; op = cur === 0 ? 1 : cl(kk * 3); }
+      else if (i === prev && cur > 0) { const kk = eio(seg(t, TI[cur] - TR, TI[cur] - TR + .28)); y = -kk * 110; op = 1 - kk; }
+      w.tt.style.transform = `translateY(${y}%)`; w.tt.style.opacity = op;
+    });
+  }
+
+  // ---- stats ----
+  const sOn = t > 23.3 && t < 26.6;
+  $("stats").style.display = sOn ? "block" : "none";
+  if (sOn) {
+    const out = eio(seg(t, 25.95, 26.45));
+    [[ "n1", 7, 23.45], ["n2", 3, 23.62], ["n3", 12, 23.79]].forEach(([id, v, a]) => {
+      const k = eo5(seg(t, a, a + .6)); const e = $(id); const col = e.parentNode;
+      e.textContent = String(Math.round(v * eo(seg(t, a + .05, a + 1.0)))).padStart(2, "0");
+      col.style.opacity = k * (1 - out); col.style.transform = `translateY(${(1 - k) * 60 - out * 50}px)`;
+    });
+    const lk = eo(seg(t, 24.5, 25.1)); $("sln").style.opacity = lk * (1 - out); $("sln").style.transform = `translateY(${(1 - lk) * 16 - out * 40}px)`;
+  }
+
+  // ---- final fade ----
+  $("fade").style.opacity = eio(seg(t, 29.45, 30));
+  return Promise.all(pend);
+}
+
+window.renderAt = renderAt; window.DURATION = DURATION;
+window.reelReady = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+  renderAt(0);
+})();
+if (!location.search.includes("capture")) {
+  window.reelReady.then(() => { const t0 = performance.now(); const loop = async () => { await renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); });
+}
+</script>
+</body>
+</html>

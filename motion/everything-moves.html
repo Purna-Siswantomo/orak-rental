@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everything Moves — 30s</title>
+<!--
+  30-second landscape (1920×1080) pure-motion piece, dark. One continuous flow, no hard cuts:
+  point → line → sound wave → ridgelines → wireframe terrain & sun → tunnel → geometric bloom → point → title.
+  Drawn on a single <canvas> by renderAt(t).
+  Render: node render.mjs --page everything-moves.html --width 1920 --height 1080 --name everything-moves --sound everything_moves_sound.py --sub 4
+-->
+<style>
+@font-face{font-family:"Syne";src:url(fonts/Syne-normal.woff2) format("woff2");font-weight:400 800;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+html,body{margin:0;height:100%;background:#000}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+body.capture{display:block}
+canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="cv" width="1920" height="1080"></canvas>
+<script>
+"use strict";
+const W = 1920, H = 1080, CX = W / 2, CY = H / 2, DUR = 30, FPS = 60, BEAT = 0.5;
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+const CAPTURE = /capture/.test(location.search);
+if (CAPTURE) document.body.classList.add("capture");
+else { const fit = () => { const z = Math.min(innerWidth / W, innerHeight / H); cv.style.width = W * z + "px"; cv.style.height = H * z + "px"; }; addEventListener("resize", fit); fit(); }
+
+const BG = "#050507", WHITE = "#EDEAE4", CYAN = "#3DF5E0", AMBER = "#FFB547", MAG = "#FF2E88", VIOLET = "#7A5CFF";
+
+// ---------- math ----------
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => cl((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eOutExpo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
+const eInExpo = x => x <= 0 ? 0 : Math.pow(2, 10 * x - 10);
+const eInOutExpo = x => x <= 0 ? 0 : x >= 1 ? 1 : x < .5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2;
+const eOutCubic = x => 1 - Math.pow(1 - x, 3);
+const eInCubic = x => x * x * x;
+const eInOutCubic = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eInOutSine = x => -(Math.cos(Math.PI * x) - 1) / 2;
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const hash2 = (x, y) => hash(x * 157.31 + y * 311.7);
+function noise2(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  return lerp(lerp(hash2(xi, yi), hash2(xi + 1, yi), u), lerp(hash2(xi, yi + 1), hash2(xi + 1, yi + 1), u), v);
+}
+const TAU = Math.PI * 2;
+const pulse = (t, d = 8) => Math.exp(-(((t % BEAT) + BEAT) % BEAT) * d);
+const rgba = (h, a) => { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+const mix = (h1, h2, k) => { const a = parseInt(h1.slice(1), 16), b = parseInt(h2.slice(1), 16);
+  const c = s => Math.round(lerp((a >> s) & 255, (b >> s) & 255, cl(k))); return "#" + ((c(16) << 16) | (c(8) << 8) | c(0)).toString(16).padStart(6, "0"); };
+
+function glowLine(pts, color, width, glow = 1, alpha = 1) {
+  if (pts.length < 2) return;
+  ctx.save(); ctx.lineJoin = "round"; ctx.lineCap = "round";
+  const path = () => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); };
+  if (glow > 0) { ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = rgba(color, .08 * glow * alpha); ctx.lineWidth = width * 8; path(); ctx.stroke(); ctx.strokeStyle = rgba(color, .18 * glow * alpha); ctx.lineWidth = width * 3; path(); ctx.stroke(); }
+  ctx.globalCompositeOperation = "source-over"; ctx.strokeStyle = rgba(color, alpha); ctx.lineWidth = width; path(); ctx.stroke();
+  ctx.restore();
+}
+function glowDot(x, y, r, color, a = 1) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, rgba(color, a)); g.addColorStop(.25, rgba(color, a * .35)); g.addColorStop(1, rgba(color, 0));
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+}
+function txt(s, x, y, o = {}) {
+  ctx.save();
+  ctx.font = `${o.st || "normal"} ${o.w || 400} ${o.size || 40}px "${o.f || "Syne"}"`;
+  ctx.textAlign = o.align || "center"; ctx.textBaseline = o.base || "middle";
+  ctx.letterSpacing = (o.ls || 0) + "px";
+  ctx.globalAlpha = o.alpha == null ? 1 : o.alpha;
+  if (o.blur) ctx.filter = `blur(${o.blur}px)`;
+  if (o.comp) ctx.globalCompositeOperation = o.comp;
+  ctx.fillStyle = o.color || WHITE; ctx.fillText(s, x, y);
+  ctx.restore();
+}
+
+// camera projection (y up, looking down +z)
+function proj(x, y, z, cam) {
+  let dx = x - cam.x, dy = y - cam.y, dz = z - cam.z;
+  const cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+  const dy2 = dy * cp + dz * sp, dz2 = -dy * sp + dz * cp;
+  if (dz2 <= 5) { if (!cam.clamp) return null; }
+  const k = cam.f / Math.max(dz2, 40);
+  return [CX + dx * k, cam.cy - dy2 * k, dz2];
+}
+
+/* ==========================================================================
+   ACT 1 · POINT → LINE → WAVE (0–5.2)
+   ========================================================================== */
+function waveY(x, t) {
+  const amp = 70 * eInOutCubic(P(t, 3.9, 5.0));
+  const env = Math.exp(-Math.pow((x - CX) / 520, 2));
+  return CY - amp * env * (Math.sin(x * .018 - t * 9) * .7 + Math.sin(x * .041 + t * 5) * .3);
+}
+function act1(t) {
+  // heartbeat point
+  const beats = [.6, .85, 1.5, 1.75];
+  let hb = 0; beats.forEach(b => { if (t > b) hb = Math.max(hb, Math.exp(-(t - b) * 9)); });
+  const on = eOutCubic(P(t, .15, .5));
+  const half = (W / 2 + 40) * eInOutExpo(P(t, 2.0, 2.9));
+  if (half < 2) {
+    glowDot(CX, CY, (80 + 120 * hb) * on, WHITE, .5 * on);
+    ctx.fillStyle = WHITE; ctx.beginPath(); ctx.arc(CX, CY, (4 + 5 * hb) * on, 0, TAU); ctx.fill();
+  } else {
+    const pts = [];
+    for (let x = CX - half; x <= CX + half; x += 8) pts.push([x, waveY(x, t)]);
+    glowLine(pts, WHITE, 2.4, 1.2);
+    glowDot(CX, CY, 140 * (1 - P(t, 2.0, 2.6)), WHITE, .6);
+  }
+  // quiet caption
+  const ca = P(t, 2.7, 3.2) * (1 - P(t, 4.3, 4.8));
+  txt("EVERYTHING STARTS WITH A SINGLE POINT", CX, CY + 90, { f: "Geist Mono", size: 20, ls: lerp(8, 14, P(t, 2.7, 4.8)), color: WHITE, alpha: ca * .7 });
+}
+
+/* ==========================================================================
+   ACT 2+3 · RIDGELINES → WIREFRAME TERRAIN + SUN (5–15.2)
+   ========================================================================== */
+const NR = 44, DZ = 70, ZN = 60, XS = 46, XR = 2600;
+function scrollAt(t) { // distance travelled; integrates an accelerating speed
+  const a = Math.max(0, t - 5);
+  return 180 * a + 55 * a * a;   // speed 180 → ~1280 u/s by t=15
+}
+function ridgeH(x, row, t) {
+  // starts perfectly flat (continuing act 1's line) and grows into a canyon as the camera lifts
+  const ampK = Math.pow(eInOutCubic(P(t, 5.0, 8.0)), 1.4);
+  const walls = Math.exp(-Math.pow((Math.abs(x) - 720) / 420, 2));
+  const n = noise2(x * .0052, row * .28);
+  const peaks = (.35 + Math.pow(n, 1.8)) * 340 * walls + noise2(x * .02, row * .9) * 22 + (noise2(x * .003 + 7, row * .08) - .5) * 50;
+  return peaks * ampK;
+}
+function actTerrain(t) {
+  const lift = eInOutCubic(P(t, 5.0, 8.2));
+  const dive = eInCubic(P(t, 13.6, 15.1));
+  const cam = { x: 0, y: lerp(0, 300, lift) - dive * 120, z: 0, pitch: lerp(0, .3, lift) - dive * .34, f: 1100, cy: CY - 120 * lift, clamp: true };
+  const sc = scrollAt(t), base = Math.floor(sc / DZ), frac = sc - base * DZ;
+  const gridK = eInOutCubic(P(t, 9.6, 11.4));
+  const lineCol = k => mix(mix(WHITE, CYAN, gridK), MAG, k * gridK);
+  // sky + sun (behind everything)
+  const skyK = P(t, 9.8, 12);
+  if (skyK > 0) {
+    const g = ctx.createLinearGradient(0, 0, 0, cam.cy + 60);
+    g.addColorStop(0, rgba("#000000", 0)); g.addColorStop(1, rgba("#2A0F46", .9 * skyK));
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, cam.cy + 60);
+    const rise = eOutCubic(P(t, 10.4, 12.6));
+    const grow = 1 + 9 * eInExpo(P(t, 13.9, 15.1));
+    const sr = 250 * grow, sy = cam.cy + 120 - rise * 260 + dive * 180;
+    glowDot(CX, sy, sr * 2.4, AMBER, .22 * rise);
+    const sg = ctx.createLinearGradient(0, sy - sr, 0, sy + sr);
+    sg.addColorStop(0, AMBER); sg.addColorStop(.6, MAG); sg.addColorStop(1, VIOLET);
+    ctx.save(); ctx.globalAlpha = rise; ctx.beginPath(); ctx.arc(CX, sy, sr, 0, TAU); ctx.fillStyle = sg; ctx.fill();
+    // retro slits through the lower half
+    ctx.fillStyle = BG; ctx.globalAlpha = rise * (1 - P(t, 14.2, 14.9));
+    for (let i = 0; i < 7; i++) { const yy = sy + sr * (.12 + i * .13) + ((t * 40) % (sr * .13)), hh = 3 + i * 2.2 * (sr / 250); if (yy < sy + sr) ctx.fillRect(CX - sr, yy, sr * 2, hh); }
+    ctx.restore();
+  }
+  // rows far → near; each row fills black below itself to occlude what is behind
+  const rows = [];
+  for (let j = NR - 1; j >= 0; j--) {
+    const z = ZN + j * DZ - frac, row = base + j, pts = [];
+    for (let x = -XR; x <= XR; x += XS) { const p = proj(x, ridgeH(x, row, t), z, cam); if (p) pts.push(p); }
+    rows[j] = pts;
+  }
+  for (let j = NR - 1; j >= 0; j--) {
+    const pts = rows[j]; if (!pts || pts.length < 2) continue;
+    const depth = j / NR, fadeIn = cl((1 - depth) * 1.4) * cl((NR - j - frac / DZ) / 3);
+    const near = j === 0 ? cl(1 - frac / DZ) : 1;
+    ctx.beginPath(); ctx.moveTo(pts[0][0], H + 10);
+    pts.forEach(p => ctx.lineTo(p[0], p[1])); ctx.lineTo(pts[pts.length - 1][0], H + 10); ctx.closePath();
+    ctx.fillStyle = BG; ctx.fill();
+    const a = fadeIn * near * lerp(1, .35, depth) * (t < 5.4 ? P(t, 5.0, 5.4) * .7 + .3 : 1);
+    // longitudinal grid lines to the next row back
+    if (gridK > 0 && rows[j + 1]) {
+      const back = rows[j + 1];
+      ctx.strokeStyle = rgba(CYAN, .45 * gridK * a); ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      for (let i = 0; i < Math.min(pts.length, back.length); i += 2) { ctx.moveTo(pts[i][0], pts[i][1]); ctx.lineTo(back[i][0], back[i][1]); }
+      ctx.stroke();
+    }
+    glowLine(pts, lineCol(depth), lerp(2.2, 1, depth), lerp(.9, .2, depth), a);
+  }
+  // white-hot entry into the sun
+  const flash = eInExpo(P(t, 14.5, 15.1));
+  if (flash > 0) { ctx.fillStyle = rgba("#FFF3DC", flash); ctx.fillRect(0, 0, W, H); }
+}
+
+/* ==========================================================================
+   ACT 4 · TUNNEL (15–20.1)
+   ========================================================================== */
+const NRING = 46, RS = 130, TR = 520;
+const STARS = [...Array(320)].map((_, i) => [hash(i) * TAU, .15 + hash(i + 50) * .8, hash(i + 90)]);
+function tunnelDist(t) { const a = Math.max(0, t - 15); return 1400 * a + 220 * a * a; }
+function actTunnel(t) {
+  const d = tunnelDist(t), f = 820;
+  const collapse = eInExpo(P(t, 19.45, 20.0));
+  const R = TR * (1 - collapse * .96);
+  const bend = z => [Math.sin((z + d) * .0016 + t * .6) * 260 * (1 - collapse), Math.cos((z + d) * .0013 + t * .4) * 170 * (1 - collapse)];
+  const P3 = (x, y, z) => { const k = f / z; return [CX + x * k, CY + y * k]; };
+  const off0 = bend(0);
+  const base = Math.floor(d / RS), frac = d - base * RS;
+  const polys = [];
+  for (let i = NRING - 1; i >= 0; i--) {
+    const z = 40 + i * RS - frac, idx = base + i;
+    const [bx, by] = bend(z), rot = idx * .09 + t * .5;
+    const pts = [];
+    for (let k = 0; k <= 6; k++) { const a = k / 6 * TAU + rot; pts.push(P3(Math.cos(a) * R + bx - off0[0], Math.sin(a) * R + by - off0[1], z)); }
+    polys[i] = { pts, z, idx };
+  }
+  for (let i = NRING - 1; i >= 0; i--) {
+    const { pts, z, idx } = polys[i];
+    const depth = z / (NRING * RS);
+    const a = cl((1 - depth) * 1.3) * cl((z - 40) / 160);
+    const col = mix(CYAN, MAG, depth * 1.4);
+    const hit = idx % 4 === 0 ? 1.6 : 1;
+    glowLine(pts, idx % 8 === 0 ? AMBER : col, lerp(3.2, .8, depth) * hit, lerp(1, .3, depth), a);
+    if (polys[i + 1]) {
+      const b = polys[i + 1].pts;
+      ctx.strokeStyle = rgba(col, .35 * a); ctx.lineWidth = 1;
+      ctx.beginPath(); for (let k = 0; k < 6; k++) { ctx.moveTo(pts[k][0], pts[k][1]); ctx.lineTo(b[k][0], b[k][1]); } ctx.stroke();
+    }
+  }
+  // streaks
+  ctx.save(); ctx.globalCompositeOperation = "lighter";
+  const speed = 1400 + 440 * Math.max(0, t - 15);
+  STARS.forEach(([a, r, ph], i) => {
+    const L = NRING * RS, z = ((ph * L - d * 1.15) % L + L) % L + 30;
+    const zb = z + speed * .035;
+    const [bx, by] = bend(z), x = Math.cos(a) * r * R + bx - off0[0], y = Math.sin(a) * r * R + by - off0[1];
+    const p1 = P3(x, y, z), p2 = P3(x, y, zb);
+    ctx.strokeStyle = rgba(i % 5 ? WHITE : CYAN, cl(1 - z / L) * .8); ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+  });
+  ctx.restore();
+  // beat words
+  [["MOVE", 16.0], ["SHAPE", 17.0], ["FLOW", 18.0], ["BREAK", 19.0]].forEach(([w, bt]) => {
+    const k = P(t, bt, bt + .55); if (k <= 0 || k >= 1) return;
+    txt(w, CX, CY, { size: 190, w: 800, ls: lerp(10, 40, k), color: WHITE, alpha: (1 - k) * .95, comp: "lighter", blur: (1 - eOutExpo(P(t, bt, bt + .08))) * 10 });
+  });
+  // entry flash from the sun
+  const inF = 1 - eOutCubic(P(t, 15.0, 15.45));
+  if (inF > 0) { ctx.fillStyle = rgba("#FFF3DC", inF); ctx.fillRect(0, 0, W, H); }
+  const out = eInExpo(P(t, 19.7, 20.02));
+  if (out > 0) { glowDot(CX, CY, 900 * out, WHITE, out); }
+}
+
+/* ==========================================================================
+   ACT 5 · GEOMETRIC BLOOM (20–25.3)
+   ========================================================================== */
+const PHI = (1 + Math.sqrt(5)) / 2;
+const ICO = [[-1, PHI, 0], [1, PHI, 0], [-1, -PHI, 0], [1, -PHI, 0], [0, -1, PHI], [0, 1, PHI], [0, -1, -PHI], [0, 1, -PHI], [PHI, 0, -1], [PHI, 0, 1], [-PHI, 0, -1], [-PHI, 0, 1]];
+const EDGES = []; for (let i = 0; i < 12; i++) for (let j = i + 1; j < 12; j++) { const d = Math.hypot(...ICO[i].map((v, k) => v - ICO[j][k])); if (Math.abs(d - 2) < .01) EDGES.push([i, j]); }
+const TORUS = [...Array(700)].map((_, i) => [hash(i * 1.7) * TAU, hash(i * 3.3) * TAU, hash(i * 5.9)]);
+function rot3([x, y, z], ax, ay) {
+  const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
+  const x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
+  return [x1, y * cx - z1 * sx, y * sx + z1 * cx];
+}
+function actBloom(t) {
+  const lt = t - 20;
+  const spinUp = eInCubic(P(t, 23.4, 25.0));
+  const shrink = eInExpo(P(t, 24.5, 25.25));
+  const S = (1 - shrink) * (1 + .04 * lt);
+  const ay = lt * .7 + spinUp * 9, ax = .4 + lt * .45 + spinUp * 6;
+  // shockwaves
+  for (let b = 0; b < 10; b++) {
+    const bt = 20 + b * BEAT, k = P(t, bt, bt + 1.1); if (t < bt || k >= 1) continue;
+    ctx.strokeStyle = rgba([CYAN, MAG, AMBER][b % 3], (1 - k) * .6 * (1 - shrink)); ctx.lineWidth = 3 * (1 - k) + .5;
+    ctx.beginPath(); ctx.arc(CX, CY, (120 + k * 1000) * S, 0, TAU); ctx.stroke();
+  }
+  // mandala arcs
+  ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+  [[360, CYAN, 1], [430, MAG, -1.3], [500, AMBER, .8]].forEach(([r, c, dir], ri) => {
+    const len = (.18 + .1 * pulse(t, 6)) * eOutExpo(P(t, 20.05 + ri * .12, 20.8 + ri * .12));
+    for (let k = 0; k < 12; k++) {
+      const a = k / 12 * TAU + t * .6 * dir + spinUp * 8 * dir;
+      ctx.strokeStyle = rgba(c, .75); ctx.lineWidth = 6 - ri;
+      ctx.beginPath(); ctx.arc(CX, CY, r * S, a, a + len); ctx.stroke();
+    }
+  });
+  // particle torus
+  TORUS.forEach(([u, v, h], i) => {
+    const R0 = 3.4, r0 = .55 + .25 * pulse(t, 5);
+    const p = rot3([(R0 + r0 * Math.cos(v)) * Math.cos(u + lt * .5), r0 * Math.sin(v), (R0 + r0 * Math.cos(v)) * Math.sin(u + lt * .5)], ax * .5, ay * .3);
+    const k = 900 / (900 + p[2] * 90), x = CX + p[0] * 95 * S * k, y = CY + p[1] * 95 * S * k;
+    ctx.fillStyle = rgba(h > .5 ? CYAN : MAG, .55 * k * (1 - shrink * .5));
+    ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+  });
+  ctx.restore();
+  // icosahedron
+  const sc = 250 * S * (1 + .14 * pulse(t, 7)) * eOutExpo(P(t, 20.0, 20.5));
+  const V = ICO.map(v => { const p = rot3(v.map(q => q / 1.902), ax, ay); const k = 900 / (900 + p[2] * sc * .6); return [CX + p[0] * sc * k, CY + p[1] * sc * k, p[2]]; });
+  EDGES.forEach(([i, j]) => glowLine([V[i], V[j]], mix(CYAN, WHITE, (V[i][2] + V[j][2] + 2) / 4), 2.6, 1.1));
+  V.forEach(v => { glowDot(v[0], v[1], 26, AMBER, .6); ctx.fillStyle = WHITE; ctx.beginPath(); ctx.arc(v[0], v[1], 4, 0, TAU); ctx.fill(); });
+  // implosion streaks
+  if (shrink > 0) {
+    ctx.save(); ctx.globalCompositeOperation = "lighter";
+    for (let i = 0; i < 60; i++) {
+      const a = hash(i) * TAU, r1 = lerp(1100, 0, shrink) * (.6 + hash(i + 7) * .6), r2 = r1 * (1 - .35 * shrink) + 20;
+      ctx.strokeStyle = rgba(i % 3 ? WHITE : CYAN, .6 * shrink); ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(CX + Math.cos(a) * r1, CY + Math.sin(a) * r1); ctx.lineTo(CX + Math.cos(a) * r2, CY + Math.sin(a) * r2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // drop flash
+  const fl = 1 - eOutCubic(P(t, 20.0, 20.35));
+  if (fl > 0) { ctx.fillStyle = rgba("#FFFFFF", fl); ctx.fillRect(0, 0, W, H); }
+}
+
+/* ==========================================================================
+   ACT 6 · RETURN + TITLE (25–30)
+   ========================================================================== */
+function actTitle(t) {
+  // the point again
+  const pt = P(t, 25.1, 25.5) * (1 - P(t, 25.9, 26.3)) + P(t, 29.0, 29.4) * (1 - P(t, 29.6, 30));
+  if (pt > 0) { glowDot(CX, CY, 160, WHITE, .5 * pt); ctx.fillStyle = rgba(WHITE, pt); ctx.beginPath(); ctx.arc(CX, CY, 5, 0, TAU); ctx.fill(); }
+  // EVERYTHING — letters resolve from the centre outwards
+  const word = "EVERYTHING", size = 124, ls = lerp(70, 34, eOutExpo(P(t, 25.9, 27.2)));
+  ctx.save(); ctx.font = `800 ${size}px "Syne"`;
+  const widths = [...word].map(c => ctx.measureText(c).width); ctx.restore();
+  const total = widths.reduce((a, b) => a + b, 0) + ls * (word.length - 1);
+  let x = CX - total / 2;
+  const fadeOut = 1 - P(t, 28.9, 29.5);
+  [...word].forEach((c, i) => {
+    const order = Math.abs(i - (word.length - 1) / 2);
+    const k = eOutExpo(P(t, 25.95 + order * .07, 26.7 + order * .07));
+    txt(c, x + widths[i] / 2, CY - 40, { size, w: 800, color: WHITE, alpha: k * fadeOut, blur: (1 - k) * 14 });
+    x += widths[i] + ls;
+  });
+  // moves.
+  const mk = eOutExpo(P(t, 26.7, 27.5));
+  ctx.save(); ctx.beginPath(); ctx.rect(0, CY + 30, W, 220); ctx.clip();
+  txt("moves.", CX, CY + 110 + (1 - mk) * 160, { f: "Instrument Serif", st: "italic", size: 170, color: AMBER, alpha: fadeOut * cl(mk * 4) });
+  ctx.restore();
+  // hairline + tiny credit line
+  const lk = eInOutCubic(P(t, 27.2, 28.0)) * fadeOut;
+  const g = ctx.createLinearGradient(CX - 420, 0, CX + 420, 0);
+  g.addColorStop(0, rgba(CYAN, 0)); g.addColorStop(.5, rgba(WHITE, .9)); g.addColorStop(1, rgba(MAG, 0));
+  ctx.fillStyle = g; ctx.fillRect(CX - 420 * lk, CY + 222, 840 * lk, 2);
+  txt("A 30-SECOND STUDY IN MOTION", CX, CY + 262, { f: "Geist Mono", size: 18, ls: 10, color: WHITE, alpha: .6 * P(t, 27.6, 28.2) * fadeOut });
+}
+
+/* ==========================================================================
+   COMPOSITION
+   ========================================================================== */
+const grainCv = document.createElement("canvas"); grainCv.width = 480; grainCv.height = 270;
+const gctx = grainCv.getContext("2d");
+const GRAIN = [...Array(6)].map((_, k) => {
+  const img = gctx.createImageData(480, 270); let s = 91 + k * 57;
+  for (let i = 0; i < img.data.length; i += 4) { s = (s * 1664525 + 1013904223) >>> 0; const v = (s >>> 24); img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  return img;
+});
+function finish(t) {
+  // vignette
+  const v = ctx.createRadialGradient(CX, CY, 300, CX, CY, 1150);
+  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,.55)");
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  // film grain (12 fps boil)
+  gctx.putImageData(GRAIN[Math.floor(t * 12) % GRAIN.length], 0, 0);
+  ctx.save(); ctx.globalCompositeOperation = "overlay"; ctx.globalAlpha = .07; ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(grainCv, 0, 0, W, H); ctx.restore();
+  // fade from / to black
+  const fb = (1 - P(t, 0, .3)) + P(t, 29.7, 30);
+  if (fb > 0) { ctx.fillStyle = rgba("#000000", cl(fb)); ctx.fillRect(0, 0, W, H); }
+}
+function layer(fn, t, alpha) { if (alpha <= 0) return; ctx.save(); ctx.globalAlpha = alpha; fn(t); ctx.restore(); }
+
+function renderAt(t) {
+  t = cl(t, 0, DUR);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  // subtle camera sway keeps the single shot alive
+  ctx.save();
+  const sway = .5 + .5 * Math.sin(t * .4);
+  ctx.translate(CX, CY); ctx.rotate(Math.sin(t * .31) * .006 * sway); ctx.translate(-CX, -CY);
+  if (t < 5.4) layer(act1, t, 1 - P(t, 5.0, 5.4));
+  if (t > 4.95 && t < 15.25) layer(actTerrain, t, P(t, 4.95, 5.2));
+  if (t > 14.95 && t < 20.1) layer(actTunnel, t, 1);
+  if (t > 19.95 && t < 25.4) layer(actBloom, t, 1);
+  if (t > 25.0) layer(actTitle, t, 1);
+  ctx.restore();
+  finish(t);
+}
+
+window.renderAt = renderAt;
+window.DURATION = DUR;
+window.reelReady = (async () => {
+  await document.fonts.ready;
+  await Promise.all(['800 40px "Syne"', '40px "Geist Mono"', 'italic 40px "Instrument Serif"'].map(f => document.fonts.load(f)));
+  renderAt(0);
+  return true;
+})();
+if (!CAPTURE) {
+  let paused = false, last = performance.now(), cur = 0;
+  addEventListener("keydown", e => { if (e.code === "Space") { paused = !paused; e.preventDefault(); } if (e.code === "ArrowRight") cur += 1; if (e.code === "ArrowLeft") cur = Math.max(0, cur - 1); });
+  window.reelReady.then(() => {
+    last = performance.now();
+    const loop = now => { if (!paused) { cur += (now - last) / 1000; if (cur > DUR + 1) cur = 0; } last = now; renderAt(Math.min(cur, DUR)); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+}
+</script>
+</body>
+</html>

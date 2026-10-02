@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="id" data-pdf="Motion-Pakai-Claude-Design.pdf">
+<head>
+<meta charset="utf-8">
+<title>Motion Pakai Claude Design — Otak Rental</title>
+<!-- Side module (A4 PDF). Build: node modul/build.mjs claude-design.html → modul/Motion-Pakai-Claude-Design.pdf
+     The Claude interface is redrawn in HTML/CSS as an illustration (not screenshots). -->
+<link rel="stylesheet" href="modul.css">
+<link rel="stylesheet" href="claude-ui.css">
+</head>
+<body>
+
+<!-- ================================================================ 01 · COVER -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Modul bonus 02</span><span>Edisi Sept 2026 · v1.0</span></div>
+  <div class="pad" style="padding-top:112px">
+    <span class="kicker dark"><i></i>Khusus pelanggan Claude Pro</span>
+    <h1 style="font-size:66px;line-height:.98;margin-top:20px">Motion pakai<span class="ser" style="font-size:78px;margin-top:4px"><span class="mk">Claude Design.</span></span></h1>
+    <p class="lead" style="width:470px;font-size:15px">Tutorial klik demi klik: dari setup akun sampai video motion jadi MP4, pakai model <b>Opus 5.5</b>. Tanpa coding, tanpa After Effects.</p>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <span class="kicker">15 halaman</span><span class="kicker">8 langkah</span><span class="kicker">10 prompt siap pakai</span>
+    </div>
+
+    <div class="ui win" style="position:absolute;left:52px;right:52px;top:520px;height:430px">
+      <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>claude.ai</b>/design</span></div>
+      <div class="atop"><span class="brand"><i class="spk"></i>Claude Design <span class="pj">/ Promo Kopi Nalar 10s</span></span><span class="rp">Research preview</span>
+        <div class="tools"><span>Tweaks</span><span class="on">Comment</span><span>Edit</span><span>Draw</span></div><span class="ubtn">Share</span><span class="ubtn dk">Export</span></div>
+      <div class="abody" style="height:372px">
+        <div class="chat">
+          <div class="msg-u">Buat animasi promo 10 detik, 1080×1350, untuk kopi susu gula aren "Kopi Nalar". Hangat, playful, teks besar.</div>
+          <div class="msg-c"><i class="spk"></i><div><span class="think">✓ Thought for 12s</span><p>Siap! Aku buat 5 scene dengan timeline: hook, produk, rasa, harga, dan logo penutup. Tekan ▶ untuk memutar.</p></div></div>
+          <div class="msg-u">Judulnya masuk lebih pelan ya, pakai overshoot.</div>
+          <div class="msg-c"><i class="spk"></i><p>Beres. Durasi masuk judul jadi 0,8 detik dengan efek memantul. Coba putar lagi.</p></div>
+          <div class="composer"><div class="ph">Reply to Claude…</div><div class="row"><span class="plus">+</span><span class="model">Opus 5.5 ▾</span><span class="send">↑</span></div></div>
+        </div>
+        <div class="cv">
+          <div class="stage" style="width:190px;height:238px;margin-bottom:34px"><img src="img/kopi-cup.jpg" alt=""></div>
+          <div class="tline"><span class="pl">▶</span><span class="t"><b>00:03.4</b> / 00:10.0</span><div class="tr"><b style="--w:2"></b><b class="on" style="--w:2.5"></b><b style="--w:2"></b><b style="--w:1.5"></b><b style="--w:2"></b><span class="ph" style="left:34%"></span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="abs" style="position:absolute;right:30px;top:420px;width:110px;height:110px;border-radius:50%;background:var(--lime);border:2px solid var(--ink);display:grid;place-items:center;text-align:center;transform:rotate(10deg);z-index:5;box-shadow:0 16px 26px -14px rgba(5,16,14,.6)">
+      <div><div class="mono" style="font-size:8px;letter-spacing:.18em">MODEL</div><div style="font-size:26px;font-weight:840;letter-spacing:-.05em;line-height:1">Opus<br>5.5</div></div>
+    </div>
+  </div>
+  <div class="ft"><span>otakrental · @otakrental</span><span>Motion pakai Claude Design</span></div>
+</section>
+
+<!-- ================================================================ 02 · SEBELUM MULAI -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Persiapan</span></div>
+  <div class="pad">
+    <span class="kicker"><i></i>Sebelum mulai</span>
+    <h1>Siapkan ini dulu,<span class="ser">cuma 5 menit.</span></h1>
+    <p class="lead">Modul ini adalah versi "jalan pintas" dari modul utama. Di sini kita tidak menulis kode sama sekali: semua dikerjakan di <b>Claude Design</b>, alat desain dari Anthropic yang bisa membuat animasi cukup lewat ngobrol.</p>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card"><span class="kicker dark">01 · Akun</span><h3>Claude Pro aktif</h3><p class="small">Claude Design tersedia untuk paket Pro, Max, Team, dan Enterprise. Cek paketmu di <b>Settings → Billing</b>. Akun gratis belum bisa.</p></div>
+      <div class="card"><span class="kicker dark">02 · Perangkat</span><h3>Laptop / PC + Chrome</h3><p class="small">Kerjakan di browser desktop. Layar lebar membuat panel chat dan kanvas enak dilihat berdampingan.</p></div>
+      <div class="card"><span class="kicker dark">03 · Aset brand</span><h3>Logo + 2–3 warna</h3><p class="small">Logo PNG (latar transparan lebih baik), kode warna hex, dan nama font kalau ada. Tidak punya? Pakai contoh "Kopi Nalar" di modul ini.</p></div>
+      <div class="card"><span class="kicker dark">04 · Perekam</span><h3>Perekam layar</h3><p class="small">Bawaan Windows / Mac sudah cukup. Dipakai di langkah terakhir untuk mengubah animasi jadi MP4.</p></div>
+    </div>
+    <div class="grid2" style="margin-top:14px;grid-template-columns:1.1fr .9fr">
+      <div class="card ink"><span class="kicker" style="background:transparent;border-color:rgba(255,255,255,.2);color:var(--lime)">Kenapa Opus 5.5?</span>
+        <p style="margin-top:10px;font-size:11.4px">Opus 5.5 adalah model Opus terbaru (rilis 22 September 2026) dan <b style="color:var(--lime)">sudah termasuk di paket Pro</b> tanpa biaya tambahan. Untuk animasi yang punya banyak scene dan detail timing, model Opus lebih teliti dan lebih jarang "lupa" instruksi.</p></div>
+      <div class="card" style="padding:12px"><div class="cap" style="margin:0 0 8px">Yang akan kita buat</div>
+        <div style="display:flex;gap:6px"><div class="shot" style="width:33%;height:92px"><img src="img/kopi-hook.jpg" alt=""></div><div class="shot" style="width:33%;height:92px"><img src="img/kopi-cup.jpg" alt=""></div><div class="shot" style="width:33%;height:92px"><img src="img/kopi-brand.jpg" alt=""></div></div>
+        <p class="small" style="margin-top:8px">Video promo <b>10 detik</b>, format feed Instagram <b>4:5</b>, untuk brand fiktif "Kopi Nalar".</p></div>
+    </div>
+    <div class="tip warn"><b class="t">CATATAN</b><span>Claude Design masih berstatus <b>research preview</b>. Tampilan dan nama tombol bisa sedikit berbeda dari ilustrasi di modul ini (ilustrasi dibuat ulang, bukan tangkapan layar resmi). Alurnya tetap sama.</span></div>
+  </div>
+  <div class="ft"><span>02</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 03 · PETA ALUR -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Peta alur</span></div>
+  <div class="pad">
+    <span class="kicker"><i></i>Peta alur</span>
+    <h1>8 langkah,<span class="ser">dari nol sampai MP4.</span></h1>
+    <p class="lead">Video pertamamu kira-kira butuh <span class="mk"><b>± 30 menit</b></span>. Video berikutnya jauh lebih cepat karena design system cukup dibuat sekali.</p>
+    <div class="tlist">
+      <div class="tstep"><span class="n">1</span><div class="bx"><div><h3>Buka Claude Design</h3><p>Masuk ke claude.ai/design dengan akun Pro.</p></div><div class="m"><b>1 mnt</b>hal. 04</div></div></div>
+      <div class="tstep"><span class="n o">2</span><div class="bx"><div><h3>Pasang design system <span class="small">(sekali saja)</span></h3><p>Upload logo &amp; warna supaya semua video otomatis sesuai brand.</p></div><div class="m"><b>5 mnt</b>hal. 05</div></div></div>
+      <div class="tstep"><span class="n">3</span><div class="bx"><div><h3>Buat project baru</h3><p>Pilih jenis project, beri nama, klik Create.</p></div><div class="m"><b>1 mnt</b>hal. 06</div></div></div>
+      <div class="tstep"><span class="n">4</span><div class="bx"><div><h3>Pilih Opus 5.5 &amp; tulis prompt</h3><p>Satu prompt lengkap = hasil pertama yang sudah bagus.</p></div><div class="m"><b>3 mnt</b>hal. 07</div></div></div>
+      <div class="tstep"><span class="n">5</span><div class="bx"><div><h3>Kenali layar kerja</h3><p>Chat, kanvas, timeline, dan toolbar.</p></div><div class="m"><b>2 mnt</b>hal. 08</div></div></div>
+      <div class="tstep"><span class="n">6</span><div class="bx"><div><h3>Revisi: chat, komentar, tweaks</h3><p>Tiga cara memperbaiki hasil tanpa mengulang dari awal.</p></div><div class="m"><b>10 mnt</b>hal. 09–10</div></div></div>
+      <div class="tstep"><span class="n">7</span><div class="bx"><div><h3>Export jadi file HTML</h3><p>Simpan animasi supaya bisa diputar di browser mana pun.</p></div><div class="m"><b>1 mnt</b>hal. 11</div></div></div>
+      <div class="tstep"><span class="n">8</span><div class="bx"><div><h3>Rekam jadi MP4 &amp; upload</h3><p>Rekam layar, potong, tambah musik, selesai.</p></div><div class="m"><b>5 mnt</b>hal. 12</div></div></div>
+    </div>
+    <div class="tip"><b class="t">SARAN</b><span>Baca sekali sampai habis, lalu praktik sambil membuka modul ini di HP atau layar kedua.</span></div>
+  </div>
+  <div class="ft"><span>03</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 04 · LANGKAH 1 -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 1</span></div>
+  <div class="chapnum">01</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Langkah 1 · ±1 menit</span>
+    <h1>Buka<span class="ser">Claude Design.</span></h1>
+    <ol class="num">
+      <li>Buka <b>claude.ai</b> di Chrome dan login dengan akun <b>Pro</b>-mu.</li>
+      <li>Di address bar, ketik <b>claude.ai/design</b> lalu tekan <span class="kbd">Enter</span>.</li>
+      <li>Kalau baru pertama kali, ikuti layar sambutan (onboarding) sampai muncul halaman utama seperti di bawah.</li>
+    </ol>
+
+    <div class="ui win" style="margin-top:16px;height:400px">
+      <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>claude.ai</b>/design</span></div>
+      <div class="atop"><span class="brand"><i class="spk"></i>Claude Design</span><span class="rp">Research preview</span><span style="margin-left:auto;display:flex;gap:6px;align-items:center"><span class="ubtn">Design systems</span><span style="width:20px;height:20px;border-radius:50%;background:#D9D4C7;display:grid;place-items:center;font-size:8px;font-weight:600">PS</span></span></div>
+      <div style="padding:26px 30px;background:var(--cb);height:344px">
+        <div style="font-family:'Instrument Serif',serif;font-size:30px;letter-spacing:-.01em;display:flex;gap:10px;align-items:center"><i class="spk" style="width:24px;height:24px"></i>What are we designing today?</div>
+        <div class="composer" style="margin:16px 0 20px;width:420px"><div class="ph">Describe what you want to create…</div><div class="row"><span class="plus">+</span><span class="model">Opus 5.5 ▾</span><span class="send">↑</span></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:9px;font-weight:600">Recent projects</span><span class="ubtn or">+ New project</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div style="font-size:7.6px"><div class="thumb" style="height:66px;background:#1d1a17"></div><b>Menu board</b><div style="color:var(--cm)">Edited 2d ago</div></div>
+          <div style="font-size:7.6px"><div class="thumb" style="height:66px;background:#E8E3D6"></div><b>Pitch deck Q4</b><div style="color:var(--cm)">Edited 5d ago</div></div>
+          <div style="font-size:7.6px"><div class="thumb" style="height:66px;background:#D7E2D9"></div><b>Landing page</b><div style="color:var(--cm)">Edited 1w ago</div></div>
+          <div style="font-size:7.6px"><div class="thumb" style="height:66px;border:1.5px dashed #cfcabd;background:transparent;display:grid;place-items:center;color:var(--cm);font-size:14px">+</div><b>Blank</b><div style="color:var(--cm)">Start fresh</div></div>
+        </div>
+      </div>
+      <span class="co" style="left:260px;top:30px">1</span>
+      <span class="co" style="right:66px;top:34px">2</span>
+      <span class="co" style="right:20px;top:176px">3</span>
+    </div>
+    <div class="legend">
+      <div><span class="n">1</span><span><b>Alamat halaman.</b> Simpan sebagai bookmark supaya besok tinggal klik.</span></div>
+      <div><span class="n">2</span><span><b>Design systems.</b> Tempat menyimpan identitas brand (langkah 2).</span></div>
+      <div><span class="n">3</span><span><b>New project.</b> Tombol untuk memulai video baru (langkah 3).</span></div>
+      <div><span class="n">!</span><span><b>Tidak bisa dibuka?</b> Pastikan paket Pro aktif, lalu logout-login ulang.</span></div>
+    </div>
+  </div>
+  <div class="ft"><span>04</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 05 · LANGKAH 2 -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 2</span></div>
+  <div class="chapnum">02</div>
+  <div class="pad">
+    <span class="kicker"><i></i>Langkah 2 · ±5 menit · opsional</span>
+    <h1>Pasang<span class="ser">design system.</span></h1>
+    <p class="lead">Design system adalah "identitas brand" yang disimpan Claude: warna, font, logo, dan gaya. Cukup dibuat <b>sekali</b>, setelah itu setiap project baru otomatis on-brand.</p>
+
+    <div class="ui win" style="margin-top:14px;height:330px">
+      <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>claude.ai</b>/design</span></div>
+      <div class="atop"><span class="brand"><i class="spk"></i>Claude Design <span class="pj">/ Design systems / New</span></span><span style="margin-left:auto" class="ubtn or">Save design system</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;height:274px">
+        <div style="padding:14px;border-right:1px solid var(--cl)">
+          <div class="fld" style="margin-top:0">Name</div><div class="inp">Kopi Nalar</div>
+          <div class="fld">Add brand materials</div>
+          <div style="border:1.5px dashed #cfcabd;border-radius:10px;padding:12px;text-align:center;font-size:7.6px;color:var(--cm)">Drop logo, brand guide, screenshots,<br>or link a website / codebase</div>
+          <div class="filechip"><i></i>logo-kopi-nalar.png</div> <div class="filechip"><i style="background:#6E7169"></i>feed-instagram.jpg</div>
+          <div class="fld">Notes for Claude</div>
+          <div class="inp" style="font-size:7.6px;line-height:1.45;height:44px">Hangat, playful, untuk anak muda. Judul tebal, aksen serif miring.</div>
+        </div>
+        <div style="padding:14px;background:var(--cp)">
+          <div class="fld" style="margin-top:0">Colors (detected)</div>
+          <div style="display:flex;gap:6px;align-items:center;font-family:'Geist Mono';font-size:6.6px;color:var(--cm)">
+            <span style="text-align:center"><span class="sw" style="background:#2B1B12"></span><br>#2B1B12</span><span style="text-align:center"><span class="sw" style="background:#EE8A2F"></span><br>#EE8A2F</span><span style="text-align:center"><span class="sw" style="background:#F4EADB"></span><br>#F4EADB</span><span style="text-align:center"><span class="sw" style="background:#7A4A2A"></span><br>#7A4A2A</span></div>
+          <div class="fld">Typography</div>
+          <div style="background:#fff;border:1px solid var(--cl);border-radius:8px;padding:8px"><div style="font-size:15px;font-weight:800;letter-spacing:-.04em">Es Kopi Susu</div><div style="font-family:'Instrument Serif';font-style:italic;font-size:14px;color:#B0652A">Gula Aren.</div><div style="font-size:6.8px;color:var(--cm);margin-top:3px">Heading: Bold sans · Accent: Italic serif</div></div>
+          <div class="fld">Components</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap"><span class="ubtn" style="background:#2B1B12;color:#fff;border-color:#2B1B12">Pesan sekarang</span><span class="ubtn" style="border-radius:999px;background:#EE8A2F;color:#fff;border-color:#EE8A2F">-33%</span><span class="ubtn">Harga</span></div>
+        </div>
+      </div>
+      <span class="co" style="left:14px;top:92px">1</span><span class="co" style="left:280px;top:120px">2</span><span class="co" style="right:14px;top:66px">3</span>
+    </div>
+    <div class="legend">
+      <div><span class="n">1</span><span><b>Upload bahan brand:</b> logo, screenshot feed IG, atau link website. Makin banyak contoh, makin akurat.</span></div>
+      <div><span class="n">2</span><span><b>Tulis catatan gaya</b> dalam 1–2 kalimat: untuk siapa, suasananya apa.</span></div>
+      <div><span class="n">3</span><span><b>Cek hasil deteksi.</b> Warna atau font salah? Minta Claude memperbaikinya lewat chat.</span></div>
+      <div><span class="n">✓</span><span><b>Simpan.</b> Di langkah 3 tinggal pilih design system ini.</span></div>
+    </div>
+    <div class="tip"><b class="t">GAK PUNYA?</b><span>Tidak punya brand guide? Cukup logo + 3 kode warna. Tidak punya logo juga? Lewati langkah ini, lalu tulis warna &amp; gaya langsung di prompt.</span></div>
+  </div>
+  <div class="ft"><span>05</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 06 · LANGKAH 3 -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 3</span></div>
+  <div class="chapnum">03</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Langkah 3 · ±1 menit</span>
+    <h1>Buat<span class="ser">project baru.</span></h1>
+    <p class="lead">Satu video = satu project. Dengan begitu riwayat revisi tiap video rapi dan tidak tercampur.</p>
+    <div class="side" style="margin-top:14px;grid-template-columns:1.05fr .95fr">
+      <div class="ui" style="position:relative">
+        <div class="dlg">
+          <h5>New project</h5>
+          <div class="tabs"><span class="on">Prototype</span><span>Slide deck</span><span>From template</span><span>Other</span></div>
+          <div class="fld" style="margin-top:0">Project name</div>
+          <div class="inp focus">Promo Kopi Nalar 10s<span style="display:inline-block;width:1px;height:9px;background:var(--ct);vertical-align:-1px;margin-left:1px"></span></div>
+          <div class="fld">Fidelity</div>
+          <div class="opt"><div><div class="thumb"><div style="position:absolute;inset:8px;border:1.3px dashed #bdb8aa;border-radius:4px"></div></div><b>Wireframe</b>Rough layout</div><div class="on"><div class="thumb" style="background:#2B1B12"><div style="position:absolute;left:8px;top:8px;width:40px;height:6px;border-radius:2px;background:#EE8A2F"></div><div style="position:absolute;left:8px;top:18px;width:60px;height:4px;border-radius:2px;background:#F4EADB"></div></div><b>High fidelity</b>Polished, final look</div></div>
+          <div class="fld">Design system</div>
+          <div class="inp" style="display:flex;justify-content:space-between"><span><span class="sw" style="width:10px;height:10px;background:#EE8A2F;border-radius:3px;vertical-align:-1px"></span> Kopi Nalar</span><span style="color:var(--cm)">▾</span></div>
+          <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:14px"><span class="ubtn">Cancel</span><span class="ubtn dk">Create</span></div>
+        </div>
+        <span class="co" style="left:14px;top:40px">1</span><span class="co" style="left:-8px;top:82px">2</span><span class="co" style="right:-8px;top:150px">3</span><span class="co" style="left:-8px;top:236px">4</span><span class="co" style="right:60px;top:276px">5</span>
+      </div>
+      <div>
+        <ol class="num" style="margin-top:0">
+          <li>Klik <b>+ New project</b>, pilih tab <b>Prototype</b>. Animasi di Claude Design dibuat sebagai prototipe yang bisa diputar.</li>
+          <li>Beri <b>nama</b> yang jelas. Tombol Create belum aktif sebelum nama diisi.</li>
+          <li>Pilih <b>High fidelity</b> supaya hasilnya langsung rapi, bukan sketsa.</li>
+          <li>Pilih <b>design system</b> "Kopi Nalar" dari langkah 2 (kalau ada).</li>
+          <li>Klik <b>Create</b>. Kamu masuk ke layar kerja.</li>
+        </ol>
+        <div class="tip" style="margin-top:14px"><b class="t">KENAPA BUKAN SLIDE?</b><span>Tab Slide deck untuk presentasi yang diklik per halaman. Untuk video yang bergerak sendiri, Prototype lebih cocok.</span></div>
+        <p class="small">Di beberapa akun, tab <b>From template</b> punya template animasi. Boleh dipakai, alurnya sama.</p>
+      </div>
+    </div>
+    <h2>Beri nama yang gampang dicari</h2>
+    <table><tr><th>Format nama</th><th>Contoh</th></tr>
+      <tr><td>Brand + jenis + durasi</td><td>Kopi Nalar · Promo · 10s</td></tr>
+      <tr><td>Klien + tanggal (untuk jasa)</td><td>Toko Budi · Intro · 2026-10-01</td></tr>
+    </table>
+  </div>
+  <div class="ft"><span>06</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 07 · LANGKAH 4 -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 4</span></div>
+  <div class="chapnum">04</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Langkah 4 · ±3 menit</span>
+    <h1>Pilih Opus 5.5,<span class="ser">tulis prompt pertama.</span></h1>
+    <div class="side" style="margin-top:14px;grid-template-columns:.9fr 1.1fr">
+      <div class="ui" style="position:relative;height:250px">
+        <div class="composer" style="position:absolute;left:0;right:0;bottom:0"><div class="ph typed">Buat animasi promo 10 detik untuk Kopi Nalar…</div><div class="row"><span class="plus">+</span><span class="model" style="background:#F3F1EA">Opus 5.5 ▾</span><span class="send">↑</span></div></div>
+        <div class="menu" style="right:20px;bottom:62px;width:210px">
+          <div class="hd">Model</div>
+          <div class="it on"><div><b>Opus 5.5</b><div style="font-size:7px;color:var(--cm)">Paling teliti untuk pekerjaan rumit</div></div><span class="ok">✓</span></div>
+          <div class="it"><div>Sonnet<div style="font-size:7px;color:var(--cm)">Cepat untuk tugas harian</div></div></div>
+          <div class="it"><div>Haiku<div style="font-size:7px;color:var(--cm)">Paling ringan</div></div></div>
+        </div>
+        <span class="co" style="right:60px;bottom:12px">1</span><span class="co" style="right:4px;bottom:150px">2</span>
+      </div>
+      <div>
+        <ol class="num" style="margin-top:0">
+          <li>Klik nama model di kotak chat (bawah panel kiri).</li>
+          <li>Pilih <b>Opus 5.5</b>. Kalau pemilih model tidak muncul, berarti Claude Design sedang memakai model bawaannya. Lanjutkan saja.</li>
+          <li>Tempel prompt di bawah, ganti bagian <span class="mk">yang disorot</span> sesuai brand-mu, lalu tekan <b>↑</b>.</li>
+        </ol>
+        <div class="tip"><b class="t">KATA KUNCI</b><span>Sebut <b>"animasi timeline dengan tombol play"</b> supaya Claude membuat video yang bisa diputar, bukan halaman web biasa.</span></div>
+      </div>
+    </div>
+<div class="prompt" data-label="Prompt utama · copy-paste" style="margin-top:14px">Buat <b>animasi timeline dengan tombol play dan scrubber</b>, ukuran <b>1080×1350 (4:5)</b>,
+durasi <b>10 detik</b>, untuk promo <b>es kopi susu gula aren "Kopi Nalar"</b>.
+Pakai design system yang aktif. Kalau tidak ada: coklat tua <b>#2B1B12</b>, oranye <b>#EE8A2F</b>,
+krem <b>#F4EADB</b>. Judul sans tebal, aksen serif miring.
+
+Alur:
+0–2 dtk   Hook: teks besar <b>"Pagi berat?"</b> jatuh dan memantul.
+2–4 dtk   Gelas kopi muncul dari bawah, es batu jatuh satu per satu.
+4–6 dtk   Tiga label rasa muncul bergantian: <b>"2 shot"</b>, <b>"creamy"</b>, <b>"gula aren asli"</b>.
+6–8 dtk   Harga lama <b>Rp18.000</b> dicoret, harga baru <b>Rp12.000</b> berputar seperti slot.
+8–10 dtk  Logo + tagline <b>"biar mikir tetap jalan"</b>, lalu diam 1 detik.
+
+Gerakan halus dengan ease-out, ada sedikit overshoot. Pastikan semua teks terbaca di HP.
+Tambahkan tweaks untuk kecepatan animasi dan warna aksen.</div>
+    <p class="small">Tunggu 1–3 menit. Opus 5.5 kadang "berpikir" dulu (muncul tulisan <i>Thinking…</i>) sebelum mulai membangun. Itu normal.</p>
+  </div>
+  <div class="ft"><span>07</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 08 · LANGKAH 5 -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 5</span></div>
+  <div class="chapnum">05</div>
+  <div class="pad">
+    <span class="kicker"><i></i>Langkah 5 · ±2 menit</span>
+    <h1>Kenali<span class="ser">layar kerjamu.</span></h1>
+    <p class="lead">Semua yang kamu butuhkan ada di satu layar. Hafalkan 7 bagian ini dan kamu tidak akan bingung lagi.</p>
+
+    <div class="ui win" style="margin-top:14px;height:500px">
+      <div class="tb"><i></i><i></i><i></i><span class="url">🔒 <b>claude.ai</b>/design</span></div>
+      <div class="atop"><span class="brand"><i class="spk"></i>Claude Design <span class="pj">/ Promo Kopi Nalar 10s</span></span>
+        <div class="tools"><span>Tweaks</span><span>Comment</span><span>Edit</span><span>Draw</span></div><span class="ubtn">Share</span><span class="ubtn dk">Export</span></div>
+      <div class="abody" style="height:442px">
+        <div class="chat">
+          <div class="msg-u">Buat animasi timeline dengan tombol play dan scrubber, 1080×1350, durasi 10 detik, promo Kopi Nalar…</div>
+          <div class="msg-c"><i class="spk"></i><div><span class="think">✓ Thought for 18s</span><p>Animasinya siap: 5 scene sesuai alur. Aku juga menambahkan tweaks untuk <b>kecepatan</b> dan <b>warna aksen</b>. Tekan ▶ di bawah kanvas untuk memutar.</p></div></div>
+          <div class="composer"><div class="ph">Reply to Claude…</div><div class="row"><span class="plus">+</span><span class="model">Opus 5.5 ▾</span><span class="send">↑</span></div></div>
+        </div>
+        <div class="cv">
+          <div class="stage" style="width:250px;height:312px;margin-bottom:36px"><img src="img/kopi-hook.jpg" alt=""></div>
+          <div class="tline"><span class="pl">▶</span><span class="t"><b>00:01.2</b> / 00:10.0</span><div class="tr"><b class="on" style="--w:2"></b><b style="--w:2"></b><b style="--w:2"></b><b style="--w:2"></b><b style="--w:2"></b><span class="ph" style="left:12%"></span></div></div>
+        </div>
+      </div>
+      <span class="co" style="left:96px;top:230px">1</span>
+      <span class="co" style="left:520px;top:110px">2</span>
+      <span class="co" style="left:300px;bottom:28px">3</span>
+      <span class="co" style="left:412px;top:20px">4</span>
+      <span class="co" style="left:458px;top:20px">5</span>
+      <span class="co" style="left:512px;top:20px">6</span>
+      <span class="co" style="left:626px;top:20px">7</span>
+    </div>
+    <div class="legend">
+      <div><span class="n">1</span><span><b>Panel chat.</b> Perubahan besar: ganti alur, gaya, atau tambah scene.</span></div>
+      <div><span class="n">2</span><span><b>Kanvas.</b> Pratinjau animasi yang selalu ter-update.</span></div>
+      <div><span class="n">3</span><span><b>Timeline.</b> Tombol ▶ untuk memutar, geser garis oranye untuk lompat ke detik tertentu.</span></div>
+      <div><span class="n">4</span><span><b>Tweaks.</b> Slider &amp; pemilih warna buatan Claude untuk diatur manual.</span></div>
+      <div><span class="n">5</span><span><b>Comment.</b> Klik elemen di kanvas lalu tulis revisi khusus elemen itu.</span></div>
+      <div><span class="n">6</span><span><b>Edit / Draw.</b> Ubah teks langsung atau coret area yang mau diubah.</span></div>
+      <div><span class="n">7</span><span><b>Share / Export.</b> Bagikan link atau simpan file (langkah 7).</span></div>
+    </div>
+  </div>
+  <div class="ft"><span>08</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 09 · LANGKAH 6A -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 6 · revisi</span></div>
+  <div class="chapnum">06</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Langkah 6 · ±10 menit</span>
+    <h1>Revisi tepat sasaran<span class="ser">dengan Comment.</span></h1>
+    <p class="lead">Hasil pertama jarang langsung sempurna. Kuncinya: <b>putar dulu 2–3 kali</b>, catat yang kurang, baru revisi satu per satu.</p>
+    <div class="side" style="margin-top:12px;grid-template-columns:1fr 1fr">
+      <div class="ui win" style="height:330px">
+        <div class="atop"><span class="brand" style="font-size:7.6px"><i class="spk"></i>Promo Kopi Nalar 10s</span><div class="tools"><span>Tweaks</span><span class="on">Comment</span><span>Edit</span></div></div>
+        <div class="cv" style="height:296px">
+          <div class="stage" style="width:176px;height:220px;margin-bottom:30px"><img src="img/kopi-price.jpg" alt=""></div>
+          <div class="sel" data-tag="price-new" style="left:63px;top:152px;width:128px;height:34px"></div>
+          <span class="pin" style="left:186px;top:136px">1</span>
+          <div class="cbox" style="left:140px;top:190px;width:150px"><b style="font-size:7.4px">Kamu</b><div>Harga baru muncul 0,5 detik lebih lambat, ukurannya 20% lebih besar.</div><div style="display:flex;justify-content:flex-end;margin-top:5px"><span class="ubtn or" style="padding:2px 7px">Send</span></div></div>
+        </div>
+      </div>
+      <div>
+        <ol class="num" style="margin-top:0">
+          <li>Aktifkan <b>Comment</b> di toolbar.</li>
+          <li><b>Klik elemen</b> yang mau diubah di kanvas (misal harga). Elemen akan diberi garis oranye.</li>
+          <li>Tulis revisi <b>khusus elemen itu</b>, lalu Send. Bagian lain tidak akan diutak-atik.</li>
+        </ol>
+        <div class="card" style="margin-top:12px;padding:12px 14px"><h3 style="margin:0 0 4px">Kapan pakai apa?</h3>
+          <p class="small" style="margin:0"><b>Comment</b>: satu elemen (teks, ikon, harga).<br><b>Chat</b>: seluruh video (alur, gaya, durasi).<br><b>Tweaks</b>: angka &amp; warna yang mau dicoba-coba.<br><b>Edit</b>: salah ketik, cukup ganti sendiri.</p></div>
+      </div>
+    </div>
+    <h2>Rumus kalimat revisi</h2>
+    <table><tr><th style="width:36%">Kurang jelas</th><th>Jelas (pakai ini)</th></tr>
+      <tr><td>"Kurang keren."</td><td>"Tambahkan overshoot saat gelas muncul dan beri bayangan halus."</td></tr>
+      <tr><td>"Kecepetan."</td><td>"Perlambat scene 3 jadi 3 detik, total durasi tetap 10 detik."</td></tr>
+      <tr><td>"Warnanya jelek."</td><td>"Ganti background scene 1 ke #2B1B12, teks ke #F4EADB."</td></tr>
+      <tr><td>"Ubah semuanya."</td><td>"Pertahankan semua, hanya ganti font judul jadi lebih tebal."</td></tr>
+    </table>
+    <h2>Revisi dalam 3 putaran</h2>
+    <div class="grid3">
+      <div class="card"><span class="kicker dark">Putaran 1</span><h3>Alur &amp; timing</h3><p class="small">Urutan scene, durasi tiap scene, kapan teks muncul dan hilang.</p></div>
+      <div class="card"><span class="kicker dark">Putaran 2</span><h3>Teks &amp; warna</h3><p class="small">Isi kalimat, ukuran judul, warna latar dan aksen.</p></div>
+      <div class="card"><span class="kicker dark">Putaran 3</span><h3>Detail kecil</h3><p class="small">Bayangan, overshoot, jeda akhir. Paling enak lewat Tweaks.</p></div>
+    </div>
+  </div>
+  <div class="ft"><span>09</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 10 · LANGKAH 6B -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 6 · tweaks</span></div>
+  <div class="pad">
+    <span class="kicker"><i></i>Langkah 6 · lanjutan</span>
+    <h1>Atur sendiri<span class="ser">pakai Tweaks.</span></h1>
+    <p class="lead">Tweaks adalah panel slider dan pemilih warna yang <b>dibuatkan Claude khusus untuk desainmu</b>. Menggesernya tidak perlu chat, jadi lebih cepat dan hemat kuota.</p>
+    <div class="side" style="margin-top:12px;grid-template-columns:1.05fr .95fr">
+      <div class="ui win" style="height:340px">
+        <div class="atop"><span class="brand" style="font-size:7.6px"><i class="spk"></i>Promo Kopi Nalar 10s</span><div class="tools"><span class="on">Tweaks</span><span>Comment</span><span>Edit</span></div></div>
+        <div class="cv" style="height:306px;justify-content:flex-start;padding-left:18px">
+          <div class="stage" style="width:150px;height:188px;margin-bottom:30px"><img src="img/kopi-dingin.jpg" alt=""></div>
+          <div class="menu" style="right:10px;top:12px;width:150px;padding:8px 10px">
+            <div class="hd" style="padding:0 0 4px">Tweaks</div>
+            <div class="slider"><span class="lb" style="width:48px">Kecepatan</span><span class="rl"><b style="width:60%"></b><i style="left:60%"></i></span><span class="v" style="width:24px">1.2×</span></div>
+            <div class="slider"><span class="lb" style="width:48px">Ukuran judul</span><span class="rl"><b style="width:72%"></b><i style="left:72%"></i></span><span class="v" style="width:24px">96px</span></div>
+            <div class="slider"><span class="lb" style="width:48px">Overshoot</span><span class="rl"><b style="width:35%"></b><i style="left:35%"></i></span><span class="v" style="width:24px">0.35</span></div>
+            <div class="slider"><span class="lb" style="width:48px">Jeda akhir</span><span class="rl"><b style="width:50%"></b><i style="left:50%"></i></span><span class="v" style="width:24px">1.0s</span></div>
+            <div class="sep" style="height:1px;background:var(--cl);margin:6px 0"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:7.6px">Aksen <span><span class="sw" style="width:14px;height:14px;background:#EE8A2F"></span> <span class="sw" style="width:14px;height:14px;background:#D4E751"></span> <span class="sw" style="width:14px;height:14px;background:#C94F3D"></span></span></div>
+          </div>
+          <div class="tline" style="left:10px;right:170px"><span class="pl">▶</span><div class="tr"><b style="--w:2"></b><b style="--w:2"></b><b class="on" style="--w:2"></b><b style="--w:2"></b><span class="ph" style="left:58%"></span></div></div>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-top:0">Belum ada panel Tweaks?</h3>
+        <p>Minta saja lewat chat:</p>
+        <div class="prompt" data-label="Prompt tweaks">Tambahkan tweaks untuk: <b>kecepatan animasi</b>,
+<b>ukuran judul</b>, <b>kekuatan overshoot</b>,
+<b>lama jeda di akhir</b>, dan <b>3 pilihan
+warna aksen</b>.</div>
+        <h3>Sudah pas? Kunci nilainya</h3>
+        <p>Tweaks bisa kembali ke nilai awal. Setelah cocok, kirim: <i>"Jadikan nilai tweaks sekarang sebagai default."</i></p>
+        <div class="tip"><b class="t">VERSI</b><span>Sebelum eksperimen besar, minta: <i>"Simpan versi ini sebagai v1."</i> Kalau hasil baru jelek, tinggal minta kembali ke v1.</span></div>
+      </div>
+    </div>
+    <h2>Tweaks paling berguna untuk motion</h2>
+    <table><tr><th style="width:30%">Tweak</th><th>Efeknya</th></tr>
+      <tr><td><b>Kecepatan global</b></td><td>Mempercepat/memperlambat semua gerakan tanpa mengubah urutan</td></tr>
+      <tr><td><b>Jeda antar elemen</b></td><td>Mengatur efek bergantian (stagger) pada huruf atau kartu</td></tr>
+      <tr><td><b>Gaya easing</b></td><td>Pilihan halus, memantul, atau tegas untuk elemen yang masuk</td></tr>
+    </table>
+    <h2>Checklist sebelum lanjut ke export</h2>
+    <ul class="clean" style="columns:2;column-gap:24px">
+      <li>Diputar 3× tanpa ada yang janggal</li><li>Semua teks sempat dibaca</li><li>Warna sesuai brand</li><li>Ada jeda diam di akhir</li><li>Tidak ada elemen keluar frame</li><li>Logo tampil jelas</li>
+    </ul>
+  </div>
+  <div class="ft"><span>10</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 11 · LANGKAH 7 -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 7</span></div>
+  <div class="chapnum">07</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Langkah 7 · ±1 menit</span>
+    <h1>Export<span class="ser">jadi file HTML.</span></h1>
+    <p class="lead">Claude Design (per September 2026) <b>belum punya tombol "Export MP4"</b>. Jadi kita simpan animasinya sebagai file HTML yang bisa diputar di browser, lalu direkam di langkah 8.</p>
+    <div class="side" style="margin-top:12px;grid-template-columns:1fr 1fr">
+      <div class="ui" style="position:relative;height:330px">
+        <div class="win" style="position:absolute;inset:0 0 auto 0;height:60px"><div class="atop" style="height:40px"><span class="brand" style="font-size:7.6px"><i class="spk"></i>Promo Kopi Nalar 10s</span><span style="margin-left:auto" class="ubtn">Share</span><span class="ubtn dk">Export ▾</span></div></div>
+        <div class="menu" style="right:6px;top:48px;width:220px">
+          <div class="hd">Share</div>
+          <div class="it"><i style="border-radius:50%"></i>Copy share link<span class="k">view · comment · edit</span></div>
+          <div class="sep"></div>
+          <div class="hd">Export</div>
+          <div class="it on"><i style="background:var(--ca);border-color:var(--ca)"></i><b>Standalone HTML</b><span class="ok">◀ ini</span></div>
+          <div class="it"><i></i>Download folder (ZIP)</div>
+          <div class="it"><i></i>PDF</div>
+          <div class="it"><i></i>PPTX</div>
+          <div class="it"><i></i>Send to Canva</div>
+          <div class="sep"></div>
+          <div class="it"><i></i>Handoff to Claude Code</div>
+        </div>
+        <span class="co" style="right:36px;top:4px">1</span><span class="co" style="left:84px;top:124px">2</span>
+      </div>
+      <div>
+        <ol class="num" style="margin-top:0">
+          <li>Klik <b>Export</b> di pojok kanan atas.</li>
+          <li>Pilih <b>Standalone HTML</b>. File <code>.html</code> akan terunduh.</li>
+          <li>Buka file itu dengan <b>Chrome</b>. Animasinya harus bisa diputar tanpa internet.</li>
+        </ol>
+        <table style="margin-top:12px"><tr><th>Pilihan</th><th>Untuk apa</th></tr>
+          <tr><td><b>Standalone HTML</b></td><td>Direkam jadi video ✓</td></tr>
+          <tr><td>ZIP</td><td>Arsip lengkap / diolah tools lain</td></tr>
+          <tr><td>PDF / PPTX / Canva</td><td>Desain diam (poster, slide). Animasi tidak ikut.</td></tr>
+          <tr><td>Share link</td><td>Minta pendapat rekan tim sebelum final</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="prompt" data-label="Prompt mode rekam · kirim sebelum export" style="margin-top:14px">Tambahkan <b>mode rekam</b>: kalau saya tekan tombol <b>H</b>, sembunyikan timeline, tombol,
+dan semua UI. Animasi otomatis mulai <b>1 detik</b> setelah halaman dibuka, kanvas
+<b>di tengah layar dengan latar hitam</b>, dan berhenti di frame terakhir.</div>
+    <div class="tip"><b class="t">PENTING</b><span>Kirim prompt mode rekam di atas <b>sebelum</b> export. Hasil rekamanmu jadi bersih tanpa tombol dan garis timeline.</span></div>
+    <h2>Simpan rapi, pakai lagi</h2>
+    <div class="grid2">
+      <div class="card"><h3 style="margin-top:0">Nama file</h3><p class="small">Samakan dengan nama project, misal <code>kopi-nalar-promo-10s-v2.html</code>. Simpan di satu folder per klien.</p></div>
+      <div class="card"><h3 style="margin-top:0">Jadikan template</h3><p class="small">Video berikutnya cukup buka project lama, lalu minta: <i>"Ganti produknya jadi es teh leci, alurnya sama."</i></p></div>
+    </div>
+  </div>
+  <div class="ft"><span>11</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 12 · LANGKAH 8 -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Langkah 8</span></div>
+  <div class="chapnum">08</div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Langkah 8 · ±5 menit</span>
+    <h1>Rekam, potong,<span class="ser">jadi MP4.</span></h1>
+    <div class="side" style="margin-top:14px;grid-template-columns:1fr 1fr">
+      <div>
+        <ol class="num" style="margin-top:0">
+          <li>Buka file HTML di Chrome, tekan <span class="kbd">F11</span> (Mac: <span class="kbd">Ctrl</span>+<span class="kbd">Cmd</span>+<span class="kbd">F</span>) untuk layar penuh.</li>
+          <li>Tekan <span class="kbd">H</span> untuk menyembunyikan UI.</li>
+          <li>Mulai rekam layar (tabel di bawah), lalu <b>muat ulang halaman</b> supaya animasi mulai dari awal.</li>
+          <li>Hentikan rekaman setelah frame terakhir.</li>
+          <li>Di <b>CapCut</b>: potong awal/akhir, crop ke <b>4:5</b>, tambah musik, export <b>1080p · 30/60 fps</b>.</li>
+        </ol>
+      </div>
+      <div style="position:relative;height:250px">
+        <div style="position:absolute;inset:0;background:#000;border-radius:12px;box-shadow:0 30px 50px -30px rgba(0,0,0,.7);display:grid;place-items:center">
+          <div class="shot" style="position:relative;width:150px;height:188px;border-color:rgba(255,255,255,.1)"><img src="img/kopi-brand.jpg" alt=""></div>
+        </div>
+        <div style="position:absolute;left:12px;top:12px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border-radius:6px;padding:4px 8px;font-family:'Geist Mono';font-size:8.5px;color:#fff;letter-spacing:.1em"><i style="width:7px;height:7px;border-radius:50%;background:#FF4B3E;box-shadow:0 0 0 3px rgba(255,75,62,.3)"></i>REC 00:10</div>
+        <div class="cap" style="position:absolute;left:0;bottom:-20px">Layar penuh · UI tersembunyi · siap direkam</div>
+      </div>
+    </div>
+    <table style="margin-top:22px"><tr><th style="width:24%">Perangkat</th><th>Cara merekam</th></tr>
+      <tr><td><b>Windows 10/11</b></td><td><b>Xbox Game Bar</b>: <span class="kbd">Win</span>+<span class="kbd">Alt</span>+<span class="kbd">R</span> mulai/berhenti. Alternatif: <b>Snipping Tool</b> → mode rekam video.</td></tr>
+      <tr><td><b>macOS</b></td><td><span class="kbd">Cmd</span>+<span class="kbd">Shift</span>+<span class="kbd">5</span> → Record Entire Screen / Selected Portion → Record.</td></tr>
+      <tr><td><b>OBS Studio</b></td><td>Gratis, paling rapi. Tambah sumber <i>Window Capture</i>, output 1080p 60 fps.</td></tr>
+    </table>
+    <div class="grid2" style="margin-top:12px">
+      <div class="tip" style="margin:0"><b class="t">MUSIK</b><span>Pakai musik bebas royalti (Audio Library YouTube, musik bawaan CapCut/Instagram). Taruh beat drop tepat di momen harga muncul.</span></div>
+      <div class="tip warn" style="margin:0"><b class="t">TOOLS LAIN</b><span>Ada ekstensi pihak ketiga yang bisa mengubah animasi Claude Design langsung jadi MP4. Kalau mau coba, cek ulasan &amp; izin aksesnya dulu.</span></div>
+    </div>
+    <h2>Setting export di CapCut</h2>
+    <table><tr><th style="width:30%">Pengaturan</th><th style="width:30%">Pilih</th><th>Kenapa</th></tr>
+      <tr><td>Rasio</td><td>4:5 (feed) · 9:16 (Reels)</td><td>Sesuai ukuran animasi, tanpa bar hitam</td></tr>
+      <tr><td>Resolusi</td><td>1080p</td><td>Standar semua platform sosial</td></tr>
+      <tr><td>Frame rate</td><td>30 atau 60 fps</td><td>60 fps terasa lebih halus</td></tr>
+      <tr><td>Format</td><td>MP4</td><td>Bisa diunggah di mana saja</td></tr>
+    </table>
+  </div>
+  <div class="ft"><span>12</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 13 · PROMPT LIBRARY -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Bonus · 10 prompt</span></div>
+  <div class="pad">
+    <span class="kicker dark"><i></i>Bonus</span>
+    <h1>10 prompt<span class="ser">khusus Claude Design.</span></h1>
+    <p class="lead" style="margin-top:10px">Semua prompt diawali <b>"Buat animasi timeline dengan tombol play, [ukuran], [durasi]:"</b>, lalu tempel isinya. Ganti teks dalam [kurung].</p>
+    <div class="grid2" style="margin-top:12px;gap:9px">
+      <div class="pl"><span class="no">01</span><div><h4>Logo reveal 5 dtk</h4><p>Titik jatuh memantul, meledak jadi cincin, nama [brand] naik per huruf, tagline muncul pelan. Latar gelap.</p></div></div>
+      <div class="pl"><span class="no">02</span><div><h4>Promo diskon 8 dtk</h4><p>"DISKON" menghantam masuk, angka [50%] bergetar, harga lama dicoret, CTA "[Pesan sekarang]" berdenyut.</p></div></div>
+      <div class="pl"><span class="no">03</span><div><h4>Teks kinetik 9:16</h4><p>Kalimat "[quote]" muncul 1 kata per ketukan (0,5 dtk), kata kunci diberi warna aksen, background berganti.</p></div></div>
+      <div class="pl"><span class="no">04</span><div><h4>Menu 3 produk</h4><p>3 kartu produk masuk bergantian dari kanan, masing-masing dengan nama, harga, dan ikon. Terakhir logo.</p></div></div>
+      <div class="pl"><span class="no">05</span><div><h4>Testimoni chat</h4><p>Mockup HP, 3 bubble chat testimoni muncul dengan indikator mengetik, bintang 5 menyala satu per satu.</p></div></div>
+      <div class="pl"><span class="no">06</span><div><h4>Countdown launching</h4><p>Hitung mundur 3-2-1 dengan angka raksasa, flash putih, lalu nama produk baru [produk] dan tanggal rilis.</p></div></div>
+      <div class="pl"><span class="no">07</span><div><h4>Statistik tumbuh</h4><p>3 angka pencapaian ([1.200 pelanggan], dst.) dihitung naik dari 0, grafik batang tumbuh di belakangnya.</p></div></div>
+      <div class="pl"><span class="no">08</span><div><h4>Intro YouTube 4 dtk</h4><p>Garis-garis menyapu layar, nama channel [nama] terbentuk di tengah, efek glitch halus, diakhiri logo.</p></div></div>
+      <div class="pl"><span class="no">09</span><div><h4>Info lokasi</h4><p>Peta sederhana bergaya flat, pin jatuh ke titik [alamat], kartu jam buka muncul dari bawah.</p></div></div>
+      <div class="pl"><span class="no">10</span><div><h4>Before–after</h4><p>Layar terbagi dua dengan garis yang bergeser, kiri "[sebelum]" kusam, kanan "[sesudah]" cerah, label besar.</p></div></div>
+    </div>
+    <div class="tip"><b class="t">UKURAN</b><span>Reels/TikTok <b>1080×1920</b> · Feed IG <b>1080×1350</b> · YouTube <b>1920×1080</b>. Selalu tulis ukurannya di awal prompt.</span></div>
+  </div>
+  <div class="ft"><span>13</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 14 · HEMAT KUOTA & TROUBLESHOOTING -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Tips Pro</span></div>
+  <div class="pad">
+    <span class="kicker"><i></i>Tips pelanggan Pro</span>
+    <h1>Hemat kuota,<span class="ser">minim drama.</span></h1>
+    <p class="lead">Paket Pro punya batas pemakaian yang di-reset berkala. Claude Design dan Opus 5.5 memakai kuota lebih banyak dari chat biasa, jadi pakai dengan cerdas.</p>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card"><h3 style="margin-top:0">5 kebiasaan hemat</h3><ul class="clean">
+        <li><b>Prompt pertama selengkap mungkin</b> (pakai templat hal. 07)</li>
+        <li>Revisi kecil lewat <b>Comment</b>, bukan minta buat ulang</li>
+        <li>Angka &amp; warna diatur di <b>Tweaks</b></li>
+        <li>Salah ketik diperbaiki sendiri lewat <b>Edit</b></li>
+        <li>Kumpulkan 2–3 revisi dalam <b>satu pesan</b></li></ul></div>
+      <div class="card ink"><h3 style="margin-top:0;color:#fff">Kalau kuota habis</h3><p>Tunggu sampai batas di-reset (waktunya muncul di layar), atau aktifkan <b style="color:var(--lime)">extra usage</b> di pengaturan kalau tersedia di akunmu. Sambil menunggu: rekam dan edit video yang sudah jadi.</p></div>
+    </div>
+    <h2>Kalau ada yang aneh</h2>
+    <table><tr><th style="width:30%">Masalah</th><th style="width:30%">Penyebab umum</th><th>Solusi / kalimat perbaikan</th></tr>
+      <tr><td><b>Tidak ada tombol play</b></td><td>Claude membuat halaman biasa</td><td>"Ubah jadi animasi timeline dengan tombol play dan scrubber."</td></tr>
+      <tr><td><b>Animasi patah-patah</b></td><td>Terlalu banyak efek/partikel</td><td>"Kurangi partikel jadi 20 dan pakai transform &amp; opacity saja."</td></tr>
+      <tr><td><b>Teks kepotong</b></td><td>Kalimat terlalu panjang</td><td>"Semua teks punya margin minimal 80px dari tepi kanvas."</td></tr>
+      <tr><td><b>Warna tidak sesuai brand</b></td><td>Design system belum dipilih</td><td>Cek langkah 3, atau tulis kode hex langsung di prompt.</td></tr>
+      <tr><td><b>Revisi merusak bagian lain</b></td><td>Instruksi terlalu umum</td><td>Pakai Comment, atau tambahkan: "Jangan ubah bagian lain."</td></tr>
+      <tr><td><b>Hasil jauh dari bayangan</b></td><td>Prompt terlalu singkat</td><td>Upload gambar referensi lewat tombol <b>+</b> di kotak chat.</td></tr>
+      <tr><td><b>File HTML tidak bergerak</b></td><td>Export bukan HTML</td><td>Export ulang sebagai <b>Standalone HTML</b>, buka di Chrome.</td></tr>
+    </table>
+  </div>
+  <div class="ft"><span>14</span><span>@otakrental</span></div>
+</section>
+
+<!-- ================================================================ 15 · PENUTUP -->
+<section class="page">
+  <i class="cm a"></i><i class="cm b"></i><i class="cm c"></i><i class="cm d"></i>
+  <div class="hd"><span><img src="../assets/logo-icon-dark.png" alt=""><b>Otak Rental</b> &nbsp;/&nbsp; Motion pakai Claude Design</span><span>Penutup</span></div>
+  <div class="pad">
+    <span class="kicker"><i></i>Ringkasan</span>
+    <h1>Satu halaman,<span class="ser">semua langkah.</span></h1>
+    <table style="margin-top:14px"><tr><th style="width:8%">#</th><th style="width:34%">Langkah</th><th>Ingat ini</th></tr>
+      <tr><td>1</td><td>Buka claude.ai/design</td><td>Akun Pro, browser desktop</td></tr>
+      <tr><td>2</td><td>Design system</td><td>Sekali saja: logo + warna + catatan gaya</td></tr>
+      <tr><td>3</td><td>New project</td><td>Prototype → High fidelity → Create</td></tr>
+      <tr><td>4</td><td>Opus 5.5 + prompt</td><td>"Animasi timeline dengan tombol play", ukuran, durasi, alur per detik</td></tr>
+      <tr><td>5</td><td>Layar kerja</td><td>Chat · kanvas · timeline · Tweaks · Comment · Edit · Export</td></tr>
+      <tr><td>6</td><td>Revisi</td><td>Putar 3×, lalu revisi spesifik satu per satu</td></tr>
+      <tr><td>7</td><td>Export</td><td>Mode rekam dulu, lalu Standalone HTML</td></tr>
+      <tr><td>8</td><td>MP4</td><td>Layar penuh → H → rekam → CapCut → upload</td></tr>
+    </table>
+    <div class="card ink" style="margin-top:18px;display:flex;align-items:center;gap:18px;padding:18px 20px">
+      <div style="flex:1"><div class="mono" style="font-size:8.5px;letter-spacing:.18em;color:var(--lime)">MAU LEBIH DALAM?</div>
+        <div style="font-size:21px;font-weight:800;letter-spacing:-.035em;margin-top:4px;color:#fff">Modul utama: <span class="ser" style="color:var(--lime);font-size:24px">Motion tanpa After Effects.</span></div>
+        <p style="margin-top:4px">24 halaman: dasar motion, rumus prompt O.T.A.K, 3 praktik, render 60 fps, dan cara jual jasanya.</p></div>
+      <span style="flex:none;background:var(--lime);color:var(--ink);border-radius:999px;padding:12px 18px;font-weight:800;font-size:13.5px;letter-spacing:-.02em">DM @otakrental</span>
+    </div>
+    <h2>Lisensi &amp; catatan</h2>
+    <p class="small">Modul ini untuk penggunaan pribadi pembeli. Dilarang menjual ulang atau membagikan file ini, baik sebagian maupun seluruhnya. Prompt dan hasil animasi buatanmu sendiri boleh dipakai untuk proyek pribadi maupun komersial.</p>
+    <p class="small">Claude, Claude Design, dan Opus adalah merek milik Anthropic. Modul ini dibuat secara independen oleh Otak Rental dan tidak berafiliasi dengan maupun disponsori oleh Anthropic. Ilustrasi antarmuka di modul ini digambar ulang untuk keperluan edukasi, bukan tangkapan layar resmi. Informasi fitur, paket, dan model berlaku per September 2026 dan dapat berubah sewaktu-waktu.</p>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:18px"><img src="../assets/logo-icon-dark.png" alt="" style="width:42px"><div><div style="font-weight:750;font-size:14px">Otak Rental</div><div class="mono" style="font-size:8.5px;letter-spacing:.14em;color:var(--muted)">SEWA OTAK TEKNIS, SEBELUM DEADLINE MENCEKIK · BONUS 02 · V1.0</div></div></div>
+  </div>
+  <div class="ft"><span>15</span><span>@otakrental</span></div>
+</section>
+
+<script src="claude-ui.js"></script>
+</body>
+</html>
