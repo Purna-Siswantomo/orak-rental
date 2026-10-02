@@ -8,7 +8,7 @@ import {
   MessageCircle,
   ArrowRight,
   ClipboardCheck,
-  Calculator,
+  Handshake,
   PackageCheck,
   SlidersHorizontal,
   Ban,
@@ -23,7 +23,6 @@ import {
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { CategoryBento } from "@/components/CategoryBento";
 import { InteractiveWorkflowShowcase } from "@/components/InteractiveWorkflowShowcase";
-import { InteractivePricingCalculator } from "@/components/InteractivePricingCalculator";
 import { FaqAccordion } from "@/components/FaqAccordion";
 
 const WHATSAPP_LINK = "https://wa.me/6288221401935";
@@ -39,10 +38,10 @@ const STEPS = [
   },
   {
     step: "STEP 2",
-    title: "Kalkulasi Formula Terbuka",
-    body: "Harga dihitung rasional dari jam kerja, urgensi, dan kompleksitas tanpa mark-up sepihak.",
-    tag: "Transparan 100%",
-    icon: Calculator,
+    title: "Diskusi Scope & Kesepakatan",
+    body: "Ruang lingkup, target hasil, dan deadline dibahas bersama sampai jelas dan disepakati sebelum pengerjaan dimulai.",
+    tag: "Fleksibel & Terbuka",
+    icon: Handshake,
   },
   {
     step: "STEP 3",
@@ -63,9 +62,9 @@ const STEPS = [
 const PRINCIPLES = [
   {
     icon: SlidersHorizontal,
-    title: "Formula Terbuka Tanpa Tebak Harga",
-    body: "Rumus baku: (Jam Kerja × Rate Standar) × Urgensi × Kompleksitas + Biaya Khusus. Kami buka estimasi jam dan faktor pengali sebelum Anda membayar sepeser pun.",
-    badge: "TRANSPARENCY FIRST",
+    title: "Diskusi Terbuka Sebelum Mulai",
+    body: "Setiap kebutuhan dibahas dulu bersama Anda: ruang lingkup, deadline, dan hasil yang diharapkan, sampai semuanya jelas dan disepakati. Silakan tanya-tanya dulu, tanpa kewajiban langsung order.",
+    badge: "OPEN DISCUSSION",
   },
   {
     icon: ClipboardCheck,
@@ -103,9 +102,9 @@ const FAQ_ITEMS = [
       "Integritas akademik adalah batasan fundamental platform kami. Kami tidak pernah menyediakan jasa ghostwriting karya ilmiah kelulusan. Kami hanya melayani konsultasi coding tugas praktikum, tubes, pengembangan website/aplikasi, dan olah data teknis.",
   },
   {
-    question: "Bagaimana mekanisme pembayaran aman?",
+    question: "Bagaimana mekanisme pembayaran?",
     answer:
-      "Pembayaran dapat dilakukan setelah ruang lingkup dan estimasi harga disepakati. Sistem mendukung termin Down Payment (DP) atau pelunasan setelah demo progres awal.",
+      "Pembayaran dilakukan setelah ruang lingkup pekerjaan dibahas dan disepakati bersama. Tersedia opsi Down Payment (DP) atau pelunasan setelah demo progres awal.",
   },
 ];
 
@@ -200,7 +199,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-4 sm:mt-6 max-w-2xl mx-auto text-sm sm:text-lg text-zinc-400 leading-relaxed font-sans px-2"
           >
-            Kalkulasi harga transparan untuk tugas kuliah, tugas besar pemrograman, dan project development. Dihitung rasional dari effort jam kerja, urgensi, dan kompleksitas tanpa mark-up sepihak.
+            Bantuan teknis untuk tugas kuliah, tugas besar pemrograman, dan project development. Dikerjakan rapi, tepat waktu, dan bisa didiskusikan dulu tanpa kewajiban langsung order.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -220,16 +219,6 @@ export default function LandingPage() {
             >
               <MessageCircle className="h-4 w-4" />
               <span>Konsultasi via WhatsApp</span>
-            </motion.a>
-            <motion.a
-              href="#kalkulator"
-              onClick={(e) => scrollToSection(e, "kalkulator")}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.05] hover:bg-white/[0.1] px-6 py-3.5 text-sm font-medium text-zinc-200 transition-colors cursor-pointer"
-            >
-              <Calculator className="h-4 w-4 text-[#D4E751]" />
-              <span>Simulasi Harga Mandiri</span>
             </motion.a>
           </motion.div>
 
@@ -258,9 +247,9 @@ export default function LandingPage() {
               </p>
             </div>
             <div>
-              <p className="font-mono text-2xl sm:text-3xl font-bold text-[#D4E751] tracking-tight">100%</p>
+              <p className="font-mono text-2xl sm:text-3xl font-bold text-[#D4E751] tracking-tight">7 Hari</p>
               <p className="font-mono text-[11px] text-zinc-400 uppercase tracking-wider mt-1">
-                Formula Terbuka
+                Garansi Revisi
               </p>
             </div>
             <div>
@@ -368,22 +357,13 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="mt-3 text-base text-zinc-600">
-              Baseline jam kerja disesuaikan secara realistis berdasarkan kategori, lalu dikalikan dengan parameter urgensi dan kompleksitas.
+              Estimasi waktu pengerjaan disesuaikan secara realistis berdasarkan kategori, deadline, dan kompleksitas kebutuhan Anda.
             </p>
           </div>
 
           <div className="mt-14">
             <CategoryBento />
           </div>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 4. INTERACTIVE PRICING CALCULATOR (Sage Background, Crisp White Box)       */}
-      {/* ========================================================================= */}
-      <section id="kalkulator" className="bg-[#E8ECE9] text-zinc-900 py-20 sm:py-28 border-t border-zinc-300/60">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <InteractivePricingCalculator />
         </div>
       </section>
 
@@ -477,7 +457,7 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="mt-2 text-sm text-zinc-600">
-              Pertanyaan umum mengenai metode kalkulasi, keamanan, dan dukungan pengerjaan.
+              Pertanyaan umum mengenai metode pengerjaan, keamanan, dan dukungan pengerjaan.
             </p>
           </motion.div>
 
@@ -516,14 +496,14 @@ export default function LandingPage() {
           </div>
 
           <h2 className="relative text-3xl sm:text-5xl font-bold tracking-tight text-white font-sans max-w-2xl mx-auto leading-tight">
-            Stop menebak harga,{" "}
+            Punya tugas atau project?{" "}
             <span className="font-serif-italic font-normal text-[#D4E751] block sm:inline">
               selesaikan deadline dengan tenang
             </span>
           </h2>
 
           <p className="relative mt-4 text-sm sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            Kirimkan berkas soal atau kebutuhan software Anda sekarang. Kami review feasibility dan hitung estimasi harga secara transparan.
+            Ceritakan dulu kebutuhan Anda. Kami bantu review kelayakan dan deadline-nya bersama, tanya-tanya dulu juga boleh.
           </p>
 
           <div className="relative mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
@@ -537,16 +517,6 @@ export default function LandingPage() {
             >
               <MessageCircle className="h-4 w-4" />
               <span>Konsultasi Sekarang via WhatsApp</span>
-            </motion.a>
-            <motion.a
-              href="#kalkulator"
-              onClick={(e) => scrollToSection(e, "kalkulator")}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 hover:bg-white/15 px-6 py-3.5 text-sm font-medium text-white transition-colors cursor-pointer"
-            >
-              <Calculator className="h-4 w-4 text-[#D4E751]" />
-              <span>Hitung Simulasi Harga</span>
             </motion.a>
           </div>
         </motion.div>
@@ -573,7 +543,7 @@ export default function LandingPage() {
                 </span>
               </Link>
               <p className="mt-3 text-sm text-zinc-600 max-w-sm leading-relaxed">
-                Platform estimasi harga transparan dan layanan konsultasi pengerjaan teknis untuk mahasiswa, praktisi, dan developer.
+                Layanan konsultasi dan pengerjaan teknis untuk mahasiswa, praktisi, dan developer.
               </p>
               <div className="mt-6 flex items-center gap-3">
                 <a
@@ -605,21 +575,16 @@ export default function LandingPage() {
               <ul className="mt-4 space-y-2 text-sm text-zinc-700">
                 <li><a href="#cara-kerja" onClick={(e) => scrollToSection(e, "cara-kerja")} className="hover:text-zinc-950 cursor-pointer">Cara Kerja</a></li>
                 <li><a href="#kategori" onClick={(e) => scrollToSection(e, "kategori")} className="hover:text-zinc-950 cursor-pointer">Kategori Pekerjaan</a></li>
-                <li><a href="#kalkulator" onClick={(e) => scrollToSection(e, "kalkulator")} className="hover:text-zinc-950 cursor-pointer">Simulasi Kalkulator</a></li>
                 <li><a href="#transparansi" onClick={(e) => scrollToSection(e, "transparansi")} className="hover:text-zinc-950 cursor-pointer">Batasan Etis &amp; Prinsip</a></li>
                 <li><a href="#faq" onClick={(e) => scrollToSection(e, "faq")} className="hover:text-zinc-950 cursor-pointer">Tanya Jawab (FAQ)</a></li>
               </ul>
             </div>
 
-            {/* Col 3: Formula & Portal */}
+            {/* Col 3: Portal */}
             <div className="md:col-span-4">
               <p className="font-mono text-xs uppercase tracking-wider text-zinc-500 font-semibold">
-                Formula Respon Layanan
+                Administrator
               </p>
-              <div className="mt-4 rounded-2xl border border-zinc-300 bg-white p-4 text-xs font-mono text-zinc-600 space-y-1 shadow-2xs">
-                <p className="text-zinc-900 font-semibold">Total Formula Resmi:</p>
-                <p>(Jam Kerja × Hourly Rate) × Urgensi × Kompleksitas + Biaya Khusus</p>
-              </div>
               <div className="mt-4">
                 <Link
                   href="/login"
@@ -635,7 +600,7 @@ export default function LandingPage() {
           <div className="mt-12 pt-8 border-t border-zinc-300/70 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-4">
             <p>&copy; {new Date().getFullYear()} Otak Rental. All rights reserved.</p>
             <p className="font-mono text-[11px]">
-              Built with precision &bull; Fair pricing for students &amp; developers
+              Built with precision &bull; For students &amp; developers
             </p>
           </div>
         </div>

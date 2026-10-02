@@ -11,15 +11,13 @@ import {
   Layers,
   ShieldCheck,
   Zap,
-  ArrowRight,
 } from "lucide-react";
 import Image from "next/image";
 
-type WorkflowStage = "intake" | "formula" | "quality" | "delivery";
+type WorkflowStage = "intake" | "quality" | "delivery";
 
 const STAGES: { id: WorkflowStage; label: string; icon: any }[] = [
   { id: "intake", label: "Brief & Scope", icon: FileText },
-  { id: "formula", label: "Formula Engine", icon: Cpu },
   { id: "quality", label: "Quality Gate", icon: ShieldCheck },
   { id: "delivery", label: "Delivery & Handover", icon: Zap },
 ];
@@ -68,45 +66,6 @@ const STAGE_DATA: Record<
         icon: ShieldCheck,
         value: "Verified Aman",
         badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-      },
-    ],
-  },
-  formula: {
-    leftCards: [
-      {
-        title: "Baseline Effort",
-        subtitle: "20 Jam × Rp 50.000",
-        icon: Layers,
-        tag: "Subtotal: Rp 1.000.000",
-      },
-      {
-        title: "Multiplier Urgensi",
-        subtitle: "Tenggat waktu 3 hari (Mepet)",
-        icon: Clock,
-        tag: "Multiplier ×1.2",
-      },
-      {
-        title: "Multiplier Kompleksitas",
-        subtitle: "Fullstack Next.js + Database",
-        icon: Cpu,
-        tag: "Multiplier ×1.5",
-      },
-    ],
-    centerLabel: "Pricing Engine",
-    rightCards: [
-      {
-        title: "Total Estimasi Harga",
-        subtitle: "(20j × 50rb) × 1.2 × 1.5",
-        icon: Sparkles,
-        value: "Rp 1.800.000",
-        badgeColor: "text-[#D4E751] bg-[#D4E751]/10 border-[#D4E751]/20",
-      },
-      {
-        title: "Breakdown Formula",
-        subtitle: "Transparan per jam & risiko",
-        icon: CheckCircle2,
-        value: "Terbuka 100%",
-        badgeColor: "text-white bg-white/10 border-white/15",
       },
     ],
   },
@@ -191,7 +150,7 @@ const STAGE_DATA: Record<
 };
 
 export function InteractiveWorkflowShowcase() {
-  const [activeStage, setActiveStage] = useState<WorkflowStage>("formula");
+  const [activeStage, setActiveStage] = useState<WorkflowStage>("intake");
   const stage = STAGE_DATA[activeStage];
 
   return (
@@ -365,15 +324,6 @@ export function InteractiveWorkflowShowcase() {
                     </motion.div>
                   );
                 })}
-
-                {/* Micro Action Button under right cards */}
-                <a
-                  href="#kalkulator"
-                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#D4E751]/30 bg-[#D4E751]/10 hover:bg-[#D4E751]/20 py-2.5 text-xs font-semibold text-[#D4E751] transition-all cursor-pointer"
-                >
-                  <span>Coba Simulasi Harga Mandiri</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </a>
               </motion.div>
             </AnimatePresence>
           </div>
